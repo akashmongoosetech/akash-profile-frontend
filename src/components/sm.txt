@@ -1,0 +1,101 @@
+import React, { useEffect, useRef } from 'react';
+
+const NUM_PARTICLES = 30;
+const TRAIL_LENGTH = 20;
+// LGBT rainbow colors
+const RAINBOW_COLORS = [
+  '#FF3B30', // Red
+  '#FF9500', // Orange
+  '#FFEB3B', // Yellow
+  '#34C759', // Green
+  '#007AFF', // Blue
+  '#5856D6', // Indigo
+  '#AF52DE', // Violet
+];
+
+const SmokeTrail: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const trail = useRef<{ x: number; y: number }[]>([]);
+  const mouse = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+
+    const resizeCanvas = () => {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Initialize trail
+    trail.current = Array(TRAIL_LENGTH).fill({ x: mouse.current.x, y: mouse.current.y });
+
+    function drawSmoke() {
+      if (!canvas || !ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Update trail
+      const last = trail.current[trail.current.length - 1];
+      const dx = mouse.current.x - last.x;
+      const dy = mouse.current.y - last.y;
+      const newPoint = {
+        x: last.x + dx * 0.2,
+        y: last.y + dy * 0.2,
+      };
+      trail.current.push(newPoint);
+      if (trail.current.length > TRAIL_LENGTH) trail.current.shift();
+
+      // Draw rainbow bubbles
+      for (let i = 0; i < trail.current.length; i++) {
+        const t = i / trail.current.length;
+        for (let j = 0; j < NUM_PARTICLES; j++) {
+          const angle = (Math.PI * 2 * j) / NUM_PARTICLES;
+          const radius = 8 + 18 * t + Math.random() * 2;
+          const x = trail.current[i].x + Math.cos(angle) * radius * (0.7 + Math.random() * 0.3);
+          const y = trail.current[i].y + Math.sin(angle) * radius * (0.7 + Math.random() * 0.3);
+          // Pick color based on position and particle index
+          const colorIdx = (i + j) % RAINBOW_COLORS.length;
+          ctx.beginPath();
+          ctx.arc(x, y, 8 * (1 - t) + Math.random() * 2, 0, Math.PI * 2);
+          ctx.fillStyle = RAINBOW_COLORS[colorIdx] + (Math.round(0.13 * (1 - t) * 255)).toString(16).padStart(2, '0'); // Add alpha
+          ctx.shadowColor = RAINBOW_COLORS[colorIdx];
+          ctx.shadowBlur = 16 * (1 - t);
+          ctx.globalAlpha = 0.7 * (1 - t) + 0.2;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+      animationId = requestAnimationFrame(drawSmoke);
+    }
+    drawSmoke();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-20"
+      style={{ width: '100vw', height: '100vh' }}
+    />
+  );
+};
+
+export default SmokeTrail; 
