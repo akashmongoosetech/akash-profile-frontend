@@ -47,10 +47,10 @@ const Admin: React.FC = () => {
     try {
       setLoading(true);
       // Stats
-      const statsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact/stats`);
+      const statsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`);
       const statsData = await statsRes.json();
       // Recent contacts
-      const contactsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`);
+      const contactsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
       const contactsData = await contactsRes.json();
       
       if (statsRes.ok && contactsRes.ok) {

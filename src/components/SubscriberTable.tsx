@@ -21,7 +21,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   const fetchSubscribers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/subscription`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription`);
       const data = await response.json();
       if (response.ok) {
         setSubscribers(data.subscriptions || []);
@@ -42,7 +42,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   const deleteSubscriber = async (subscriberId: string) => {
     if (!window.confirm('Are you sure you want to delete this subscriber?')) return;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/subscription/${subscriberId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/${subscriberId}`, {
         method: 'DELETE',
       });
       if (response.ok) {

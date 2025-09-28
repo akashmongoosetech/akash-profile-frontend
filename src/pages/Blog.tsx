@@ -195,7 +195,7 @@ const Blog: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/subscription`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

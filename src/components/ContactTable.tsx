@@ -63,7 +63,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const fetchContacts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
       const data = await response.json();
       
       if (response.ok) {
@@ -82,7 +82,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const fetchStats = async () => {
     try {
       setStatsLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact/stats`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`);
       const data = await response.json();
       if (response.ok) {
         const statsArr = data.stats as ContactStats[];
@@ -123,7 +123,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   // Update contact status
   const updateContactStatus = async (contactId: string, newStatus: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact/${contactId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact/${contactId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
         method: 'DELETE',
       });
 
@@ -173,7 +173,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   // Update contact
   const updateContact = async (contactId: string, updates: Partial<Contact>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact/${contactId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
