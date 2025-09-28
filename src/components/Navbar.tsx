@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Code, ChevronDown } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import BlogPopupTrigger from './BlogPopupTrigger';
+import { useBlogPopup } from '../hooks/useBlogPopup';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +12,7 @@ const Navbar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { openPopup } = useBlogPopup();
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -130,6 +133,13 @@ const Navbar: React.FC = () => {
                 )}
               </div>
             ))}
+            
+            {/* Blog Popup Trigger */}
+            <BlogPopupTrigger 
+              onTrigger={openPopup}
+              variant="icon"
+              className="hover:scale-110"
+            />
             
             {/* Theme Toggle */}
             <button

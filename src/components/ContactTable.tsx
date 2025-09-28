@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Eye, 
@@ -13,7 +13,11 @@ import {
   Mail,
   MessageSquare,
   Users,
-  TrendingUp
+  TrendingUp,
+  Download,
+  FileSpreadsheet,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import StatsCard from './StatsCard';
 
@@ -58,6 +62,9 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
     completed: 0
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
+  const itemsPerPage = 10;
 
   // Fetch contacts
   const fetchContacts = async () => {
@@ -107,6 +114,11 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
     fetchContacts();
     fetchStats();
   }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   // Filter contacts
   const filteredContacts = contacts.filter(contact => {
@@ -235,6 +247,120 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
     });
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentContacts = useMemo(() => {
+    return filteredContacts.slice(startIndex, endIndex);
+  }, [filteredContacts, startIndex, endIndex]);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  // Export functions
+  const exportToPDF = async () => {
+    try {
+      setExporting(true);
+      const { jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(20);
+      doc.text('Contact Management Report', 14, 22);
+      
+      // Add date
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+      
+      // Prepare table data
+      const tableData = filteredContacts.map(contact => [
+        contact.name,
+        contact.email,
+        contact.mobile || 'N/A',
+        contact.subject,
+        contact.status,
+        contact.priority,
+        formatDate(contact.createdAt)
+      ]);
+      
+      // Add table
+      (doc as any).autoTable({
+        head: [['Name', 'Email', 'Mobile', 'Subject', 'Status', 'Priority', 'Date']],
+        body: tableData,
+        startY: 40,
+        theme: 'grid',
+        styles: {
+          fontSize: 7,
+          cellPadding: 2
+        },
+        headStyles: {
+          fillColor: [59, 130, 246],
+          textColor: 255
+        },
+        columnStyles: {
+          3: { cellWidth: 40 }, // Subject column wider
+        }
+      });
+      
+      doc.save('contact-management-report.pdf');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      setError('Failed to export PDF');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportToCSV = async () => {
+    try {
+      setExporting(true);
+      
+      // Create CSV data
+      const csvData = [
+        ['Name', 'Email', 'Mobile', 'Subject', 'Message', 'Status', 'Priority', 'Admin Notes', 'Date Created'],
+        ...filteredContacts.map(contact => [
+          contact.name,
+          contact.email,
+          contact.mobile || '',
+          contact.subject,
+          contact.message,
+          contact.status,
+          contact.priority,
+          contact.adminNotes || '',
+          formatDate(contact.createdAt)
+        ])
+      ];
+      
+      // Convert to CSV string
+      const csvString = csvData.map(row => 
+        row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+      
+      // Create blob and download
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'contact-management-report.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      setError('Failed to export CSV');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const statsConfig = [
     {
       icon: <Users className="w-6 h-6 text-white" />,
@@ -292,15 +418,34 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">Contact Management</h2>
-          <p className="text-gray-400">Manage and respond to contact form submissions</p>
+          <p className="text-gray-400">Manage and respond to contact form submissions ({filteredContacts.length} contacts)</p>
         </div>
-        <button
-          onClick={() => { fetchContacts(); fetchStats(); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Export Buttons */}
+          <button
+            onClick={exportToPDF}
+            disabled={exporting || filteredContacts.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            PDF
+          </button>
+          <button
+            onClick={exportToCSV}
+            disabled={exporting || filteredContacts.length === 0}
+            className="flex items-center gap-2 px-3 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            CSV
+          </button>
+          <button
+            onClick={() => { fetchContacts(); fetchStats(); }}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -363,7 +508,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
-              {filteredContacts.map((contact) => {
+              {currentContacts.map((contact) => {
                 const statusInfo = getStatusInfo(contact.status);
                 const StatusIcon = statusInfo.icon;
                 
@@ -456,6 +601,68 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
         {filteredContacts.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-400">No contacts found</p>
+          </div>
+        )}
+        
+        {/* Pagination */}
+        {filteredContacts.length > 0 && (
+          <div className="px-6 py-4 bg-white/5 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-400">
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredContacts.length)} of {filteredContacts.length} contacts
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => goToPage(page)}
+                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                            page === currentPage
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white/10 hover:bg-white/20 text-gray-300'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    } else if (
+                      page === currentPage - 2 ||
+                      page === currentPage + 2
+                    ) {
+                      return (
+                        <span key={page} className="px-2 text-gray-500">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+                
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
