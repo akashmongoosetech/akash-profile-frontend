@@ -9,15 +9,12 @@ import Services from './pages/Services';
 import Experience from './pages/Experience';
 import Testimonials from './pages/Testimonials';
 import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
-import BuildingScalableReactApplications from './pages/blogs/BuildingScalableReactApplications';
-import ModernBackendDevelopment from './pages/blogs/ModernBackendDevelopment';
-import DockerKubernetesDeployment from './pages/blogs/DockerKubernetesDeployment';
-import FutureOfWebDevelopment from './pages/blogs/FutureOfWebDevelopment';
-import DatabasePerformanceOptimization from './pages/blogs/DatabasePerformanceOptimization';
 import ContactTable from './components/ContactTable';
 import SubscriberTable from './components/SubscriberTable';
+import BlogManagement from './components/BlogManagement';
 
 function App() {
   return (
@@ -33,13 +30,10 @@ function App() {
             <Route path="experience" element={<Experience />} />
             <Route path="testimonials" element={<Testimonials />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
             <Route path="admin" element={<Admin />} />
-            <Route path="blog/building-scalable-react-applications" element={<BuildingScalableReactApplications />} />
-            <Route path="blog/modern-backend-development" element={<ModernBackendDevelopment />} />
-            <Route path="blog/docker-kubernetes-deployment" element={<DockerKubernetesDeployment />} />
-            <Route path="blog/future-of-web-development" element={<FutureOfWebDevelopment />} />
-            <Route path="blog/database-performance-optimization" element={<DatabasePerformanceOptimization />} />
+            <Route path="admin/blog-management" element={<BlogManagement />} />
 
             <Route path="ContactTable" element={<ContactTable />} />
             <Route path="SubscriberTable" element={<SubscriberTable />} />

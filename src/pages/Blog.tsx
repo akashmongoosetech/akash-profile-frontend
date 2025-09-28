@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface BlogPost {
@@ -10,6 +10,8 @@ interface BlogPost {
   excerpt: string;
   image: string;
   author: string;
+  authorProfile: string;
+  authorProfilePic: string;
   category: string;
   tags: string[];
   readTime: string;
@@ -18,6 +20,9 @@ interface BlogPost {
   formattedDate: string;
   views: number;
   likes: number;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
 }
 
 interface BlogResponse {
@@ -47,6 +52,10 @@ const Blog: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<BlogResponse['pagination']>();
   const [categories, setCategories] = useState<{_id: string; count: number}[]>([]);
+  
+  // Expanded content state
+  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
+  const [expandedFeaturedPosts, setExpandedFeaturedPosts] = useState<Set<string>>(new Set());
 
   // Fetch blogs from API
   const fetchBlogs = async () => {
@@ -59,7 +68,7 @@ const Blog: React.FC = () => {
       params.append('page', currentPage.toString());
       params.append('limit', '6');
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/blog?${params}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog?${params}`);
       const data: BlogResponse = await response.json();
       
       if (data.success) {
@@ -76,7 +85,7 @@ const Blog: React.FC = () => {
   // Fetch featured blogs
   const fetchFeaturedBlogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/blog/featured`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/featured`);
       const data: BlogResponse = await response.json();
       
       if (data.success) {
@@ -90,7 +99,7 @@ const Blog: React.FC = () => {
   // Fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/blog/categories`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/categories`);
       const data = await response.json();
       
       if (data.success) {
@@ -117,6 +126,41 @@ const Blog: React.FC = () => {
   // Handle page change
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // Handle expand/collapse for regular posts
+  const togglePostExpansion = (postId: string) => {
+    setExpandedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle expand/collapse for featured posts
+  const toggleFeaturedPostExpansion = (postId: string) => {
+    setExpandedFeaturedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  // Check if content should be truncated (more than 150 characters)
+  const shouldTruncate = (text: string) => text.length > 150;
+
+  // Get truncated text
+  const getTruncatedText = (text: string, limit: number = 150) => {
+    if (text.length <= limit) return text;
+    return text.substring(0, limit) + '...';
   };
 
   // useEffect hooks
@@ -299,14 +343,38 @@ const Blog: React.FC = () => {
                     </div>
                     
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
+                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
                         {post.title}
                       </h3>
-                      <p className="text-gray-400 mb-4 text-sm leading-relaxed line-clamp-3">
-                        {post.excerpt}
-                      </p>
+                      <div className="text-gray-400 mb-4 text-sm leading-relaxed">
+                        <p className="whitespace-pre-wrap">
+                          {expandedFeaturedPosts.has(post._id) || !shouldTruncate(post.excerpt)
+                            ? post.excerpt
+                            : getTruncatedText(post.excerpt)
+                          }
+                        </p>
+                        {shouldTruncate(post.excerpt) && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              toggleFeaturedPostExpansion(post._id);
+                            }}
+                            className="inline-flex items-center gap-1 mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
+                          >
+                            {expandedFeaturedPosts.has(post._id) ? (
+                              <>
+                                Show less <ChevronUp className="w-3 h-3" />
+                              </>
+                            ) : (
+                              <>
+                                Read more <ChevronDown className="w-3 h-3" />
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                       
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -318,6 +386,29 @@ const Blog: React.FC = () => {
                           </span>
                         </div>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      
+                      {/* Author Information */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                        {post.authorProfilePic ? (
+                          <img
+                            src={post.authorProfilePic}
+                            alt={post.author}
+                            className="w-8 h-8 rounded-full object-cover border border-white/20"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-semibold">
+                              {post.author.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-white text-xs font-medium">{post.author}</p>
+                          {post.authorProfile && (
+                            <p className="text-gray-500 text-xs">{post.authorProfile}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </motion.article>
@@ -368,14 +459,38 @@ const Blog: React.FC = () => {
                     </div>
                     
                     <div className="p-6">
-                      <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
+                      <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
                         {post.title}
                       </h3>
-                      <p className="text-gray-400 mb-4 text-sm leading-relaxed line-clamp-3">
-                        {post.excerpt}
-                      </p>
+                      <div className="text-gray-400 mb-4 text-sm leading-relaxed">
+                        <p className="whitespace-pre-wrap">
+                          {expandedPosts.has(post._id) || !shouldTruncate(post.excerpt)
+                            ? post.excerpt
+                            : getTruncatedText(post.excerpt)
+                          }
+                        </p>
+                        {shouldTruncate(post.excerpt) && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              togglePostExpansion(post._id);
+                            }}
+                            className="inline-flex items-center gap-1 mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
+                          >
+                            {expandedPosts.has(post._id) ? (
+                              <>
+                                Show less <ChevronUp className="w-3 h-3" />
+                              </>
+                            ) : (
+                              <>
+                                Read more <ChevronDown className="w-3 h-3" />
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                       
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -387,6 +502,29 @@ const Blog: React.FC = () => {
                           </span>
                         </div>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                      
+                      {/* Author Information */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                        {post.authorProfilePic ? (
+                          <img
+                            src={post.authorProfilePic}
+                            alt={post.author}
+                            className="w-8 h-8 rounded-full object-cover border border-white/20"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-semibold">
+                              {post.author.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-white text-xs font-medium">{post.author}</p>
+                          {post.authorProfile && (
+                            <p className="text-gray-500 text-xs ">{post.authorProfile}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </motion.article>
