@@ -65,6 +65,70 @@ const BlogPost: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Utility function to get relative time
+  const getRelativeTime = (publishedDate: string) => {
+    const now = currentTime.getTime();
+    const published = new Date(publishedDate).getTime();
+    const diffInSeconds = Math.floor((now - published) / 1000);
+
+    if (diffInSeconds < 60) {
+      return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds} seconds ago`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return diffInMinutes === 1 ? '1 minute ago' : `${diffInMinutes} minutes ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return diffInDays === 1 ? '1 day ago' : `${diffInDays} days ago`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+      return diffInWeeks === 1 ? '1 week ago' : `${diffInWeeks} weeks ago`;
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return diffInMonths === 1 ? '1 month ago' : `${diffInMonths} months ago`;
+    }
+
+    const diffInYears = Math.floor(diffInDays / 365);
+    return diffInYears === 1 ? '1 year ago' : `${diffInYears} years ago`;
+  };
+
+  // Live time tracking with dynamic update frequency
+  useEffect(() => {
+    const updateTime = () => {
+      setCurrentTime(new Date());
+    };
+
+    // Determine update frequency based on blog age
+    const getUpdateInterval = () => {
+      if (!blog) return 60000; // Default 1 minute
+      
+      const now = new Date().getTime();
+      const published = new Date(blog.publishedAt).getTime();
+      const diffInHours = Math.floor((now - published) / (1000 * 60 * 60));
+      
+      if (diffInHours < 1) return 30000; // 30 seconds for posts less than 1 hour old
+      if (diffInHours < 24) return 60000; // 1 minute for posts less than 1 day old
+      return 300000; // 5 minutes for older posts
+    };
+
+    const interval = setInterval(updateTime, getUpdateInterval());
+
+    return () => clearInterval(interval);
+  }, [blog]);
 
   // Fetch blog post by slug
   const fetchBlogPost = async () => {
@@ -487,11 +551,23 @@ const BlogPost: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-4 text-gray-500 text-sm">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>{new Date(blog.publishedAt).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}</span>
+                    <span 
+                      className="relative cursor-help"
+                      title={`Published on ${new Date(blog.publishedAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}`}
+                    >
+                      {getRelativeTime(blog.publishedAt)}
+                      <motion.div
+                        animate={{ opacity: [0.3, 0.8, 0.3] }}
+                        transition={{ duration: 3, repeat: Infinity }}
+                        className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 rounded-full"
+                      />
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
   Edit, 
@@ -15,7 +15,10 @@ import {
   FileText,
   BarChart3,
   Code,
-  Move
+  Move,
+  CheckCircle,
+  AlertTriangle,
+  Sparkles
 } from 'lucide-react';
 
 interface ContentSection {
@@ -82,7 +85,15 @@ const BlogManagement: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories] = useState(['React', 'Backend', 'DevOps', 'Database', 'Trends', 'Tutorial', 'Technology']);
+  const [categories, setCategories] = useState(['React', 'Backend', 'DevOps', 'Database', 'Trends', 'Tutorial', 'Technology']);
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
+  
+  // Success and Delete Modal States
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [blogToDelete, setBlogToDelete] = useState<BlogPost | null>(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
@@ -143,6 +154,30 @@ const BlogManagement: React.FC = () => {
       .replace(/^-+|-+$/g, ''); // Remove leading and trailing dashes
   };
 
+  // Handle custom category addition
+  const handleAddCustomCategory = () => {
+    if (customCategory.trim() && !categories.includes(customCategory.trim())) {
+      const newCategory = customCategory.trim();
+      setCategories(prev => [...prev, newCategory]);
+      setFormData(prev => ({ ...prev, category: newCategory }));
+      setCustomCategory('');
+      setShowCustomCategory(false);
+    }
+  };
+
+  // Handle tags input with better comma separation
+  const handleTagsInput = (value: string) => {
+    // Split by comma, trim each tag, and filter out empty ones
+    const tags = value.split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+    
+    setFormData(prev => ({ 
+      ...prev, 
+      tags: tags
+    }));
+  };
+
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -151,8 +186,8 @@ const BlogManagement: React.FC = () => {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (name === 'tags') {
-      const tags = value.split(',').map(tag => tag.trim()).filter(tag => tag);
-      setFormData(prev => ({ ...prev, tags }));
+      // Handle tags with improved comma separation
+      handleTagsInput(value);
     } else {
       setFormData(prev => ({ 
         ...prev, 
@@ -324,8 +359,13 @@ const BlogManagement: React.FC = () => {
           image: section.image.trim() || undefined
         })).filter(section => 
           section.title.trim() || section.content.trim() || section.image || section.code.trim()
-        )
+        ),
+        // Ensure tags are properly formatted
+        tags: formData.tags.filter(tag => tag.trim().length > 0)
       };
+
+      console.log('Form data being sent:', cleanedFormData);
+      console.log('Tags being sent:', cleanedFormData.tags);
 
       const url = editingBlog 
         ? `${import.meta.env.VITE_API_BASE_URL}/api/blog/${editingBlog._id}`
@@ -350,7 +390,13 @@ const BlogManagement: React.FC = () => {
       if (data.success) {
         closeModal();
         fetchBlogs();
-        alert(editingBlog ? 'Blog updated successfully!' : 'Blog created successfully!');
+        setSuccessMessage(editingBlog ? 'Blog updated successfully!' : 'Blog created successfully!');
+        setShowSuccessModal(true);
+        
+        // Auto-hide success modal after 3 seconds
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 3000);
       } else {
         console.error('Validation errors:', data.errors);
         if (data.errors && Array.isArray(data.errors)) {
@@ -368,12 +414,18 @@ const BlogManagement: React.FC = () => {
     }
   };
 
+  // Open delete confirmation modal
+  const openDeleteModal = (blog: BlogPost) => {
+    setBlogToDelete(blog);
+    setShowDeleteModal(true);
+  };
+
   // Delete blog
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this blog?')) return;
+  const handleDelete = async () => {
+    if (!blogToDelete) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${blogToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -381,6 +433,15 @@ const BlogManagement: React.FC = () => {
 
       if (data.success) {
         fetchBlogs();
+        setShowDeleteModal(false);
+        setBlogToDelete(null);
+        setSuccessMessage('Blog deleted successfully!');
+        setShowSuccessModal(true);
+        
+        // Auto-hide success modal after 3 seconds
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 3000);
       } else {
         alert(data.message || 'Failed to delete blog');
       }
@@ -568,7 +629,7 @@ const BlogManagement: React.FC = () => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(blog._id)}
+                            onClick={() => openDeleteModal(blog)}
                             className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -658,19 +719,70 @@ const BlogManagement: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Category *
                   </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-400"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category} className="bg-slate-800">
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="space-y-3">
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-400"
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category} className="bg-slate-800">
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    
+                    {/* Custom Category Option */}
+                    {!showCustomCategory ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowCustomCategory(true)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Custom Category
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                          placeholder="Enter new category name"
+                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddCustomCategory();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddCustomCategory}
+                          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                        >
+                          Add
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCustomCategory(false);
+                            setCustomCategory('');
+                          }}
+                          className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+                    
+                    <p className="text-xs text-gray-500 mt-2">
+                      💡 You can select from existing categories or add your own custom category.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Read Time */}
@@ -709,16 +821,21 @@ const BlogManagement: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Excerpt *
+                  <span className="text-gray-500 text-xs ml-2">(Max 1000 characters)</span>
                 </label>
                 <textarea
                   name="excerpt"
                   value={formData.excerpt}
                   onChange={handleInputChange}
                   required
-                  rows={3}
+                  rows={4}
+                  maxLength={1000}
                   placeholder="Brief description of the blog post..."
                   className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none"
                 />
+                <div className="text-xs text-gray-500 mt-1">
+                  {formData.excerpt.length}/1000 characters
+                </div>
               </div>
 
               {/* Content */}
@@ -740,16 +857,48 @@ const BlogManagement: React.FC = () => {
               {/* Tags */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Tags (comma-separated)
+                  Tags
+                  <span className="text-gray-500 text-xs ml-2">(Separate with commas)</span>
                 </label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags.join(', ')}
-                  onChange={handleInputChange}
-                  placeholder="react, javascript, tutorial"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
-                />
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    name="tags"
+                    value={formData.tags.join(', ')}
+                    onChange={handleInputChange}
+                    placeholder="react, javascript, tutorial, web development, nodejs, express"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                  />
+                  
+                  {/* Tags Preview */}
+                  {formData.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/20 text-blue-300 text-sm rounded-full border border-blue-500/30"
+                        >
+                          <Tag className="w-3 h-3" />
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newTags = formData.tags.filter((_, i) => i !== index);
+                              setFormData(prev => ({ ...prev, tags: newTags }));
+                            }}
+                            className="ml-1 hover:text-red-300 transition-colors"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-gray-500">
+                    💡 Tip: Type unlimited tags separated by commas. Each tag will appear as a badge above. You can click × to remove individual tags.
+                  </p>
+                </div>
               </div>
 
               {/* Author Information */}
@@ -919,10 +1068,15 @@ const BlogManagement: React.FC = () => {
 
               {/* SEO Settings */}
               <div className="border-t border-white/10 pt-6">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5" />
-                  SEO Settings
-                </h3>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-green-400" />
+                    SEO Settings
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    Optimize your blog post for search engines and social media sharing
+                  </p>
+                </div>
                 
                 <div className="space-y-4">
                   {/* SEO Title */}
@@ -1033,6 +1187,170 @@ const BlogManagement: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            onClick={() => setShowSuccessModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.5, opacity: 0, y: 50 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-gradient-to-br from-green-900/90 to-emerald-900/90 backdrop-blur-xl rounded-3xl p-8 border border-green-500/30 shadow-2xl max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Success Animation */}
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", duration: 0.6 }}
+                  className="relative mx-auto w-20 h-20 mb-6"
+                >
+                  <div className="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+                  <div className="relative bg-gradient-to-br from-green-400 to-emerald-500 rounded-full w-20 h-20 flex items-center justify-center">
+                    <CheckCircle className="w-10 h-10 text-white" />
+                  </div>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-2 -right-2"
+                  >
+                    <Sparkles className="w-6 h-6 text-yellow-400" />
+                  </motion.div>
+                </motion.div>
+
+                <motion.h3
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-2xl font-bold text-white mb-3"
+                >
+                  Success! 🎉
+                </motion.h3>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-green-100 text-lg mb-6"
+                >
+                  {successMessage}
+                </motion.p>
+
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowSuccessModal(false)}
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg"
+                >
+                  Awesome!
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteModal && blogToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.5, opacity: 0, y: 50 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-gradient-to-br from-red-900/90 to-rose-900/90 backdrop-blur-xl rounded-3xl p-8 border border-red-500/30 shadow-2xl max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Warning Animation */}
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1, type: "spring", duration: 0.6 }}
+                  className="relative mx-auto w-20 h-20 mb-6"
+                >
+                  <div className="absolute inset-0 bg-red-500/20 rounded-full animate-pulse"></div>
+                  <div className="relative bg-gradient-to-br from-red-400 to-rose-500 rounded-full w-20 h-20 flex items-center justify-center">
+                    <AlertTriangle className="w-10 h-10 text-white" />
+                  </div>
+                </motion.div>
+
+                <motion.h3
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-2xl font-bold text-white mb-3"
+                >
+                  Delete Blog Post?
+                </motion.h3>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-6"
+                >
+                  <p className="text-red-100 text-lg mb-3">
+                    Are you sure you want to delete this blog post?
+                  </p>
+                  <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 className="font-semibold text-white text-sm mb-1">
+                      "{blogToDelete.title}"
+                    </h4>
+                    <p className="text-gray-300 text-xs">
+                      {blogToDelete.category} • {blogToDelete.readTime}
+                    </p>
+                  </div>
+                  <p className="text-red-200 text-sm mt-3">
+                    ⚠️ This action cannot be undone!
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex gap-3 justify-center"
+                >
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 text-gray-300 rounded-xl font-semibold transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleDelete}
+                    className="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg"
+                  >
+                    Delete Forever
+                  </motion.button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
