@@ -1,20 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import About from './pages/About';
-import Projects from './pages/Projects';
-import Skills from './pages/Skills';
-import Services from './pages/Services';
-import Experience from './pages/Experience';
-import Testimonials from './pages/Testimonials';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import Contact from './pages/Contact';
-import Admin from './pages/Admin';
-import ContactTable from './components/ContactTable';
-import SubscriberTable from './components/SubscriberTable';
-import BlogManagement from './components/BlogManagement';
+import Home from './Home';
+import About from './About';
+import Projects from './projects/Projects';
+import Skills from './skills/Skills';
+import Services from './services/Services';
+import Experience from './experience/Experience';
+import Testimonials from './testimonials/Testimonials';
+import Blog from './blogs/Blog';
+import BlogPost from './blog-posts/BlogPost';
+import Contact from './contacts/Contact';
+import Admin from './admins/Admin';
+import ContactTable from './contact-tables/ContactTable';
+import SubscriberTable from './subscriber-tables/SubscriberTable';
+import BlogManagement from './blog-management/BlogManagement';
 
 function App() {
   return (

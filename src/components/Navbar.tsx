@@ -17,6 +17,7 @@ const Navbar: React.FC = () => {
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
+    { path: '/blog', label: 'Blog' },
     // { path: '/projects', label: 'Projects' },
     { path: '/skills', label: 'Skills' },
     { 
@@ -25,7 +26,7 @@ const Navbar: React.FC = () => {
         { path: '/services', label: 'Services' },
         { path: '/experience', label: 'Experience' },
         // { path: '/testimonials', label: 'Testimonials' },
-        { path: '/blog', label: 'Blog' }
+        // { path: '/blog', label: 'Blog' }
       ]
     },
     { path: '/contact', label: 'Contact' }

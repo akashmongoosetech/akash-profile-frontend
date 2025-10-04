@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Users, Mail, TrendingUp, Calendar, User, Inbox } from 'lucide-react';
-import ContactTable from '../components/ContactTable';
+import { Shield, Users, Mail, TrendingUp, Calendar, User, Inbox, BookOpen, UserPlus } from 'lucide-react';
+import ContactTable from '../contact-tables/ContactTable';
 import StatsCard from '../components/StatsCard';
 
 interface ContactStats {
@@ -17,6 +17,10 @@ interface AdminStats {
   review: number;
   worked: number;
   rejected: number;
+  totalBlogs: number;
+  publishedBlogs: number;
+  totalSubscribers: number;
+  activeSubscribers: number;
 }
 
 interface Contact {
@@ -36,7 +40,11 @@ const Admin: React.FC = () => {
     completed: 0,
     review: 0,
     worked: 0,
-    rejected: 0
+    rejected: 0,
+    totalBlogs: 0,
+    publishedBlogs: 0,
+    totalSubscribers: 0,
+    activeSubscribers: 0
   });
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,14 +54,24 @@ const Admin: React.FC = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      // Stats
-      const statsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`);
-      const statsData = await statsRes.json();
-      // Recent contacts
-      const contactsRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
-      const contactsData = await contactsRes.json();
       
-      if (statsRes.ok && contactsRes.ok) {
+      // Fetch all stats in parallel
+      const [statsRes, contactsRes, blogStatsRes, subscriberStatsRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`),
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`),
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/stats`),
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/stats`)
+      ]);
+      
+      const [statsData, contactsData, blogStatsData, subscriberStatsData] = await Promise.all([
+        statsRes.json(),
+        contactsRes.json(),
+        blogStatsRes.json(),
+        subscriberStatsRes.json()
+      ]);
+      
+      if (statsRes.ok && contactsRes.ok && blogStatsRes.ok && subscriberStatsRes.ok) {
+        // Process contact stats
         const statsArr = statsData.stats as ContactStats[];
         const totalContacts = statsArr.reduce((sum, stat) => sum + stat.count, 0);
         const pending = statsArr.find(stat => stat._id === 'pending')?.count || 0;
@@ -61,6 +79,7 @@ const Admin: React.FC = () => {
         const worked = statsArr.find(stat => stat._id === 'worked')?.count || 0;
         const done = statsArr.find(stat => stat._id === 'done')?.count || 0;
         const rejected = statsArr.find(stat => stat._id === 'rejected')?.count || 0;
+        
         setStats({
           totalContacts,
           pending,
@@ -68,12 +87,17 @@ const Admin: React.FC = () => {
           completed: done,
           review,
           worked,
-          rejected
+          rejected,
+          totalBlogs: blogStatsData.totalCount || 0,
+          publishedBlogs: blogStatsData.publishedCount || 0,
+          totalSubscribers: subscriberStatsData.activeCount || 0,
+          activeSubscribers: subscriberStatsData.activeCount || 0
         });
+        
         // Get 3 most recent contacts
         setRecentContacts((contactsData.contacts as Contact[]).slice(0, 3));
       } else {
-        setError(statsData.message || contactsData.message || 'Failed to fetch dashboard data');
+        setError(statsData.message || contactsData.message || blogStatsData.message || subscriberStatsData.message || 'Failed to fetch dashboard data');
       }
     } catch (error) {
       setError('Network error. Please check your connection.');
@@ -110,6 +134,30 @@ const Admin: React.FC = () => {
       label: 'Completed',
       value: stats.completed.toString(),
       color: 'bg-gradient-to-r from-green-500 to-emerald-500'
+    },
+    {
+      icon: <BookOpen className="w-6 h-6 text-white" />,
+      label: 'Total Blogs',
+      value: stats.totalBlogs.toString(),
+      color: 'bg-gradient-to-r from-indigo-500 to-purple-500'
+    },
+    {
+      icon: <BookOpen className="w-6 h-6 text-white" />,
+      label: 'Published Blogs',
+      value: stats.publishedBlogs.toString(),
+      color: 'bg-gradient-to-r from-teal-500 to-cyan-500'
+    },
+    {
+      icon: <UserPlus className="w-6 h-6 text-white" />,
+      label: 'Total Subscribers',
+      value: stats.totalSubscribers.toString(),
+      color: 'bg-gradient-to-r from-pink-500 to-rose-500'
+    },
+    {
+      icon: <UserPlus className="w-6 h-6 text-white" />,
+      label: 'Active Subscribers',
+      value: stats.activeSubscribers.toString(),
+      color: 'bg-gradient-to-r from-emerald-500 to-green-500'
     }
   ];
 
@@ -235,7 +283,7 @@ const Admin: React.FC = () => {
         )}
 
         {/* Dashboard Cards */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-6">
           {statsConfig.map((stat, index) => (
             <StatsCard
               key={stat.label}

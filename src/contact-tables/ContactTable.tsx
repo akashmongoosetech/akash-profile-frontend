@@ -19,7 +19,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import StatsCard from './StatsCard';
+import StatsCard from '../components/StatsCard';
 
 interface Contact {
   _id: string;
