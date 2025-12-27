@@ -19,7 +19,7 @@ import BlogManagement from './blog-management/BlogManagement';
 function App() {
   return (
     <ThemeProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
