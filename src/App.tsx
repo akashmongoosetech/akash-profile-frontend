@@ -12,6 +12,7 @@ import Blog from './blogs/Blog';
 import BlogPost from './blog-posts/BlogPost';
 import Contact from './contacts/Contact';
 import Admin from './admins/Admin';
+import AdminLayout from './admins/AdminLayout';
 import ContactTable from './contact-tables/ContactTable';
 import SubscriberTable from './subscriber-tables/SubscriberTable';
 import BlogManagement from './blog-management/BlogManagement';
@@ -32,11 +33,12 @@ function App() {
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
-            <Route path="admin" element={<Admin />} />
-            <Route path="admin/blog-management" element={<BlogManagement />} />
-
-            <Route path="ContactTable" element={<ContactTable />} />
-            <Route path="SubscriberTable" element={<SubscriberTable />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Admin />} />
+            <Route path="blog-management" element={<BlogManagement />} />
+            <Route path="contact-table" element={<ContactTable />} />
+            <Route path="subscriber-table" element={<SubscriberTable />} />
           </Route>
         </Routes>
       </Router>

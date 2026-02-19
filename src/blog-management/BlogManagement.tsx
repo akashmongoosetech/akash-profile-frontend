@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Search, 
-  Calendar, 
-  Clock, 
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Search,
+  Calendar,
+  Clock,
   Star,
   Save,
   X,
@@ -76,6 +78,9 @@ interface BlogFormData {
 }
 
 const BlogManagement: React.FC = () => {
+  // Refs for CKEditor instances
+  const contentEditorRef = React.useRef<any>(null);
+  const excerptEditorRef = React.useRef<any>(null);
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,6 +119,16 @@ const BlogManagement: React.FC = () => {
     seoDescription: '',
     seoKeywords: ''
   });
+
+  // Update editors when formData changes
+  React.useEffect(() => {
+    if (contentEditorRef.current && showModal) {
+      contentEditorRef.current.setData(formData.content || '');
+    }
+    if (excerptEditorRef.current && showModal) {
+      excerptEditorRef.current.setData(formData.excerpt || '');
+    }
+  }, [formData.content, formData.excerpt, showModal]);
 
   // Fetch blogs
   const fetchBlogs = async () => {
@@ -823,18 +838,25 @@ const BlogManagement: React.FC = () => {
                   Excerpt *
                   <span className="text-gray-500 text-xs ml-2">(Max 1000 characters)</span>
                 </label>
-                <textarea
-                  name="excerpt"
-                  value={formData.excerpt}
-                  onChange={handleInputChange}
-                  required
-                  rows={4}
-                  maxLength={1000}
-                  placeholder="Brief description of the blog post..."
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none"
+                <CKEditor
+                  key={`excerpt-${editingBlog?._id || 'new'}`}
+                  editor={ClassicEditor}
+                  onReady={(editor) => {
+                    excerptEditorRef.current = editor;
+                  }}
+                  onChange={(event, editor) => {
+                    const data = editor.getData();
+                    if (data.length <= 1000) {
+                      setFormData(prev => ({ ...prev, excerpt: data }));
+                    }
+                  }}
+                  config={{
+                    toolbar: ['bold', 'italic', 'underline', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
+                    placeholder: "Brief description of the blog post..."
+                  }}
                 />
                 <div className="text-xs text-gray-500 mt-1">
-                  {formData.excerpt.length}/1000 characters
+                  {formData.excerpt.replace(/<[^>]*>/g, '').length}/1000 characters
                 </div>
               </div>
 
@@ -843,14 +865,27 @@ const BlogManagement: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Content *
                 </label>
-                <textarea
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  required
-                  rows={10}
-                  placeholder="Write your blog post content here..."
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none"
+                <CKEditor
+                  key={`content-${editingBlog?._id || 'new'}`}
+                  editor={ClassicEditor}
+                  onReady={(editor) => {
+                    contentEditorRef.current = editor;
+                  }}
+                  onChange={(event, editor) => {
+                    const data = editor.getData();
+                    setFormData(prev => ({ ...prev, content: data }));
+                  }}
+                  config={{
+                    toolbar: [
+                      'heading', '|',
+                      'bold', 'italic', 'underline', 'strikethrough', '|',
+                      'bulletedList', 'numberedList', '|',
+                      'link', 'blockquote', '|',
+                      'insertTable', '|',
+                      'undo', 'redo'
+                    ],
+                    placeholder: "Write your blog post content here..."
+                  }}
                 />
               </div>
 
@@ -1022,12 +1057,18 @@ const BlogManagement: React.FC = () => {
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                               Content
                             </label>
-                            <textarea
-                              value={section.content}
-                              onChange={(e) => handleContentSectionChange(index, 'content', e.target.value)}
-                              rows={4}
-                              placeholder="Section content..."
-                              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 resize-none text-sm"
+                            <CKEditor
+                              key={`section-${index}-${editingBlog?._id || 'new'}`}
+                              editor={ClassicEditor}
+                              data={section.content}
+                              onChange={(event, editor) => {
+                                const data = editor.getData();
+                                handleContentSectionChange(index, 'content', data);
+                              }}
+                              config={{
+                                toolbar: ['bold', 'italic', 'underline', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
+                                placeholder: "Section content..."
+                              }}
                             />
                           </div>
 

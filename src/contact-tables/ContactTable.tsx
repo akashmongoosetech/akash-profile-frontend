@@ -759,7 +759,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-900 rounded-2xl p-6 max-w-md w-full"
+            className="bg-gray-900 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
           >
             <div className="flex justify-between items-start mb-6">
               <h3 className="text-xl font-bold text-white">Edit Contact</h3>

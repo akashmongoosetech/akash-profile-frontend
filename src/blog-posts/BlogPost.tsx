@@ -523,9 +523,9 @@ const BlogPost: React.FC = () => {
             {blog.title}
           </h1>
 
-          <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-            {blog.excerpt}
-          </p>
+          <div className="text-xl text-gray-400 mb-8 leading-relaxed">
+            <div dangerouslySetInnerHTML={{ __html: blog.excerpt }} />
+          </div>
 
           {/* Author Information */}
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 mb-8">
@@ -598,10 +598,10 @@ const BlogPost: React.FC = () => {
         {/* Article Content */}
         <motion.article variants={itemVariants} className="mb-12">
           <div className="prose prose-lg prose-invert max-w-none">
-            <div 
+            <div
               className="text-gray-300 leading-relaxed"
-              dangerouslySetInnerHTML={{ 
-                __html: blog.content.replace(/\n/g, '<br />') 
+              dangerouslySetInnerHTML={{
+                __html: blog.content
               }}
             />
           </div>
@@ -623,10 +623,10 @@ const BlogPost: React.FC = () => {
                   <div className="space-y-6">
                     {section.content && (
                       <div className="prose prose-lg prose-invert max-w-none">
-                        <div 
+                        <div
                           className="text-gray-300 leading-relaxed"
-                          dangerouslySetInnerHTML={{ 
-                            __html: section.content.replace(/\n/g, '<br />') 
+                          dangerouslySetInnerHTML={{
+                            __html: section.content
                           }}
                         />
                       </div>
@@ -748,9 +748,9 @@ const BlogPost: React.FC = () => {
                       <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-gray-400 mb-4 text-sm leading-relaxed line-clamp-3">
-                        {post.excerpt}
-                      </p>
+                      <div className="text-gray-400 mb-4 text-sm leading-relaxed line-clamp-3">
+                        <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                      </div>
                       
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <div className="flex items-center gap-3">
