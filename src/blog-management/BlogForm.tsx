@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {
@@ -71,19 +71,28 @@ const BlogForm: React.FC<BlogFormProps> = ({
 }) => {
   // Refs for CKEditor instances
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const contentEditorRef = React.useRef<any>(null);
+  const contentEditorRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const excerptEditorRef = React.useRef<any>(null);
+  const excerptEditorRef = useRef<any>(null);
 
-  // Update editors when formData changes
+  // Set CKEditor data when editingBlog changes (initial load only)
   useEffect(() => {
-    if (contentEditorRef.current) {
-      contentEditorRef.current.setData(formData.content || '');
+    const setEditorData = () => {
+      if (editingBlog) {
+        if (contentEditorRef.current && formData.content) {
+          contentEditorRef.current.setData(formData.content);
+        }
+        if (excerptEditorRef.current && formData.excerpt) {
+          excerptEditorRef.current.setData(formData.excerpt);
+        }
+      }
+    };
+    
+    // Small delay to ensure CKEditor is fully ready
+    if (editingBlog) {
+      setTimeout(setEditorData, 100);
     }
-    if (excerptEditorRef.current) {
-      excerptEditorRef.current.setData(formData.excerpt || '');
-    }
-  }, [formData.content, formData.excerpt]);
+  }, [editingBlog]);
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -356,10 +365,13 @@ const BlogForm: React.FC<BlogFormProps> = ({
           <span className="text-gray-500 text-xs ml-2">(Max 1000 characters)</span>
         </label>
         <CKEditor
-          key={`excerpt-${editingBlog?._id || 'new'}`}
           editor={ClassicEditor as /* eslint-disable @typescript-eslint/no-explicit-any */ any}
           onReady={(editor: any) => {
             excerptEditorRef.current = editor;
+            // Set initial data when editing
+            if (formData.excerpt) {
+              editor.setData(formData.excerpt);
+            }
           }}
           onChange={(_event: any, editor: any) => {
             const data = editor.getData();
@@ -380,10 +392,15 @@ const BlogForm: React.FC<BlogFormProps> = ({
           Content *
         </label>
         <CKEditor
-          key={`content-${editingBlog?._id || 'new'}`}
           editor={ClassicEditor as /* eslint-disable @typescript-eslint/no-explicit-any */ any}
           onReady={(editor: any) => {
             contentEditorRef.current = editor;
+            // Set initial data when editing - use setTimeout to ensure data is available
+            if (formData.content) {
+              setTimeout(() => {
+                editor.setData(formData.content);
+              }, 0);
+            }
           }}
           onChange={(_event: any, editor: any) => {
             const data = editor.getData();
