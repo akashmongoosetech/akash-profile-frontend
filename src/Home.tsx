@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
-  Download, 
   Github, 
   Linkedin, 
   Instagram,
@@ -31,8 +30,6 @@ import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   const containerVariants = {
     hidden: { opacity: 0 },

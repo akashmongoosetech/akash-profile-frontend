@@ -6,6 +6,27 @@ const POPUP_DELAY = 3000; // 3 seconds delay before showing popup
 const POPUP_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const DEV_MODE = true; // Set to false in production - bypasses cooldown for testing
 
+// Check if there are any published blogs
+const checkBlogExists = async (): Promise<boolean> => {
+  try {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const response = await fetch(`${API_BASE_URL}/api/blog/stats`);
+    
+    if (!response.ok) {
+      return false;
+    }
+    
+    const data = await response.json();
+    if (data.success && data.publishedCount > 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('[BlogPopup] Error checking blog existence:', error);
+    return false;
+  }
+};
+
 export const useBlogPopup = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const location = useLocation();
@@ -13,7 +34,7 @@ export const useBlogPopup = () => {
   const hasShownRef = useRef(false);
 
   useEffect(() => {
-    const checkAndShowPopup = () => {
+    const checkAndShowPopup = async () => {
       try {
         // Check if we're on the homepage
         const isHomePage = location.pathname === '/';
@@ -42,6 +63,13 @@ export const useBlogPopup = () => {
           }
         } else {
           console.log('[BlogPopup] Dev mode active, bypassing cooldown');
+        }
+
+        // Check if there are any blogs before showing popup
+        const blogExists = await checkBlogExists();
+        if (!blogExists) {
+          console.log('[BlogPopup] No blogs found, skipping popup');
+          return;
         }
 
         // Clear any existing timer
@@ -77,7 +105,14 @@ export const useBlogPopup = () => {
     setIsPopupOpen(false);
   };
 
-  const openPopup = () => {
+  const openPopup = async () => {
+    // Check if there are any blogs before opening popup
+    const blogExists = await checkBlogExists();
+    if (!blogExists) {
+      console.log('[BlogPopup] No blogs found, cannot open popup');
+      return;
+    }
+    
     setIsPopupOpen(true);
     hasShownRef.current = true;
     localStorage.setItem(POPUP_STORAGE_KEY, Date.now().toString());
