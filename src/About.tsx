@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Download, Calendar, MapPin, Code, Award, Users } from 'lucide-react';
+import { Calendar, MapPin, Code, Award, Users } from 'lucide-react';
 
 const About: React.FC = () => {
   const containerVariants = {
@@ -32,31 +32,62 @@ const About: React.FC = () => {
   const timeline = [
     {
       type: 'experience',
-      title: 'Senior Software Engineer',
-      company: 'Profilics Systems',
-      period: '2025 - Present (Project Based)',
-      description: 'Spearheading end-to-end web development initiatives, guiding junior engineers, and designing robust, scalable solutions with React, Node.js, and AWS infrastructure.'
-    },
-    {
-      type: 'experience',
-      title: 'Software Engineer II',
-      company: 'Kataria Group',
-      period: '2024 - 2024',
-      description: 'Leading full-stack development projects, mentoring junior developers, and architecting scalable web applications using React, Node.js, and AWS.'
-    },
-    {
-      type: 'experience',
       title: 'Software Engineer',
+      company: 'Profilics Systems Pvt. Ltd.',
+      location: 'Ujjain, India',
+      period: 'Feb 2025 - Present',
+      description: 'Developing scalable and responsive web applications using MERN Stack. Building reusable UI components and integrating RESTful APIs. Collaborating with cross-functional Agile teams to deliver reliable software solutions.',
+      achievements: [
+        'Developing scalable web applications using MERN Stack',
+        'Building reusable UI components for improved efficiency',
+        'Integrating RESTful APIs for seamless data flow',
+        'Optimizing application performance and user experience'
+      ],
+      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'REST APIs']
+    },
+    {
+      type: 'experience',
+      title: 'Graduate Software Engineer',
       company: 'Knocial India Limited',
-      period: '2023 - 2024',
-      description: 'Developed and maintained multiple client projects, implemented CI/CD pipelines, and improved application performance by 40%.'
+      location: 'Gurgaon, India',
+      period: 'June 2023 - Nov 2024',
+      description: 'Worked on full stack development following Agile and SDLC best practices. Implemented new features, resolved bugs, and improved application performance. Participated in code reviews and collaborated closely with senior engineers.',
+      achievements: [
+        'Implemented new features following Agile methodology',
+        'Resolved bugs and improved application performance',
+        'Participated in code reviews and team collaborations',
+        'Delivered scalable solutions aligned with business needs'
+      ],
+      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'JavaScript']
+    },
+    {
+      type: 'experience',
+      title: 'Software Trainee Intern',
+      company: 'Allsoft Infotech & Multimedia',
+      location: 'Ujjain, India',
+      period: 'Oct 2022 - May 2023',
+      description: 'Assisted in developing user-friendly web interfaces using HTML, CSS, and JavaScript. Supported backend integration, testing, and deployment activities. Gained hands-on experience working on live projects under senior developer guidance.',
+      achievements: [
+        'Assisted in developing user-friendly web interfaces',
+        'Supported backend integration and testing activities',
+        'Gained hands-on experience with live projects',
+        'Collaborated with senior developers on implementation'
+      ],
+      technologies: ['HTML', 'CSS', 'JavaScript', 'Backend Integration', 'Testing']
     },
     {
       type: 'education',
       title: 'Bachelor of Technology',
       company: 'Electronics & Computer Science Engineering',
+      institution: 'Ujjain Engineering College, Ujjain',
       period: '2018 - 2022',
-      description: 'Graduated with honors, specialized in software engineering and data structures. Active member of coding club and hackathon organizer.'
+      description: 'Graduated with First Class Honors. Specialized in software engineering, data structures, and algorithms. Active member of the coding club and organized multiple hackathons.',
+      achievements: [
+        'CGPA: 7.7/10.0 - First Class with Honors',
+        'Winner of Inter-College Coding Competition 2018',
+        'Led team of 20+ students in organizing TechFest 2019',
+        'Published research paper on Machine Learning applications'
+      ]
     }
   ];
 
@@ -165,13 +196,43 @@ const About: React.FC = () => {
                 className="relative pl-8 pb-8 border-l-2 border-blue-500/30 last:border-l-0 last:pb-0"
               >
                 <div className="absolute -left-3 top-0 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full border-4 border-gray-900" />
-                <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 ml-6">
+                <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 ml-6 hover:scale-[1.02] transition-all duration-300">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                    <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                      <h4 className="text-lg text-blue-400">{item.company}</h4>
+                    </div>
                     <span className="text-blue-400 font-medium">{item.period}</span>
                   </div>
-                  <h4 className="text-lg text-gray-300 mb-3">{item.company}</h4>
-                  <p className="text-gray-400 leading-relaxed">{item.description}</p>
+                  {'location' in item && (
+                    <p className="text-gray-400 text-sm mb-3">{item.location}</p>
+                  )}
+                  <p className="text-gray-400 leading-relaxed mb-4">{item.description}</p>
+                  {'achievements' in item && item.achievements && (
+                    <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-white mb-2">Key Achievements:</h5>
+                      <ul className="space-y-1">
+                        {item.achievements.map((achievement, achIndex) => (
+                          <li key={achIndex} className="text-gray-300 text-sm flex items-start gap-2">
+                            <span className="text-green-400">•</span>
+                            {achievement}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {'technologies' in item && item.technologies && (
+                    <div className="flex flex-wrap gap-2">
+                      {item.technologies.map((tech, techIndex) => (
+                        <span
+                          key={techIndex}
+                          className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs font-medium"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

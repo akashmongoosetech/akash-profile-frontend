@@ -22,7 +22,7 @@ const Services: React.FC = () => {
       description: 'Modern, responsive web applications built with the latest technologies',
       features: ['React & Next.js', 'TypeScript', 'Tailwind CSS', 'Progressive Web Apps'],
       color: 'from-blue-500 to-cyan-500',
-      price: 'Starting at $2,500'
+      price: 'Starting at ₹6,000'
     },
     {
       icon: Database,
@@ -30,7 +30,7 @@ const Services: React.FC = () => {
       description: 'Scalable server-side solutions and robust API development',
       features: ['Node.js & Express', 'Python & Django', 'RESTful APIs', 'GraphQL'],
       color: 'from-green-500 to-emerald-500',
-      price: 'Starting at $3,000'
+      price: 'Starting at ₹7,000'
     },
     {
       icon: Smartphone,
@@ -38,7 +38,7 @@ const Services: React.FC = () => {
       description: 'Cross-platform mobile applications for iOS and Android',
       features: ['React Native', 'Flutter', 'Native Performance', 'App Store Deployment'],
       color: 'from-purple-500 to-violet-500',
-      price: 'Starting at $4,000'
+      price: 'Starting at ₹15,000'
     },
     {
       icon: Cloud,
@@ -46,7 +46,7 @@ const Services: React.FC = () => {
       description: 'Cloud infrastructure setup and deployment automation',
       features: ['AWS & Azure', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Monitoring & Scaling'],
       color: 'from-orange-500 to-red-500',
-      price: 'Starting at $2,000'
+      price: 'Starting at ₹25,000'
     },
     {
       icon: Palette,
@@ -54,7 +54,7 @@ const Services: React.FC = () => {
       description: 'Beautiful, user-centered design that converts visitors to customers',
       features: ['Figma Design', 'Prototyping', 'User Research', 'Design Systems'],
       color: 'from-pink-500 to-rose-500',
-      price: 'Starting at $1,500'
+      price: 'Starting at ₹4,500'
     },
     {
       icon: Shield,
@@ -62,7 +62,7 @@ const Services: React.FC = () => {
       description: 'Comprehensive security audits and automated testing solutions',
       features: ['Security Audits', 'Automated Testing', 'Performance Testing', 'Code Reviews'],
       color: 'from-indigo-500 to-purple-500',
-      price: 'Starting at $1,800'
+      price: 'Starting at ₹3500'
     }
   ];
 
@@ -156,10 +156,10 @@ const Services: React.FC = () => {
                 <div className="border-t border-white/10 pt-6">
                   <div className="flex items-center justify-between">
                     <span className="text-blue-400 font-semibold">{service.price}</span>
-                    <button className="flex items-center gap-2 text-white hover:text-blue-400 transition-colors">
+                    {/* <button className="flex items-center gap-2 text-white hover:text-blue-400 transition-colors">
                       Learn More
                       <ArrowRight className="w-4 h-4" />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </motion.div>
