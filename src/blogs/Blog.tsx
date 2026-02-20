@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from '../utils/api';
 
 interface BlogPost {
   _id: string;
@@ -328,7 +329,7 @@ const Blog: React.FC = () => {
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={post.image}
+                        src={normalizeImageUrl(post.image)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -349,9 +350,9 @@ const Blog: React.FC = () => {
                       </h3>
                       <div className="text-gray-400 mb-4 text-sm leading-relaxed">
                         <p className="whitespace-pre-wrap">
-                          {expandedFeaturedPosts.has(post._id) || !shouldTruncate(post.excerpt)
-                            ? post.excerpt
-                            : getTruncatedText(post.excerpt)
+                          {expandedFeaturedPosts.has(post._id) || !shouldTruncate(stripHtmlTags(post.excerpt))
+                            ? stripHtmlTags(post.excerpt)
+                            : getTruncatedText(stripHtmlTags(post.excerpt))
                           }
                         </p>
                         {shouldTruncate(post.excerpt) && (
@@ -391,9 +392,9 @@ const Blog: React.FC = () => {
                       
                       {/* Author Information */}
                       <div className="flex items-center gap-2 pt-3 border-t border-white/10">
-                        {post.authorProfilePic && !authorImageErrors.has(post._id) ? (
+                        {isValidImageUrl(post.authorProfilePic) && !authorImageErrors.has(post._id) ? (
                           <img
-                            src={post.authorProfilePic}
+                            src={normalizeImageUrl(post.authorProfilePic)}
                             alt={post.author}
                             className="w-8 h-8 rounded-full object-cover border border-white/20"
                             onError={() => setAuthorImageErrors(prev => new Set(prev).add(post._id))}
@@ -448,7 +449,7 @@ const Blog: React.FC = () => {
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={post.image}
+                        src={normalizeImageUrl(post.image)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -466,9 +467,9 @@ const Blog: React.FC = () => {
                       </h3>
                       <div className="text-gray-400 mb-4 text-sm leading-relaxed">
                         <p className="whitespace-pre-wrap">
-                          {expandedPosts.has(post._id) || !shouldTruncate(post.excerpt)
-                            ? post.excerpt
-                            : getTruncatedText(post.excerpt)
+                          {expandedPosts.has(post._id) || !shouldTruncate(stripHtmlTags(post.excerpt))
+                            ? stripHtmlTags(post.excerpt)
+                            : getTruncatedText(stripHtmlTags(post.excerpt))
                           }
                         </p>
                         {shouldTruncate(post.excerpt) && (

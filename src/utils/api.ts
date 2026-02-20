@@ -2,6 +2,26 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
+// Normalize image URL to ensure it's an absolute URL
+export const normalizeImageUrl = (imageUrl: string | undefined | null): string => {
+  if (!imageUrl || imageUrl.trim() === '') {
+    return '';
+  }
+  
+  // If it's already an absolute URL (starts with http:// or https://), return as-is
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  
+  // If it's a relative URL, prepend the API base URL
+  return `${API_BASE_URL}${imageUrl}`;
+};
+
+// Check if image URL is valid (for display purposes)
+export const isValidImageUrl = (imageUrl: string | undefined | null): boolean => {
+  return !!imageUrl && imageUrl.trim() !== '';
+};
+
 // Get auth token from localStorage
 export const getAuthToken = (): string | null => {
   return localStorage.getItem('adminToken');
@@ -42,6 +62,19 @@ export const authenticatedFetch = async (
     ...options,
     headers,
   });
+};
+
+// Strip HTML tags from text (useful for excerpts displayed in lists)
+export const stripHtmlTags = (html: string | undefined | null): string => {
+  if (!html) return '';
+  
+  // Create a temporary DOM element to strip HTML tags
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  
+  // Get text content and clean up extra whitespace
+  const text = temp.textContent || temp.innerText || '';
+  return text.replace(/\s+/g, ' ').trim();
 };
 
 // Export base URL for direct API calls

@@ -13,6 +13,7 @@ import {
   BookOpen,
   PenTool
 } from 'lucide-react';
+import { normalizeImageUrl, isValidImageUrl } from '../utils/api';
 
 interface ContentSection {
   title: string;
@@ -532,9 +533,9 @@ const BlogPost: React.FC = () => {
           {/* Author Information */}
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 mb-8">
             <div className="flex items-start gap-4">
-              {blog.authorProfilePic && !authorImageError ? (
+              {isValidImageUrl(blog.authorProfilePic) && !authorImageError ? (
                 <img
-                  src={blog.authorProfilePic}
+                  src={normalizeImageUrl(blog.authorProfilePic)}
                   alt={blog.author}
                   className="w-16 h-16 rounded-full object-cover border-2 border-white/20 flex-shrink-0"
                   onError={() => setAuthorImageError(true)}
@@ -590,7 +591,7 @@ const BlogPost: React.FC = () => {
         <motion.div variants={itemVariants} className="mb-12">
           <div className="relative rounded-2xl overflow-hidden">
             <img
-              src={blog.image}
+              src={normalizeImageUrl(blog.image)}
               alt={blog.title}
               className="w-full h-64 md:h-96 object-cover"
             />
@@ -638,7 +639,7 @@ const BlogPost: React.FC = () => {
                     {section.image && (
                       <div className="relative rounded-xl overflow-hidden">
                         <img
-                          src={section.image}
+                          src={normalizeImageUrl(section.image)}
                           alt={section.title || `Section ${index + 1} image`}
                           className="w-full h-auto object-cover"
                         />
@@ -735,7 +736,7 @@ const BlogPost: React.FC = () => {
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={post.image}
+                        src={normalizeImageUrl(post.image)}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

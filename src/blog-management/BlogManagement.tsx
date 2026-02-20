@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { authenticatedFetch } from '../utils/api';
+import { authenticatedFetch, normalizeImageUrl, stripHtmlTags } from '../utils/api';
 import BlogForm from './BlogForm';
 import {
   Plus,
@@ -454,7 +454,7 @@ const BlogManagement: React.FC = () => {
                 >
                   <div className="flex items-start gap-4">
                     <img
-                      src={blog.image}
+                      src={normalizeImageUrl(blog.image)}
                       alt={blog.title}
                       className="w-24 h-24 object-cover rounded-lg"
                     />
@@ -462,7 +462,7 @@ const BlogManagement: React.FC = () => {
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <h3 className="text-xl font-bold text-white mb-1">{blog.title}</h3>
-                          <p className="text-gray-400 text-sm line-clamp-2">{blog.excerpt}</p>
+                          <p className="text-gray-400 text-sm line-clamp-2">{stripHtmlTags(blog.excerpt)}</p>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           {blog.featured && (

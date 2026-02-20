@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from '../utils/api';
 
 interface Blog {
   _id: string;
@@ -77,10 +78,10 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
   };
 
   const getAuthorAvatar = (author: string, authorProfilePic?: string) => {
-    if (authorProfilePic && !authorImageError) {
+    if (isValidImageUrl(authorProfilePic) && !authorImageError) {
       return (
         <img
-          src={authorProfilePic}
+          src={normalizeImageUrl(authorProfilePic)}
           alt={author}
           className="w-8 h-8 rounded-full object-cover border-2 border-white/20"
           onError={() => setAuthorImageError(true)}
@@ -155,7 +156,7 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
                   {/* Blog Image */}
                   <div className="relative overflow-hidden rounded-xl">
                     <img
-                      src={blog.image}
+                      src={normalizeImageUrl(blog.image)}
                       alt={blog.title}
                       className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
                     />
@@ -173,11 +174,10 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
                     </h3>
                     
                     <p className="text-gray-300 overflow-hidden" style={{
-                      display: '-webkit-box',
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical'
                     }}>
-                      {blog.excerpt}
+                      {stripHtmlTags(blog.excerpt)}
                     </p>
 
                     {/* Meta Information */}
