@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Mail, Users, Menu, X } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, BookOpen, Mail, Users, Menu, X, LogOut } from 'lucide-react';
+import { removeAuthToken } from '../utils/api';
 
 const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { to: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -11,6 +13,11 @@ const AdminLayout: React.FC = () => {
     { to: '/admin/contact-table', label: 'Contact Table', icon: <Mail className="w-5 h-5" /> },
     { to: '/admin/subscriber-table', label: 'Subscriber Table', icon: <Users className="w-5 h-5" /> },
   ];
+
+  const handleLogout = () => {
+    removeAuthToken();
+    navigate('/admin/login');
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -56,6 +63,17 @@ const AdminLayout: React.FC = () => {
             </NavLink>
           ))}
         </nav>
+        
+        {/* Logout Button */}
+        <div className="p-4 border-t border-gray-700">
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-300 rounded-lg hover:bg-red-600/20 hover:text-red-400 transition-all duration-200"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="ml-3">Logout</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}

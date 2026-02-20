@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './Home';
 import About from './About';
 import Projects from './projects/Projects';
@@ -12,6 +13,7 @@ import Blog from './blogs/Blog';
 import BlogPost from './blog-posts/BlogPost';
 import Contact from './contacts/Contact';
 import Admin from './admins/Admin';
+import AdminLogin from './admins/AdminLogin';
 import AdminLayout from './admins/AdminLayout';
 import ContactTable from './contact-tables/ContactTable';
 import SubscriberTable from './subscriber-tables/SubscriberTable';
@@ -34,7 +36,12 @@ function App() {
             <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
           </Route>
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
             <Route index element={<Admin />} />
             <Route path="blog-management" element={<BlogManagement />} />
             <Route path="contact-table" element={<ContactTable />} />

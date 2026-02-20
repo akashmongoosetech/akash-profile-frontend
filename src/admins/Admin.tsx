@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, Users, Mail, TrendingUp, Calendar, User, Inbox, BookOpen, UserPlus } from 'lucide-react';
 import ContactTable from '../contact-tables/ContactTable';
 import StatsCard from '../components/StatsCard';
+import { isAuthenticated } from '../utils/api';
 
 interface ContactStats {
   _id: string;
@@ -33,6 +35,7 @@ interface Contact {
 }
 
 const Admin: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats>({
     totalContacts: 0,
     pending: 0,
@@ -49,6 +52,13 @@ const Admin: React.FC = () => {
   const [recentContacts, setRecentContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Check authentication on mount
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/admin/login');
+    }
+  }, [navigate]);
 
   // Fetch contact statistics and recent contacts
   const fetchStats = async () => {
@@ -99,7 +109,7 @@ const Admin: React.FC = () => {
       } else {
         setError(statsData.message || contactsData.message || blogStatsData.message || subscriberStatsData.message || 'Failed to fetch dashboard data');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
@@ -284,7 +294,7 @@ const Admin: React.FC = () => {
 
         {/* Dashboard Cards */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-6">
-          {statsConfig.map((stat, index) => (
+          {statsConfig.map((stat) => (
             <StatsCard
               key={stat.label}
               icon={stat.icon}

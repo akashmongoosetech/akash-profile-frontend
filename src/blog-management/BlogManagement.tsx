@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { authenticatedFetch } from '../utils/api';
 import {
   Plus,
   Edit,
@@ -141,7 +142,7 @@ const BlogManagement: React.FC = () => {
       params.append('page', currentPage.toString());
       params.append('limit', '10');
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/admin/all?${params}`);
+      const response = await authenticatedFetch(`/api/blog/admin/all?${params}`);
       const data = await response.json();
       
       if (data.success) {
@@ -383,14 +384,14 @@ const BlogManagement: React.FC = () => {
       console.log('Tags being sent:', cleanedFormData.tags);
 
       const url = editingBlog 
-        ? `${import.meta.env.VITE_API_BASE_URL}/api/blog/${editingBlog._id}`
-        : `${import.meta.env.VITE_API_BASE_URL}/api/blog`;
+        ? `/api/blog/${editingBlog._id}`
+        : `/api/blog`;
       
       const method = editingBlog ? 'PUT' : 'POST';
       
       console.log('Sending blog data:', cleanedFormData); // Debug log
       
-      const response = await fetch(url, {
+      const response = await authenticatedFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -440,7 +441,7 @@ const BlogManagement: React.FC = () => {
     if (!blogToDelete) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${blogToDelete._id}`, {
+      const response = await authenticatedFetch(`/api/blog/${blogToDelete._id}`, {
         method: 'DELETE',
       });
 
