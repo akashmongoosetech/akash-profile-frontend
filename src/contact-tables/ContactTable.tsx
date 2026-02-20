@@ -20,6 +20,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import StatsCard from '../components/StatsCard';
+import DeleteModal from '../components/DeleteModal';
 
 interface Contact {
   _id: string;
@@ -64,6 +65,9 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const [statsLoading, setStatsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   // Fetch contacts
@@ -163,15 +167,21 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
   // Delete contact
   const deleteContact = async (contactId: string) => {
-    if (!window.confirm('Are you sure you want to delete this contact?')) return;
+    setContactToDelete(contacts.find(contact => contact._id === contactId) || null);
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteConfirm = async () => {
+    if (!contactToDelete) return;
+
+    setIsDeleting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactToDelete._id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        setContacts(prev => prev.filter(contact => contact._id !== contactId));
+        setContacts(prev => prev.filter(contact => contact._id !== contactToDelete._id));
         onDataChange?.();
         fetchStats();
       } else {
@@ -179,6 +189,10 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       }
     } catch (error) {
       setError('Network error');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setContactToDelete(null);
     }
   };
 
@@ -846,6 +860,20 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
           </motion.div>
         </div>
       )}
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setContactToDelete(null);
+        }}
+        onDelete={handleDeleteConfirm}
+        title="Delete Contact?"
+        itemName={contactToDelete?.name}
+        itemDescription={`${contactToDelete?.email} • ${contactToDelete?.subject}`}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

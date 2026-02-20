@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { RefreshCw, Trash2, CheckCircle, XCircle, Mail, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
+import DeleteModal from '../components/DeleteModal';
 
 interface Subscriber {
   _id: string;
@@ -19,6 +20,9 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [subscriberToDelete, setSubscriberToDelete] = useState<Subscriber | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   const fetchSubscribers = async () => {
@@ -43,19 +47,30 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   }, []);
 
   const deleteSubscriber = async (subscriberId: string) => {
-    if (!window.confirm('Are you sure you want to delete this subscriber?')) return;
+    setSubscriberToDelete(subscribers.find(sub => sub._id === subscriberId) || null);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!subscriberToDelete) return;
+    
+    setIsDeleting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/${subscriberId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/${subscriberToDelete._id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
-        setSubscribers(prev => prev.filter(sub => sub._id !== subscriberId));
+        setSubscribers(prev => prev.filter(sub => sub._id !== subscriberToDelete._id));
         onDataChange?.();
       } else {
         setError('Failed to delete subscriber');
       }
     } catch (error) {
       setError('Network error');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setSubscriberToDelete(null);
     }
   };
 
@@ -341,6 +356,20 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
           </div>
         )}
       </div>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSubscriberToDelete(null);
+        }}
+        onDelete={handleDeleteConfirm}
+        title="Delete Subscriber?"
+        itemName={subscriberToDelete?.email}
+        itemDescription={`Status: ${subscriberToDelete?.status}`}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };
