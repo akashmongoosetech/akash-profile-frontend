@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -66,6 +66,7 @@ const BlogPost: React.FC = () => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [authorImageError, setAuthorImageError] = useState(false);
 
   // Utility function to get relative time
   const getRelativeTime = (publishedDate: string) => {
@@ -131,7 +132,7 @@ const BlogPost: React.FC = () => {
   }, [blog]);
 
   // Fetch blog post by slug
-  const fetchBlogPost = async () => {
+  const fetchBlogPost = useCallback(async () => {
     if (!slug) return;
 
     try {
@@ -156,7 +157,7 @@ const BlogPost: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
 
   // Fetch related posts
   const fetchRelatedPosts = async (category: string, excludeId: string) => {
@@ -223,8 +224,9 @@ const BlogPost: React.FC = () => {
   };
 
   useEffect(() => {
+    setAuthorImageError(false);
     fetchBlogPost();
-  }, [slug]);
+  }, [slug, fetchBlogPost]);
 
   // Update SEO meta tags when blog loads
   useEffect(() => {
@@ -530,11 +532,12 @@ const BlogPost: React.FC = () => {
           {/* Author Information */}
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 mb-8">
             <div className="flex items-start gap-4">
-              {blog.authorProfilePic ? (
+              {blog.authorProfilePic && !authorImageError ? (
                 <img
                   src={blog.authorProfilePic}
                   alt={blog.author}
                   className="w-16 h-16 rounded-full object-cover border-2 border-white/20 flex-shrink-0"
+                  onError={() => setAuthorImageError(true)}
                 />
               ) : (
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">

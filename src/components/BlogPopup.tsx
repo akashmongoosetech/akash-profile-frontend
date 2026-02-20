@@ -25,10 +25,12 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authorImageError, setAuthorImageError] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
+      setAuthorImageError(false);
       fetchLatestBlog();
     }
   }, [isOpen]);
@@ -75,12 +77,13 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
   };
 
   const getAuthorAvatar = (author: string, authorProfilePic?: string) => {
-    if (authorProfilePic) {
+    if (authorProfilePic && !authorImageError) {
       return (
         <img
           src={authorProfilePic}
           alt={author}
           className="w-8 h-8 rounded-full object-cover border-2 border-white/20"
+          onError={() => setAuthorImageError(true)}
         />
       );
     }

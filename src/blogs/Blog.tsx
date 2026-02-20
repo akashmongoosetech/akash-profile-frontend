@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -56,9 +56,10 @@ const Blog: React.FC = () => {
   // Expanded content state
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const [expandedFeaturedPosts, setExpandedFeaturedPosts] = useState<Set<string>>(new Set());
+  const [authorImageErrors, setAuthorImageErrors] = useState<Set<string>>(new Set());
 
   // Fetch blogs from API
-  const fetchBlogs = async () => {
+  const fetchBlogs = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -80,7 +81,7 @@ const Blog: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, selectedCategory, currentPage]);
 
   // Fetch featured blogs
   const fetchFeaturedBlogs = async () => {
@@ -171,7 +172,7 @@ const Blog: React.FC = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [currentPage, selectedCategory]);
+  }, [currentPage, selectedCategory, fetchBlogs]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -184,7 +185,7 @@ const Blog: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, fetchBlogs, blogs.length]);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -213,7 +214,7 @@ const Blog: React.FC = () => {
         setSubscriptionStatus('error');
         setErrorMessage(data.message || 'Failed to subscribe. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setSubscriptionStatus('error');
       setErrorMessage('Network error. Please check your connection and try again.');
     } finally {
@@ -390,11 +391,12 @@ const Blog: React.FC = () => {
                       
                       {/* Author Information */}
                       <div className="flex items-center gap-2 pt-3 border-t border-white/10">
-                        {post.authorProfilePic ? (
+                        {post.authorProfilePic && !authorImageErrors.has(post._id) ? (
                           <img
                             src={post.authorProfilePic}
                             alt={post.author}
                             className="w-8 h-8 rounded-full object-cover border border-white/20"
+                            onError={() => setAuthorImageErrors(prev => new Set(prev).add(post._id))}
                           />
                         ) : (
                           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -506,11 +508,12 @@ const Blog: React.FC = () => {
                       
                       {/* Author Information */}
                       <div className="flex items-center gap-2 pt-3 border-t border-white/10">
-                        {post.authorProfilePic ? (
+                        {post.authorProfilePic && !authorImageErrors.has(post._id) ? (
                           <img
                             src={post.authorProfilePic}
                             alt={post.author}
                             className="w-8 h-8 rounded-full object-cover border border-white/20"
+                            onError={() => setAuthorImageErrors(prev => new Set(prev).add(post._id))}
                           />
                         ) : (
                           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
