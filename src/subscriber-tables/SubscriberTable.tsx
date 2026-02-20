@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { RefreshCw, Trash2, CheckCircle, XCircle, Mail, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteModal from '../components/DeleteModal';
 
@@ -35,7 +36,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
       } else {
         setError(data.message || 'Failed to fetch subscribers');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
       } else {
         setError('Failed to delete subscriber');
       }
-    } catch (error) {
+    } catch {
       setError('Network error');
     } finally {
       setIsDeleting(false);
@@ -130,7 +131,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
       ]);
       
       // Add table
-      (doc as any).autoTable({
+      (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         head: [['Email', 'Status', 'Date Subscribed']],
         body: tableData,
         startY: 40,
@@ -206,63 +207,73 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   }
 
   return (
-    <div className={`space-y-6 mt-[100px] ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">Newsletter Subscribers</h2>
-          <p className="text-gray-400">Manage newsletter subscriptions ({subscribers.length} total)</p>
+          <p className="text-slate-400">Manage newsletter subscriptions ({subscribers.length} total)</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {/* Export Buttons */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={exportToPDF}
             disabled={exporting || subscribers.length === 0}
             className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
             PDF
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={exportToGoogleSheets}
             disabled={exporting || subscribers.length === 0}
             className="flex items-center gap-2 px-3 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FileSpreadsheet className="w-4 h-4" />
             CSV
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={fetchSubscribers}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
-          </button>
+          </motion.button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-500/10 border border-red-500/20 rounded-xl p-4"
+        >
           <p className="text-red-400 text-sm">{error}</p>
-        </div>
+        </motion.div>
       )}
 
-      <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden">
+      <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/10">
+            <thead className="bg-slate-700/30">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date Subscribed</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Date Subscribed</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-700/50">
               {currentSubscribers.map((subscriber) => {
                 const statusInfo = getStatusInfo(subscriber.status);
                 const StatusIcon = statusInfo.icon;
                 return (
-                  <tr key={subscriber._id} className="hover:bg-white/5 transition-colors">
+                  <tr key={subscriber._id} className="hover:bg-slate-700/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-white">{subscriber.email}</div>
                     </td>

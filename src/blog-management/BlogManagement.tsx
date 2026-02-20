@@ -368,7 +368,7 @@ const BlogManagement: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <div className="min-h-screen">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -379,31 +379,33 @@ const BlogManagement: React.FC = () => {
         <motion.div variants={itemVariants} className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Blog Management</h1>
-            <p className="text-gray-400">Create, edit, and manage your blog posts</p>
+            <p className="text-slate-400">Create, edit, and manage your blog posts</p>
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/25"
           >
             <Plus className="w-5 h-5" />
             New Blog Post
-          </button>
+          </motion.button>
         </motion.div>
 
         {/* Filters */}
         <motion.div variants={itemVariants} className="mb-8">
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
             <div className="flex flex-col lg:flex-row gap-4 items-center">
               {/* Search */}
               <div className="flex-1 w-full lg:w-auto">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search blog posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 backdrop-blur-lg"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
                   />
                 </div>
               </div>
@@ -415,7 +417,7 @@ const BlogManagement: React.FC = () => {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     selectedCategory === ''
                       ? 'bg-blue-500 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
                   }`}
                 >
                   All
@@ -427,7 +429,7 @@ const BlogManagement: React.FC = () => {
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       selectedCategory === category
                         ? 'bg-blue-500 text-white'
-                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
                     }`}
                   >
                     {category}
@@ -443,26 +445,26 @@ const BlogManagement: React.FC = () => {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
-              <p className="text-gray-400 mt-4">Loading blog posts...</p>
+              <p className="text-slate-400 mt-4">Loading blog posts...</p>
             </div>
           ) : (
             <div className="space-y-4">
               {blogs.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
+                  className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300"
                 >
                   <div className="flex items-start gap-4">
                     <img
                       src={normalizeImageUrl(blog.image)}
                       alt={blog.title}
-                      className="w-24 h-24 object-cover rounded-lg"
+                      className="w-24 h-24 object-cover rounded-xl"
                     />
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <h3 className="text-xl font-bold text-white mb-1">{blog.title}</h3>
-                          <p className="text-gray-400 text-sm line-clamp-2">{stripHtmlTags(blog.excerpt)}</p>
+                          <p className="text-slate-400 text-sm line-clamp-2">{stripHtmlTags(blog.excerpt)}</p>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
                           {blog.featured && (
@@ -474,14 +476,14 @@ const BlogManagement: React.FC = () => {
                           <span className={`px-2 py-1 text-xs rounded-full ${
                             blog.published 
                               ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-gray-500/20 text-gray-400'
+                              : 'bg-slate-500/20 text-slate-400'
                           }`}>
                             {blog.published ? 'Published' : 'Draft'}
                           </span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
                         <span className="flex items-center gap-1">
                           <Tag className="w-4 h-4" />
                           {blog.category}
@@ -511,7 +513,7 @@ const BlogManagement: React.FC = () => {
                             </span>
                           ))}
                           {blog.tags.length > 3 && (
-                            <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded">
+                            <span className="px-2 py-1 bg-slate-500/20 text-slate-400 text-xs rounded">
                               +{blog.tags.length - 3} more
                             </span>
                           )}

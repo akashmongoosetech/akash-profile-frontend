@@ -82,7 +82,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       } else {
         setError(data.message || 'Failed to fetch contacts');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
@@ -160,7 +160,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       } else {
         setError('Failed to update status');
       }
-    } catch (error) {
+    } catch {
       setError('Network error');
     }
   };
@@ -187,7 +187,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       } else {
         setError('Failed to delete contact');
       }
-    } catch (error) {
+    } catch {
       setError('Network error');
     } finally {
       setIsDeleting(false);
@@ -222,7 +222,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       } else {
         setError('Failed to update contact');
       }
-    } catch (error) {
+    } catch {
       setError('Network error');
     }
   };
@@ -302,7 +302,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       ]);
       
       // Add table
-      (doc as any).autoTable({
+      (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         head: [['Name', 'Email', 'Mobile', 'Subject', 'Status', 'Priority', 'Date']],
         body: tableData,
         startY: 40,
@@ -414,10 +414,10 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   }
 
   return (
-    <div className={`space-y-6  mt-[100px] ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* Dashboard Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        {statsConfig.map((stat, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+        {statsConfig.map((stat) => (
           <StatsCard
             key={stat.label}
             icon={stat.icon}
@@ -432,52 +432,58 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white">Contact Management</h2>
-          <p className="text-gray-400">Manage and respond to contact form submissions ({filteredContacts.length} contacts)</p>
+          <p className="text-slate-400">Manage and respond to contact form submissions ({filteredContacts.length} contacts)</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {/* Export Buttons */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={exportToPDF}
             disabled={exporting || filteredContacts.length === 0}
             className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
             PDF
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={exportToCSV}
             disabled={exporting || filteredContacts.length === 0}
             className="flex items-center gap-2 px-3 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FileSpreadsheet className="w-4 h-4" />
             CSV
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => { fetchContacts(); fetchStats(); }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
-          </button>
+          </motion.button>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search contacts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 bg-gray border border-white/20 rounded-lg text-black focus:outline-none focus:border-blue-400"
+          className="px-4 py-2.5 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
         >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -490,13 +496,17 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-500/10 border border-red-500/20 rounded-xl p-4"
+        >
           <p className="text-red-400 text-sm">{error}</p>
-        </div>
+        </motion.div>
       )}
 
       {/* Table */}
-      <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden">
+      <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-white/10">

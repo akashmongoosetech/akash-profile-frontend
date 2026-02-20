@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Users, Mail, TrendingUp, Calendar, User, Inbox, BookOpen, UserPlus } from 'lucide-react';
+import { 
+  Shield, 
+  Users, 
+  TrendingUp, 
+  User, 
+  Inbox, 
+  BookOpen, 
+  UserPlus,
+  Activity,
+  Clock,
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
 import ContactTable from '../contact-tables/ContactTable';
 import StatsCard from '../components/StatsCard';
 import { isAuthenticated } from '../utils/api';
@@ -128,19 +140,19 @@ const Admin: React.FC = () => {
       color: 'bg-gradient-to-r from-blue-500 to-cyan-500'
     },
     {
-      icon: <Mail className="w-6 h-6 text-white" />,
+      icon: <Clock className="w-6 h-6 text-white" />,
       label: 'Pending',
       value: stats.pending.toString(),
       color: 'bg-gradient-to-r from-yellow-500 to-orange-500'
     },
     {
-      icon: <TrendingUp className="w-6 h-6 text-white" />,
+      icon: <Activity className="w-6 h-6 text-white" />,
       label: 'In Progress',
       value: stats.inProgress.toString(),
       color: 'bg-gradient-to-r from-purple-500 to-pink-500'
     },
     {
-      icon: <Calendar className="w-6 h-6 text-white" />,
+      icon: <CheckCircle className="w-6 h-6 text-white" />,
       label: 'Completed',
       value: stats.completed.toString(),
       color: 'bg-gradient-to-r from-green-500 to-emerald-500'
@@ -153,19 +165,19 @@ const Admin: React.FC = () => {
     },
     {
       icon: <BookOpen className="w-6 h-6 text-white" />,
-      label: 'Published Blogs',
+      label: 'Published',
       value: stats.publishedBlogs.toString(),
       color: 'bg-gradient-to-r from-teal-500 to-cyan-500'
     },
     {
       icon: <UserPlus className="w-6 h-6 text-white" />,
-      label: 'Total Subscribers',
+      label: 'Subscribers',
       value: stats.totalSubscribers.toString(),
       color: 'bg-gradient-to-r from-pink-500 to-rose-500'
     },
     {
       icon: <UserPlus className="w-6 h-6 text-white" />,
-      label: 'Active Subscribers',
+      label: 'Active Subs',
       value: stats.activeSubscribers.toString(),
       color: 'bg-gradient-to-r from-emerald-500 to-green-500'
     }
@@ -176,8 +188,8 @@ const Admin: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: 0.08,
+        delayChildren: 0.1
       }
     }
   };
@@ -187,81 +199,24 @@ const Admin: React.FC = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6 }
+      transition: { duration: 0.5, ease: "easeOut" }
     }
   };
 
-  // Recent Contacts Card
-  const RecentContactsCard = () => (
-    <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 flex-1 min-w-[260px]">
-      <div className="flex items-center gap-2 mb-4">
-        <Inbox className="w-5 h-5 text-blue-400" />
-        <span className="text-white font-semibold">Recent Contacts</span>
-      </div>
-      {loading ? (
-        <div className="space-y-2">
-          {[1,2,3].map(i => (
-            <div key={i} className="h-6 bg-gray-700/40 rounded animate-pulse" />
-          ))}
-        </div>
-      ) : recentContacts.length === 0 ? (
-        <p className="text-gray-400 text-sm">No recent contacts</p>
-      ) : (
-        <ul className="divide-y divide-white/10">
-          {recentContacts.map(contact => (
-            <li key={contact._id} className="py-2">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-blue-400" />
-                <span className="text-white font-medium">{contact.name}</span>
-                <span className="text-xs text-gray-400 ml-2">{contact.subject}</span>
-              </div>
-              <div className="text-xs text-gray-400 ml-6">{new Date(contact.createdAt).toLocaleString()}</div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-
-  // Status Breakdown Card
-  const StatusBreakdownCard = () => (
-    <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 flex-1 min-w-[260px]">
-      <div className="flex items-center gap-2 mb-4">
-        <TrendingUp className="w-5 h-5 text-purple-400" />
-        <span className="text-white font-semibold">Status Breakdown</span>
-      </div>
-      <ul className="space-y-2">
-        <li className="flex items-center gap-2 text-sm">
-          <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" />
-          <span className="text-gray-300">Pending</span>
-          <span className="ml-auto text-white font-bold">{stats.pending}</span>
-        </li>
-        <li className="flex items-center gap-2 text-sm">
-          <span className="w-3 h-3 rounded-full bg-blue-400 inline-block" />
-          <span className="text-gray-300">Review</span>
-          <span className="ml-auto text-white font-bold">{stats.review}</span>
-        </li>
-        <li className="flex items-center gap-2 text-sm">
-          <span className="w-3 h-3 rounded-full bg-purple-400 inline-block" />
-          <span className="text-gray-300">Worked</span>
-          <span className="ml-auto text-white font-bold">{stats.worked}</span>
-        </li>
-        <li className="flex items-center gap-2 text-sm">
-          <span className="w-3 h-3 rounded-full bg-green-400 inline-block" />
-          <span className="text-gray-300">Done</span>
-          <span className="ml-auto text-white font-bold">{stats.completed}</span>
-        </li>
-        <li className="flex items-center gap-2 text-sm">
-          <span className="w-3 h-3 rounded-full bg-red-400 inline-block" />
-          <span className="text-gray-300">Rejected</span>
-          <span className="ml-auto text-white font-bold">{stats.rejected}</span>
-        </li>
-      </ul>
-    </div>
-  );
+  // Get status color
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      pending: 'bg-yellow-500',
+      review: 'bg-blue-500',
+      worked: 'bg-purple-500',
+      done: 'bg-green-500',
+      rejected: 'bg-red-500'
+    };
+    return colors[status] || 'bg-gray-500';
+  };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <div className="min-h-screen">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -269,45 +224,164 @@ const Admin: React.FC = () => {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         {/* Header */}
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        <motion.div variants={itemVariants} className="text-center mb-12">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-center gap-4 mb-4"
+          >
+            <motion.div 
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.6 }}
+              className="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30"
+            >
+              <Shield className="w-8 h-8 text-white" />
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-gray-300 bg-clip-text text-transparent">
               Admin Dashboard
             </h1>
-          </div>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Manage your portfolio website, view contact submissions, and monitor your online presence.
-          </p>
+          </motion.div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-lg text-slate-400 max-w-3xl mx-auto"
+          >
+            Manage your portfolio, monitor contacts, and track your online presence
+          </motion.p>
         </motion.div>
 
         {/* Error Message */}
         {error && (
-          <motion.div variants={itemVariants} className="mb-6">
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+          <motion.div 
+            variants={itemVariants}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
+          >
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           </motion.div>
         )}
 
-        {/* Dashboard Cards */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-6">
-          {statsConfig.map((stat) => (
-            <StatsCard
+        {/* Dashboard Cards Grid */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          {statsConfig.map((stat, index) => (
+            <motion.div
               key={stat.label}
-              icon={stat.icon}
-              label={stat.label}
-              value={stat.value}
-              colorClass={stat.color}
-              loading={loading}
-            />
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <StatsCard
+                icon={stat.icon}
+                label={stat.label}
+                value={stat.value}
+                colorClass={stat.color}
+                loading={loading}
+              />
+            </motion.div>
           ))}
         </motion.div>
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
-          <RecentContactsCard />
-          <StatusBreakdownCard />
+
+        {/* Info Cards Row */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Recent Contacts Card */}
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <Inbox className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Recent Contacts</h3>
+                <p className="text-sm text-slate-400">Latest submissions</p>
+              </div>
+            </div>
+            {loading ? (
+              <div className="space-y-3">
+                {[1,2,3].map(i => (
+                  <div key={i} className="h-16 bg-slate-700/30 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : recentContacts.length === 0 ? (
+              <div className="text-center py-8">
+                <User className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-400">No recent contacts</p>
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {recentContacts.map((contact, index) => (
+                  <motion.li 
+                    key={contact._id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 transition-colors"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${getStatusColor(contact.status)}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium truncate">{contact.name}</p>
+                      <p className="text-xs text-slate-400 truncate">{contact.subject}</p>
+                    </div>
+                    <span className="text-xs text-slate-500">
+                      {new Date(contact.createdAt).toLocaleDateString()}
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
+            )}
+          </motion.div>
+
+          {/* Status Breakdown Card */}
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white">Status Breakdown</h3>
+                <p className="text-sm text-slate-400">Contact status overview</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[
+                { label: 'Pending', value: stats.pending, color: 'bg-yellow-500', text: 'text-yellow-400' },
+                { label: 'In Review', value: stats.review, color: 'bg-blue-500', text: 'text-blue-400' },
+                { label: 'Worked', value: stats.worked, color: 'bg-purple-500', text: 'text-purple-400' },
+                { label: 'Completed', value: stats.completed, color: 'bg-green-500', text: 'text-green-400' },
+                { label: 'Rejected', value: stats.rejected, color: 'bg-red-500', text: 'text-red-400' }
+              ].map((item, index) => (
+                <motion.div 
+                  key={item.label}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center gap-3"
+                >
+                  <span className={`w-3 h-3 rounded-full ${item.color}`} />
+                  <span className="text-slate-300 flex-1">{item.label}</span>
+                  <div className="w-32 h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${stats.totalContacts > 0 ? (item.value / stats.totalContacts) * 100 : 0}%` }}
+                      transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
+                      className={`h-full ${item.color}`}
+                    />
+                  </div>
+                  <span className={`${item.text} font-bold w-8 text-right`}>{item.value}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Contact Management */}
@@ -319,4 +393,4 @@ const Admin: React.FC = () => {
   );
 };
 
-export default Admin; 
+export default Admin;
