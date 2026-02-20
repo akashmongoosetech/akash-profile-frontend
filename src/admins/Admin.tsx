@@ -14,7 +14,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import ContactTable from '../contact-tables/ContactTable';
+// import ContactTable from '../contact-tables/ContactTable';
 import StatsCard from '../components/StatsCard';
 import { isAuthenticated } from '../utils/api';
 
@@ -385,9 +385,9 @@ const Admin: React.FC = () => {
         </motion.div>
 
         {/* Contact Management */}
-        <motion.div variants={itemVariants}>
+        {/* <motion.div variants={itemVariants}>
           <ContactTable onDataChange={fetchStats} />
-        </motion.div>
+        </motion.div> */}
       </motion.div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -14,12 +14,32 @@ import {
   Shield,
   Bell
 } from 'lucide-react';
-import { removeAuthToken } from '../utils/api';
+import { removeAuthToken, isTokenExpired } from '../utils/api';
 
 const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  // Check token expiration on mount and set up periodic checking
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      if (isTokenExpired()) {
+        // Token is expired, logout automatically
+        removeAuthToken();
+        navigate('/admin/login', { replace: true });
+      }
+    };
+
+    // Check immediately on mount
+    checkTokenExpiration();
+
+    // Check every minute for token expiration
+    const intervalId = setInterval(checkTokenExpiration, 60000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [navigate]);
 
   const navItems = [
     { to: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },

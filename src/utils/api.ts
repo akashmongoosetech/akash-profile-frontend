@@ -27,14 +27,33 @@ export const getAuthToken = (): string | null => {
   return localStorage.getItem('adminToken');
 };
 
-// Set auth token in localStorage
+// Get token expiration time from localStorage
+export const getTokenExpiration = (): number | null => {
+  const expiration = localStorage.getItem('adminTokenExpiration');
+  return expiration ? parseInt(expiration, 10) : null;
+};
+
+// Set auth token in localStorage with expiration
 export const setAuthToken = (token: string): void => {
   localStorage.setItem('adminToken', token);
+  // Store token expiration time (1 hour from now in milliseconds)
+  const expirationTime = Date.now() + 60 * 60 * 1000;
+  localStorage.setItem('adminTokenExpiration', expirationTime.toString());
 };
 
 // Remove auth token from localStorage
 export const removeAuthToken = (): void => {
   localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminTokenExpiration');
+};
+
+// Check if token is expired
+export const isTokenExpired = (): boolean => {
+  const expiration = getTokenExpiration();
+  if (!expiration) {
+    return true; // No expiration stored, treat as expired
+  }
+  return Date.now() >= expiration;
 };
 
 // Check if user is authenticated
@@ -58,10 +77,28 @@ export const authenticatedFetch = async (
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
   
-  return fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
+
+  // Check for token expiration (401) or invalid token (403)
+  if (response.status === 401 || response.status === 403) {
+    try {
+      const data = await response.json();
+      if (data.message && (data.message.includes('expired') || data.message.includes('Invalid'))) {
+        // Token is expired or invalid, logout automatically
+        removeAuthToken();
+        window.location.href = '/admin/login';
+      }
+    } catch {
+      // If we can't parse the response, still logout on 401/403
+      removeAuthToken();
+      window.location.href = '/admin/login';
+    }
+  }
+  
+  return response;
 };
 
 // Strip HTML tags from text (useful for excerpts displayed in lists)
