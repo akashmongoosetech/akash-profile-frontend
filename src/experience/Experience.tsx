@@ -7,57 +7,56 @@ import {
   Calendar,
   MapPin,
   ExternalLink,
-  Download
 } from 'lucide-react';
 
 const Experience: React.FC = () => {
   const experiences = [
     {
       type: 'work',
-      title: 'Senior Software Engineer',
-      company: 'Profilics Systems',
+      title: 'Software Engineer',
+      company: 'Profilics Systems Pvt. Ltd.',
       location: 'Ujjain, India',
-      period: ' 2025 - Present',
-      description: 'Leading a team of 5 developers in building scalable web applications. Architected microservices infrastructure that improved system performance by 40%. Mentored junior developers and established coding standards.',
+      period: 'Feb 2025 - Present',
+      description: 'Developing scalable and responsive web applications using MERN Stack. Building reusable UI components and integrating RESTful APIs. Collaborating with cross-functional Agile teams to deliver reliable software solutions.',
       achievements: [
-        'Led migration from monolith to microservices architecture',
-        'Reduced application load time by 60% through optimization',
-        'Implemented CI/CD pipeline reducing deployment time by 80%',
-        'Mentored 8 junior developers across multiple projects'
+        'Developing scalable web applications using MERN Stack',
+        'Building reusable UI components for improved efficiency',
+        'Integrating RESTful APIs for seamless data flow',
+        'Optimizing application performance and user experience'
       ],
-      technologies: ['React', 'Node.js', 'AWS', 'Docker', 'PostgreSQL'],
+      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'REST APIs'],
       logo: '🏢'
     },
     {
       type: 'work',
-      title: 'Software Engineer II',
-      company: 'Kataria Group',
-      location: 'Ujjain, India',
-      period: '2024 - 2024',
-      description: 'Developed and maintained multiple client projects using modern web technologies. Collaborated with design teams to implement pixel-perfect UI components and integrated third-party APIs.',
+      title: 'Graduate Software Engineer',
+      company: 'Knocial India Limited',
+      location: 'Gurgaon, India',
+      period: 'June 2023 - Nov 2024',
+      description: 'Worked on full stack development following Agile and SDLC best practices. Implemented new features, resolved bugs, and improved application performance. Participated in code reviews and collaborated closely with senior engineers.',
       achievements: [
-        'Built 12+ client projects from scratch',
-        'Improved code quality by implementing automated testing',
-        'Reduced bug reports by 45% through rigorous QA processes',
-        'Integrated payment gateways for e-commerce platforms'
+        'Implemented new features following Agile methodology',
+        'Resolved bugs and improved application performance',
+        'Participated in code reviews and team collaborations',
+        'Delivered scalable solutions aligned with business needs'
       ],
-      technologies: ['React', 'Vue.js', 'Express.js', 'MongoDB', 'Firebase'],
+      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'JavaScript'],
       logo: '💡'
     },
     {
       type: 'work',
-      title: 'Software Engineer',
-      company: 'Knocial India Limited',
-      location: 'Remote',
-      period: '2023 - 2024',
-      description: 'Focused on creating responsive and interactive user interfaces for a fintech startup. Worked closely with UX designers to implement modern design patterns and ensure optimal user experience.',
+      title: 'Software Trainee Intern',
+      company: 'Allsoft Infotech & Multimedia',
+      location: 'Ujjain, India',
+      period: 'Oct 2022 - May 2023',
+      description: 'Assisted in developing user-friendly web interfaces using HTML, CSS, and JavaScript. Supported backend integration, testing, and deployment activities. Gained hands-on experience working on live projects under senior developer guidance.',
       achievements: [
-        'Developed responsive web app serving 10K+ users',
-        'Implemented real-time data visualization dashboard',
-        'Optimized bundle size reducing load time by 50%',
-        'Created reusable component library'
+        'Assisted in developing user-friendly web interfaces',
+        'Supported backend integration and testing activities',
+        'Gained hands-on experience with live projects',
+        'Collaborated with senior developers on implementation'
       ],
-      technologies: ['React', 'TypeScript', 'D3.js', 'SASS', 'Webpack'],
+      technologies: ['HTML', 'CSS', 'JavaScript', 'Backend Integration', 'Testing'],
       logo: '🚀'
     }
   ];
@@ -79,22 +78,22 @@ const Experience: React.FC = () => {
       ],
       logo: '🎓'
     },
-    {
-      type: 'education',
-      title: 'Mater of Technology',
-      company: 'Information Technology',
-      institution: 'Mahakal Institute of Technology',
-      location: 'Ujjain, India',
-      period: '2024 - Present',
-      description: 'Pursued advanced studies in Information Technology with a focus on software architecture, cloud computing, data analytics, and machine learning. Engaged in academic research and hands-on development projects.',
-      achievements: [
-        'CGPA: 9.1/10 - First Class with Distinction',
-        'Published research paper on "Optimized Data Routing in Cloud Networks" in IEEE Xplore',
-        'Graduate Teaching Assistant for Advanced Web Technologies',
-        'Final year project selected for national-level tech symposium'
-      ],
-      logo: '📚'
-    }
+    // {
+    //   type: 'education',
+    //   title: 'Mater of Technology',
+    //   company: 'Information Technology',
+    //   institution: 'Mahakal Institute of Technology',
+    //   location: 'Ujjain, India',
+    //   period: '2024 - Present',
+    //   description: 'Pursued advanced studies in Information Technology with a focus on software architecture, cloud computing, data analytics, and machine learning. Engaged in academic research and hands-on development projects.',
+    //   achievements: [
+    //     'CGPA: 9.1/10 - First Class with Distinction',
+    //     'Published research paper on "Optimized Data Routing in Cloud Networks" in IEEE Xplore',
+    //     'Graduate Teaching Assistant for Advanced Web Technologies',
+    //     'Final year project selected for national-level tech symposium'
+    //   ],
+    //   logo: '📚'
+    // }
   ];
 
   const certifications = [
