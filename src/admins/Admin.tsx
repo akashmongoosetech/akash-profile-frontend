@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  Users, 
-  TrendingUp, 
-  User, 
-  Inbox, 
-  BookOpen, 
+import {
+  Shield,
+  Users,
+  TrendingUp,
+  User,
+  Inbox,
+  BookOpen,
   UserPlus,
   Activity,
   Clock,
@@ -76,7 +76,7 @@ const Admin: React.FC = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all stats in parallel
       const [statsRes, contactsRes, blogStatsRes, subscriberStatsRes] = await Promise.all([
         fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`),
@@ -84,14 +84,14 @@ const Admin: React.FC = () => {
         fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/stats`),
         fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/stats`)
       ]);
-      
+
       const [statsData, contactsData, blogStatsData, subscriberStatsData] = await Promise.all([
         statsRes.json(),
         contactsRes.json(),
         blogStatsRes.json(),
         subscriberStatsRes.json()
       ]);
-      
+
       if (statsRes.ok && contactsRes.ok && blogStatsRes.ok && subscriberStatsRes.ok) {
         // Process contact stats
         const statsArr = statsData.stats as ContactStats[];
@@ -101,7 +101,7 @@ const Admin: React.FC = () => {
         const worked = statsArr.find(stat => stat._id === 'worked')?.count || 0;
         const done = statsArr.find(stat => stat._id === 'done')?.count || 0;
         const rejected = statsArr.find(stat => stat._id === 'rejected')?.count || 0;
-        
+
         setStats({
           totalContacts,
           pending,
@@ -115,7 +115,7 @@ const Admin: React.FC = () => {
           totalSubscribers: subscriberStatsData.activeCount || 0,
           activeSubscribers: subscriberStatsData.activeCount || 0
         });
-        
+
         // Get 3 most recent contacts
         setRecentContacts((contactsData.contacts as Contact[]).slice(0, 3));
       } else {
@@ -225,24 +225,25 @@ const Admin: React.FC = () => {
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-12">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="flex items-center justify-center gap-4 mb-4"
           >
-            <motion.div 
+            <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className="w-16 h-16 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30"
+              className="w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.5)] ring-1 ring-white/20 relative"
             >
-              <Shield className="w-8 h-8 text-white" />
+              <div className="absolute inset-0 bg-white/20 rounded-2xl blur-md -z-10" />
+              <Shield className="w-8 h-8 text-white relative z-10" />
             </motion.div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-gray-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-blue-100 to-slate-400 bg-clip-text text-transparent drop-shadow-sm">
               Admin Dashboard
             </h1>
           </motion.div>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -254,7 +255,7 @@ const Admin: React.FC = () => {
 
         {/* Error Message */}
         {error && (
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -290,11 +291,13 @@ const Admin: React.FC = () => {
         {/* Info Cards Row */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Recent Contacts Card */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.01 }}
-            className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50"
+            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50" />
+
+            <div className="flex items-center gap-3 mb-6 relative z-10">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                 <Inbox className="w-5 h-5 text-white" />
               </div>
@@ -305,7 +308,7 @@ const Admin: React.FC = () => {
             </div>
             {loading ? (
               <div className="space-y-3">
-                {[1,2,3].map(i => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="h-16 bg-slate-700/30 rounded-xl animate-pulse" />
                 ))}
               </div>
@@ -317,14 +320,14 @@ const Admin: React.FC = () => {
             ) : (
               <ul className="space-y-3">
                 {recentContacts.map((contact, index) => (
-                  <motion.li 
+                  <motion.li
                     key={contact._id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl hover:bg-slate-700/50 transition-colors"
+                    className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-xl hover:bg-slate-600/40 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-slate-600/50 relative z-10"
                   >
-                    <div className={`w-2 h-2 rounded-full ${getStatusColor(contact.status)}`} />
+                    <div className={`w-2 h-2 rounded-full shadow-[0_0_8px_currentColor] ${getStatusColor(contact.status)}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-white font-medium truncate">{contact.name}</p>
                       <p className="text-xs text-slate-400 truncate">{contact.subject}</p>
@@ -339,11 +342,13 @@ const Admin: React.FC = () => {
           </motion.div>
 
           {/* Status Breakdown Card */}
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.01 }}
-            className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-700/50"
+            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50" />
+
+            <div className="flex items-center gap-3 mb-6 relative z-10">
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
@@ -360,24 +365,24 @@ const Admin: React.FC = () => {
                 { label: 'Completed', value: stats.completed, color: 'bg-green-500', text: 'text-green-400' },
                 { label: 'Rejected', value: stats.rejected, color: 'bg-red-500', text: 'text-red-400' }
               ].map((item, index) => (
-                <motion.div 
+                <motion.div
                   key={item.label}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-3"
                 >
-                  <span className={`w-3 h-3 rounded-full ${item.color}`} />
-                  <span className="text-slate-300 flex-1">{item.label}</span>
-                  <div className="w-32 h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div 
+                  <span className={`w-3 h-3 rounded-full shadow-[0_0_8px_currentColor] ${item.color}`} />
+                  <span className="text-slate-300 flex-1 font-medium tracking-wide text-sm">{item.label}</span>
+                  <div className="w-32 h-2 bg-slate-700/50 rounded-full overflow-hidden border border-slate-700/50">
+                    <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${stats.totalContacts > 0 ? (item.value / stats.totalContacts) * 100 : 0}%` }}
                       transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
-                      className={`h-full ${item.color}`}
+                      className={`h-full ${item.color} shadow-[0_0_10px_currentColor]`}
                     />
                   </div>
-                  <span className={`${item.text} font-bold w-8 text-right`}>{item.value}</span>
+                  <span className={`${item.text} font-bold w-10 text-right`}>{item.value}</span>
                 </motion.div>
               ))}
             </div>

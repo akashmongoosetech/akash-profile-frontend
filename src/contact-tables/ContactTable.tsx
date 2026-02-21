@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
+import {
+  Eye,
+  Edit,
+  Trash2,
+  CheckCircle,
+  Clock,
+  XCircle,
   Search,
   RefreshCw,
   Calendar,
@@ -76,7 +76,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       setLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setContacts(data.contacts);
       } else {
@@ -126,13 +126,13 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
   // Filter contacts
   const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = 
+    const matchesSearch =
       contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.subject.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || contact.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -148,9 +148,9 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       });
 
       if (response.ok) {
-        setContacts(prev => 
-          prev.map(contact => 
-            contact._id === contactId 
+        setContacts(prev =>
+          prev.map(contact =>
+            contact._id === contactId
               ? { ...contact, status: newStatus as Contact['status'] }
               : contact
           )
@@ -208,9 +208,9 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       });
 
       if (response.ok) {
-        setContacts(prev => 
-          prev.map(contact => 
-            contact._id === contactId 
+        setContacts(prev =>
+          prev.map(contact =>
+            contact._id === contactId
               ? { ...contact, ...updates }
               : contact
           )
@@ -230,11 +230,11 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   // Get status color and icon
   const getStatusInfo = (status: string) => {
     const statusConfig = {
-      pending: { color: 'text-yellow-400', bg: 'bg-yellow-400/10', icon: Clock },
-      review: { color: 'text-blue-400', bg: 'bg-blue-400/10', icon: Eye },
-      worked: { color: 'text-purple-400', bg: 'bg-purple-400/10', icon: MessageSquare },
-      done: { color: 'text-green-400', bg: 'bg-green-400/10', icon: CheckCircle },
-      rejected: { color: 'text-red-400', bg: 'bg-red-400/10', icon: XCircle },
+      pending: { color: 'text-yellow-400', bg: 'bg-yellow-400/10 border border-yellow-400/20 shadow-[0_0_10px_rgba(250,204,21,0.2)]', icon: Clock },
+      review: { color: 'text-blue-400', bg: 'bg-blue-400/10 border border-blue-400/20 shadow-[0_0_10px_rgba(96,165,250,0.2)]', icon: Eye },
+      worked: { color: 'text-purple-400', bg: 'bg-purple-400/10 border border-purple-400/20 shadow-[0_0_10px_rgba(192,132,252,0.2)]', icon: MessageSquare },
+      done: { color: 'text-green-400', bg: 'bg-green-400/10 border border-green-400/20 shadow-[0_0_10px_rgba(74,222,128,0.2)]', icon: CheckCircle },
+      rejected: { color: 'text-red-400', bg: 'bg-red-400/10 border border-red-400/20 shadow-[0_0_10px_rgba(248,113,113,0.2)]', icon: XCircle },
     };
     return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
   };
@@ -279,17 +279,17 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       setExporting(true);
       const { jsPDF } = await import('jspdf');
       await import('jspdf-autotable');
-      
+
       const doc = new jsPDF();
-      
+
       // Add title
       doc.setFontSize(20);
       doc.text('Contact Management Report', 14, 22);
-      
+
       // Add date
       doc.setFontSize(10);
       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-      
+
       // Prepare table data
       const tableData = filteredContacts.map(contact => [
         contact.name,
@@ -300,7 +300,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
         contact.priority,
         formatDate(contact.createdAt)
       ]);
-      
+
       // Add table
       (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         head: [['Name', 'Email', 'Mobile', 'Subject', 'Status', 'Priority', 'Date']],
@@ -319,7 +319,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
           3: { cellWidth: 40 }, // Subject column wider
         }
       });
-      
+
       doc.save('contact-management-report.pdf');
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -332,7 +332,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const exportToCSV = async () => {
     try {
       setExporting(true);
-      
+
       // Create CSV data
       const csvData = [
         ['Name', 'Email', 'Mobile', 'Subject', 'Message', 'Status', 'Priority', 'Admin Notes', 'Date Created'],
@@ -348,16 +348,16 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
           formatDate(contact.createdAt)
         ])
       ];
-      
+
       // Convert to CSV string
-      const csvString = csvData.map(row => 
+      const csvString = csvData.map(row =>
         row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
       ).join('\n');
-      
+
       // Create blob and download
       const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
-      
+
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
@@ -471,19 +471,19 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
             placeholder="Search contacts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
+            className="w-full pl-10 pr-4 py-3 bg-slate-800/40 backdrop-blur-xl border border-slate-700/60 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-slate-800/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
+          className="px-4 py-3 bg-slate-800/40 backdrop-blur-xl border border-slate-700/60 rounded-xl text-white focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300"
         >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
@@ -496,7 +496,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
       {/* Error Message */}
       {error && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-red-500/10 border border-red-500/20 rounded-xl p-4"
@@ -506,12 +506,12 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       )}
 
       {/* Table */}
-      <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 overflow-hidden">
+      <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/10">
+            <thead className="bg-slate-900/50 border-b border-slate-700/50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
                   Contact
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
@@ -526,22 +526,22 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-slate-700/50">
               {currentContacts.map((contact) => {
                 const statusInfo = getStatusInfo(contact.status);
                 const StatusIcon = statusInfo.icon;
-                
+
                 return (
                   <motion.tr
                     key={contact._id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="hover:bg-white/5 transition-colors"
+                    className="hover:bg-slate-700/30 transition-colors group"
                   >
                     <td className="px-6 py-4">
                       <div>
@@ -558,9 +558,9 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {contact.status}
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        <span className="capitalize">{contact.status}</span>
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -627,10 +627,10 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
             <p className="text-gray-400">No contacts found</p>
           </div>
         )}
-        
+
         {/* Pagination */}
         {filteredContacts.length > 0 && (
-          <div className="px-6 py-4 bg-white/5 border-t border-white/10">
+          <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="text-sm text-gray-400">
                 Showing {startIndex + 1} to {Math.min(endIndex, filteredContacts.length)} of {filteredContacts.length} contacts
@@ -643,7 +643,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                
+
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                     if (
@@ -655,11 +655,10 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                            page === currentPage
+                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${page === currentPage
                               ? 'bg-blue-500 text-white'
                               : 'bg-white/10 hover:bg-white/20 text-gray-300'
-                          }`}
+                            }`}
                         >
                           {page}
                         </button>
@@ -677,7 +676,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                     return null;
                   })}
                 </div>
-                
+
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
@@ -802,7 +801,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                 const status = formData.get('status') as Contact['status'];
                 const priority = formData.get('priority') as Contact['priority'];
                 const adminNotes = formData.get('adminNotes') as string;
-                
+
                 updateContact(editingContact._id, {
                   status,
                   priority,

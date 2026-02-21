@@ -85,7 +85,7 @@ const BlogManagement: React.FC = () => {
   const [categories, setCategories] = useState(['React', 'Backend', 'DevOps', 'Database', 'Trends', 'Tutorial', 'Technology']);
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
-  
+
   // Success and Delete Modal States
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -117,15 +117,15 @@ const BlogManagement: React.FC = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
+
       if (searchTerm) params.append('search', searchTerm);
       if (selectedCategory) params.append('category', selectedCategory);
       params.append('page', currentPage.toString());
       params.append('limit', '10');
-      
+
       const response = await authenticatedFetch(`/api/blog/admin/all?${params}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setBlogs(data.blogs);
         setTotalPages(data.pagination?.totalPages || 1);
@@ -226,19 +226,19 @@ const BlogManagement: React.FC = () => {
         setIsSubmitting(false);
         return;
       }
-      
+
       if (!formData.excerpt.trim()) {
         alert('Excerpt is required');
         setIsSubmitting(false);
         return;
       }
-      
+
       if (!formData.content.trim()) {
         alert('Content is required');
         setIsSubmitting(false);
         return;
       }
-      
+
       if (!formData.image.trim()) {
         alert('Image URL is required');
         setIsSubmitting(false);
@@ -253,7 +253,7 @@ const BlogManagement: React.FC = () => {
         contentSections: formData.contentSections.map(section => ({
           ...section,
           image: section.image.trim() || undefined
-        })).filter(section => 
+        })).filter(section =>
           section.title.trim() || section.content.trim() || section.image || section.code.trim()
         ),
         // Ensure tags are properly formatted
@@ -263,14 +263,14 @@ const BlogManagement: React.FC = () => {
       console.log('Form data being sent:', cleanedFormData);
       console.log('Tags being sent:', cleanedFormData.tags);
 
-      const url = editingBlog 
+      const url = editingBlog
         ? `/api/blog/${editingBlog._id}`
         : `/api/blog`;
-      
+
       const method = editingBlog ? 'PUT' : 'POST';
-      
+
       console.log('Sending blog data:', cleanedFormData); // Debug log
-      
+
       const response = await authenticatedFetch(url, {
         method,
         headers: {
@@ -280,7 +280,7 @@ const BlogManagement: React.FC = () => {
       });
 
       const data = await response.json();
-      
+
       console.log('Server response:', data); // Debug log
 
       if (data.success) {
@@ -288,7 +288,7 @@ const BlogManagement: React.FC = () => {
         fetchBlogs();
         setSuccessMessage(editingBlog ? 'Blog updated successfully!' : 'Blog created successfully!');
         setShowSuccessModal(true);
-        
+
         // Auto-hide success modal after 3 seconds
         setTimeout(() => {
           setShowSuccessModal(false);
@@ -333,7 +333,7 @@ const BlogManagement: React.FC = () => {
         setBlogToDelete(null);
         setSuccessMessage('Blog deleted successfully!');
         setShowSuccessModal(true);
-        
+
         // Auto-hide success modal after 3 seconds
         setTimeout(() => {
           setShowSuccessModal(false);
@@ -394,7 +394,7 @@ const BlogManagement: React.FC = () => {
 
         {/* Filters */}
         <motion.div variants={itemVariants} className="mb-8">
-          <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50">
+          <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl">
             <div className="flex flex-col lg:flex-row gap-4 items-center">
               {/* Search */}
               <div className="flex-1 w-full lg:w-auto">
@@ -405,7 +405,7 @@ const BlogManagement: React.FC = () => {
                     placeholder="Search blog posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-800/40 backdrop-blur-xl border border-slate-700/60 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300"
                   />
                 </div>
               </div>
@@ -414,11 +414,10 @@ const BlogManagement: React.FC = () => {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory('')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    selectedCategory === ''
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
-                  }`}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${selectedCategory === ''
+                    ? 'bg-blue-500/20 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                    : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                    }`}
                 >
                   All
                 </button>
@@ -426,11 +425,10 @@ const BlogManagement: React.FC = () => {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      selectedCategory === category
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
-                    }`}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${selectedCategory === category
+                      ? 'bg-blue-500/20 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                      : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                      }`}
                   >
                     {category}
                   </button>
@@ -452,37 +450,39 @@ const BlogManagement: React.FC = () => {
               {blogs.map((blog) => (
                 <div
                   key={blog._id}
-                  className="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300"
+                  className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 hover:border-slate-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl group overflow-hidden relative"
                 >
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={normalizeImageUrl(blog.image)}
-                      alt={blog.title}
-                      className="w-24 h-24 object-cover rounded-xl"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-1">{blog.title}</h3>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50 pointer-events-none" />
+                  <div className="flex flex-col sm:flex-row items-start gap-6 relative z-10">
+                    <div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-xl border border-slate-700/50">
+                      <img
+                        src={normalizeImageUrl(blog.image)}
+                        alt={blog.title}
+                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="flex-1 w-full min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-2 gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors truncate">{blog.title}</h3>
                           <p className="text-slate-400 text-sm line-clamp-2">{stripHtmlTags(blog.excerpt)}</p>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 sm:ml-4 flex-shrink-0">
                           {blog.featured && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">
-                              <Star className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 shadow-[0_0_10px_rgba(250,204,21,0.2)] text-yellow-400 text-xs rounded-full font-medium">
+                              <Star className="w-3.5 h-3.5" />
                               Featured
                             </span>
                           )}
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            blog.published 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-slate-500/20 text-slate-400'
-                          }`}>
+                          <span className={`px-2.5 py-1 text-xs rounded-full font-medium border ${blog.published
+                            ? 'bg-green-400/10 border-green-400/20 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)]'
+                            : 'bg-slate-500/10 border-slate-500/30 text-slate-400 shadow-[0_0_10px_rgba(100,116,139,0.2)]'
+                            }`}>
                             {blog.published ? 'Published' : 'Draft'}
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
                         <span className="flex items-center gap-1">
                           <Tag className="w-4 h-4" />
@@ -518,7 +518,7 @@ const BlogManagement: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openModal(blog)}
@@ -549,11 +549,10 @@ const BlogManagement: React.FC = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-10 h-10 rounded-lg transition-all duration-200 ${
-                  page === currentPage
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white/10 hover:bg-white/20 text-gray-300'
-                }`}
+                className={`w-10 h-10 rounded-lg transition-all duration-200 ${page === currentPage
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white/10 hover:bg-white/20 text-gray-300'
+                  }`}
               >
                 {page}
               </button>
@@ -564,20 +563,19 @@ const BlogManagement: React.FC = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 rounded-2xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">
-                  {editingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
-                </h2>
-                <button
-                  onClick={closeModal}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  <X className="w-6 h-6 text-gray-400" />
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0A0F1C] rounded-2xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+            <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0A0F1C]/80 backdrop-blur-xl z-10">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                {editingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
             </div>
 
             <BlogForm
@@ -761,7 +759,7 @@ const BlogManagement: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 };
 

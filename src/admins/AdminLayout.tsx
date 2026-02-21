@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Mail, 
-  Users, 
-  Menu, 
-  X, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Mail,
+  Users,
+  Menu,
+  X,
   LogOut,
   ChevronLeft,
   Settings,
@@ -54,7 +54,7 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="flex h-screen bg-[#070B14] text-white overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -74,13 +74,12 @@ const AdminLayout: React.FC = () => {
           initial={{ x: -300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 shadow-2xl transform transition-all duration-300 ease-in-out ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } md:translate-x-0 md:relative md:flex md:flex-col md:h-screen`}
+          className={`fixed inset-y-0 left-0 z-50 bg-[#0A0F1C]/90 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] transform transition-all duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:translate-x-0 md:relative md:flex md:flex-col md:h-screen`}
           style={{ width: isCollapsed ? 80 : 280 }}
         >
           {/* Logo Section */}
-          <motion.div 
+          <motion.div
             className="flex-shrink-0 flex items-center justify-between p-4 border-b border-slate-700/50"
             animate={{ justifyContent: isCollapsed ? 'center' : 'space-between' }}
           >
@@ -102,13 +101,13 @@ const AdminLayout: React.FC = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-            
+
             {isCollapsed && (
               <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg mx-auto">
                 <Shield className="w-5 h-5 text-white" />
               </div>
             )}
-            
+
             <button
               onClick={() => setSidebarOpen(false)}
               className="md:hidden text-slate-400 hover:text-white focus:outline-none p-1"
@@ -133,30 +132,44 @@ const AdminLayout: React.FC = () => {
                 to={item.to}
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-3 mb-1 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                    isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/25 border-r-4 border-blue-300'
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white hover:shadow-md'
+                  `flex items-center gap-3 px-3 py-3 mb-2 text-sm font-medium rounded-xl transition-all duration-300 group relative overflow-hidden ${isActive
+                    ? 'text-white shadow-[0_4px_20px_rgba(59,130,246,0.3)] ring-1 ring-white/10'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
                   }`
                 }
               >
-                <span
-                  className="text-slate-400 group-hover:text-white"
-                >
-                  {item.icon}
-                </span>
-                <AnimatePresence mode="wait">
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.2 }}
+                {({ isActive }) => (
+                  <>
+                    {/* Active State Background Indicator */}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNavBackground"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-600/80 to-blue-400/80"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 transition-colors duration-300 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'
+                        }`}
                     >
-                      {item.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                      {item.icon}
+                    </span>
+                    <AnimatePresence mode="wait">
+                      {!isCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="relative z-10"
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
@@ -181,12 +194,11 @@ const AdminLayout: React.FC = () => {
                 )}
               </AnimatePresence>
             </div>
-            
+
             <button
               onClick={handleLogout}
-              className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-300 rounded-xl hover:bg-red-500/20 hover:text-red-400 transition-all duration-200 ${
-                isCollapsed ? 'justify-center' : ''
-              }`}
+              className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-300 rounded-xl hover:bg-red-500/20 hover:text-red-400 transition-all duration-200 ${isCollapsed ? 'justify-center' : ''
+                }`}
             >
               <LogOut className="w-5 h-5" />
               <AnimatePresence mode="wait">
@@ -206,9 +218,9 @@ const AdminLayout: React.FC = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col h-full bg-[#070B14]">
         {/* Header */}
-        <header className="bg-slate-800/50 backdrop-blur-lg shadow-lg border-b border-slate-700/50 sticky top-0 z-30">
+        <header className="bg-[#0A0F1C]/80 backdrop-blur-2xl shadow-lg border-b border-white/5 sticky top-0 z-30">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
               <button
@@ -222,7 +234,7 @@ const AdminLayout: React.FC = () => {
                 <p className="text-xs text-slate-400 hidden sm:block">Welcome back to your admin panel</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {/* Notification Bell */}
               <motion.button
@@ -233,7 +245,7 @@ const AdminLayout: React.FC = () => {
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </motion.button>
-              
+
               {/* Settings */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -247,7 +259,10 @@ const AdminLayout: React.FC = () => {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-slate-900/50">
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-transparent relative z-0">
+          {/* Subtle global background glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

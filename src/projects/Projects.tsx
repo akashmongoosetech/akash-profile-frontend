@@ -10,62 +10,56 @@ const Projects: React.FC = () => {
   const projects = [
     {
       id: 1,
-      title: 'E-Commerce Platform',
-      description: 'A full-stack e-commerce solution with React, Node.js, and MongoDB. Features include user authentication, payment processing, and admin dashboard.',
-      image: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=800',
+      title: 'Hotel Management & Booking System',
+      description: 'A full-stack hotel management and booking platform developed using React, Node.js, and MongoDB. The system enables customers to browse rooms, check real-time availability, make secure online bookings, and manage reservations. The admin panel provides complete control over room management, pricing, booking status, customer data, and analytics.',
+      image: 'https://ik.imagekit.io/sentyaztie/WhatsApp%20Image%202026-02-21%20at%2010.33.36%20AM.jpeg?updatedAt=1771650381217',
       tags: ['React', 'Node.js', 'MongoDB', 'Stripe'],
       category: 'Full Stack',
-      demoUrl: 'https://demo.example.com',
-      codeUrl: 'https://github.com'
+      demoUrl: 'http://shribalajihomestay.in',
     },
     {
       id: 2,
-      title: 'Task Management App',
-      description: 'A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.',
-      image: 'https://images.pexels.com/photos/3184454/pexels-photo-3184454.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['React', 'Firebase', 'Material-UI'],
+      title: 'Event & Catering Management',
+      description: 'A full-stack event management and catering platform with a modern, responsive design. The system allows clients to book events, select catering services, customize menus, and track event details in real time. The admin panel provides complete control over event scheduling, package management, customer data, payments, and analytics.',
+      image: 'https://ik.imagekit.io/sentyaztie/eve.jpeg?updatedAt=1771650621892',
+      tags: ['React', 'Tailwind CSS', 'Sass', 'Shadcn UI', 'Chart.js, React Chartjs 2'],
       category: 'React',
-      demoUrl: 'https://demo.example.com',
-      codeUrl: 'https://github.com'
+      demoUrl: 'https://anjanievents.in/',
     },
     {
       id: 3,
-      title: 'Weather Dashboard',
-      description: 'A beautiful weather dashboard with location-based forecasts, interactive maps, and detailed weather analytics.',
-      image: 'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['React', 'API Integration', 'Charts'],
+      title: 'Massage & SPA',
+      description: 'A beautifully designed and fully responsive massage & spa website built with a modern UI/UX approach. The platform allows customers to explore services, book appointments online, view therapist profiles, and make secure payments. The admin panel enables complete control over services, pricing, therapist schedules, customer bookings, and business analytics.',      image: 'https://ik.imagekit.io/sentyaztie/tri.jpeg?updatedAt=1771651123575',
+      tags: ['React', 'API Integration', 'Charts', 'Mongodb', 'Frame-Motion'],
       category: 'React',
-      demoUrl: 'https://demo.example.com',
-      codeUrl: 'https://github.com'
+      demoUrl: 'https://tripod-wellness.netlify.app/',
     },
     {
       id: 4,
       title: 'Social Media API',
-      description: 'RESTful API for a social media platform with user authentication, post management, and real-time notifications.',
-      image: 'https://images.pexels.com/photos/1482476/pexels-photo-1482476.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['Node.js', 'Express', 'PostgreSQL'],
+      description: 'A modern NGO website and RESTful API developed for Snehjeet Social Welfare Society, focused on LGBTQ+ support, animal welfare, and old-age care initiatives. The platform includes volunteer registration, donation management, event updates, case tracking, and secure user authentication. An advanced admin panel allows administrators to manage campaigns, beneficiaries, volunteers, content, donations, and real-time updates efficiently.',
+      image: 'https://ik.imagekit.io/sentyaztie/sneh.png?updatedAt=1771652576086',
+      tags: ['Node.js', 'Express', 'PostgreSQL', 'React', 'Zod'],
       category: 'Node.js',
-      demoUrl: 'https://demo.example.com',
-      codeUrl: 'https://github.com'
+      demoUrl: 'https://sneh-jeet-social-welfare-society.netlify.app/',
     },
     {
       id: 5,
-      title: 'Recipe Finder App',
-      description: 'Mobile-first recipe application with ingredient-based search, meal planning, and shopping list generation.',
-      image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+      title: 'Pride Community',
+      description: 'Pride Voice is a modern, mobile-responsive community and awareness platform designed to support and empower the LGBTQ+ community. The website features event updates, blog posts, educational resources, member registration, and a secure admin panel for managing content, users, campaigns, and announcements.',
+      image: 'https://ik.imagekit.io/sentyaztie/pride.jpeg?updatedAt=1771650786179',
       tags: ['React Native', 'Redux', 'API'],
       category: 'Mobile',
-      demoUrl: 'https://demo.example.com',
-      codeUrl: 'https://github.com'
+      demoUrl: 'http://pridevoice.netlify.app/',
     },
     {
       id: 6,
-      title: 'Portfolio Dashboard',
-      description: 'Investment portfolio tracking dashboard with real-time stock data, performance analytics, and portfolio optimization.',
-      image: 'https://images.pexels.com/photos/590020/pexels-photo-590020.jpeg?auto=compress&cs=tinysrgb&w=800',
+      title: 'Prescription Generator',
+      description: 'A modern prescription generator web application built with a secure admin panel. The system allows doctors to create, manage, and generate patient prescriptions with structured medical details. Features include patient record management, prescription history tracking, automated PDF generation for download/print, and a responsive, user-friendly interface.',
+      image: 'https://ik.imagekit.io/sentyaztie/pre.jpeg?updatedAt=1771651761087',
       tags: ['React', 'D3.js', 'Financial API'],
       category: 'Full Stack',
-      demoUrl: 'https://demo.example.com',
+      demoUrl: 'https://bhargava-prescriptions-maker.netlify.app/',
       codeUrl: 'https://github.com'
     }
   ];
@@ -198,14 +192,14 @@ const Projects: React.FC = () => {
                     >
                       Live Demo
                     </a>
-                    <a
+                  {/* <a
                       href={project.codeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 bg-white/10 hover:bg-white/20 text-white text-center py-2 rounded-lg font-medium transition-all duration-200"
                     >
                       Source Code
-                    </a>
+                    </a>*/}
                   </div>
                 </div>
               </motion.div>

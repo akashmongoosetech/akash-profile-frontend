@@ -100,23 +100,23 @@ const Home: React.FC = () => {
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
-      position: 'CEO, TechStart Inc.',
-      image: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400',
-      text: 'Akash delivered an exceptional e-commerce platform that exceeded our expectations. His technical expertise and attention to detail are remarkable.',
+      name: 'Dr. Shashank Bhargava',
+      position: 'Director, Bhargava Clinic.',
+      image: 'https://lh3.googleusercontent.com/p/AF1QipMu2qECS8hvAogiZ1bDWUDBA5AGg7dXT_g4834m=s680-w680-h510-rw',
+      text: 'Akash delivered an outstanding prescription generator website that perfectly meets our clinical needs. The system is fast, user-friendly, and highly efficient for managing patient prescriptions. His technical expertise, attention to detail, and understanding of healthcare workflows truly exceeded our expectations.',
       rating: 5
     },
     {
-      name: 'Michael Chen',
-      position: 'CTO, DataFlow Solutions',
-      image: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400',
+      name: 'Jitendra Thakur',
+      position: 'Founder, Sneh Jeet Social Welfare Society',
+      image: 'https://thispersonnotexist.org/downloadimage/Ac3RhdGljL21hbi9zZWVkMjUzOTcuanBlZw==',
       text: 'Working with Akash was a game-changer for our startup. He built a scalable backend that handles millions of requests daily.',
       rating: 5
     },
     {
-      name: 'Emily Rodriguez',
-      position: 'Product Manager, InnovateLab',
-      image: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400',
+      name: 'Rajesh Verma',
+      position: 'Director & CEO, Azad Infrastructure',
+      image: 'https://gos3.ibcdn.com/28165e14-1544-49fa-a88e-e0e6e3707244.jpeg',
       text: 'Akash transformed our outdated application into a modern, responsive platform. The results speak for themselves.',
       rating: 5
     }
@@ -124,29 +124,33 @@ const Home: React.FC = () => {
 
   const featuredProjects = [
     {
-      title: 'E-Commerce Platform',
-      description: 'Full-stack e-commerce solution with React, Node.js, and MongoDB',
-      image: 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['React', 'Node.js', 'MongoDB'],
-      demoUrl: '#',
+      id: 1,
+      title: 'Hotel Management & Booking System',
+      description: 'A full-stack hotel management and booking platform developed using React, Node.js, and MongoDB. The system enables customers to browse rooms, check real-time availability, make secure online bookings, and manage reservations. The admin panel provides complete control over room management, pricing, booking status, customer data, and analytics.',
+      image: 'https://ik.imagekit.io/sentyaztie/WhatsApp%20Image%202026-02-21%20at%2010.33.36%20AM.jpeg?updatedAt=1771650381217',
+      tags: ['React', 'Node.js', 'MongoDB', 'Stripe'],
+      demoUrl: 'http://shribalajihomestay.in',
       codeUrl: '#'
     },
     {
-      title: 'Task Management App',
-      description: 'Collaborative task management with real-time updates',
-      image: 'https://images.pexels.com/photos/3184454/pexels-photo-3184454.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['React', 'Firebase', 'Material-UI'],
-      demoUrl: '#',
+      id: 2,
+      title: 'Event & Catering Management',
+      description: 'A full-stack event management and catering platform with a modern, responsive design. The system allows clients to book events, select catering services, customize menus, and track event details in real time. The admin panel provides complete control over event scheduling, package management, customer data, payments, and analytics.',
+      image: 'https://ik.imagekit.io/sentyaztie/eve.jpeg?updatedAt=1771650621892',
+      tags: ['React', 'Tailwind CSS', 'Sass', 'Shadcn UI', 'Chart.js'],
+      demoUrl: 'https://anjanievents.in/',
       codeUrl: '#'
     },
     {
-      title: 'Weather Dashboard',
-      description: 'Beautiful weather dashboard with location-based forecasts',
-      image: 'https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?auto=compress&cs=tinysrgb&w=800',
-      tags: ['React', 'API Integration', 'Charts'],
-      demoUrl: '#',
+      id: 3,
+      title: 'Massage & SPA',
+      description: 'A beautifully designed and fully responsive massage & spa website built with a modern UI/UX approach. The platform allows customers to explore services, book appointments online, view therapist profiles, and make secure payments. The admin panel enables complete control over services, pricing, therapist schedules, customer bookings, and business analytics.',
+      image: 'https://ik.imagekit.io/sentyaztie/tri.jpeg?updatedAt=1771651123575',
+      tags: ['React', 'API Integration', 'Charts', 'MongoDB', 'Frame-Motion'],
+      demoUrl: 'https://tripod-wellness.netlify.app/',
       codeUrl: '#'
-    }
+    },
+    
   ];
 
   const skills = [
@@ -627,12 +631,12 @@ const Home: React.FC = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project, index) => (
+            {featuredProjects.map((project) => (
               <motion.div
-                key={index}
+                key={project.id}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
+                transition={{ delay: 0.1, duration: 0.6 }}
                 viewport={{ once: true }}
                 className="group bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden hover:scale-105 transition-all duration-300"
               >
@@ -822,13 +826,13 @@ const Home: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <Link
+            {/* <Link
               to="/testimonials"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-white/20"
             >
               View All Testimonials
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </Link> */}
           </motion.div>
         </div>
       </section>
