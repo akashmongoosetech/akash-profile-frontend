@@ -24,12 +24,30 @@ import {
   MessageCircle,
   TrendingUp,
   Target,
-  Rocket
+  Rocket,
+  Lightbulb,
+  Palette,
+  Hammer,
+  Bug,
+  Zap,
+  Heart,
+  Send,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Layout,
+  Layers,
+  FileText,
+  Server,
+  Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -150,7 +168,33 @@ const Home: React.FC = () => {
       demoUrl: 'https://tripod-wellness.netlify.app/',
       codeUrl: '#'
     },
-    
+    {
+      id: 4,
+      title: 'Prescription Generator',
+      description: 'A comprehensive prescription generator system for healthcare providers. Features include patient management, prescription creation, drug interaction checking, PDF generation, and print-friendly layouts. Built with modern React and Node.js technologies.',
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800',
+      tags: ['React', 'Node.js', 'MongoDB', 'PDF'],
+      demoUrl: '#',
+      codeUrl: '#'
+    },
+    {
+      id: 5,
+      title: 'E-Commerce Platform',
+      description: 'A full-featured e-commerce platform with product catalog, shopping cart, payment integration, order management, and admin dashboard. Includes user authentication, wishlist, reviews, and responsive design for all devices.',
+      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800',
+      tags: ['React', 'Node.js', 'Stripe', 'MongoDB'],
+      demoUrl: '#',
+      codeUrl: '#'
+    },
+    {
+      id: 6,
+      title: 'Social Welfare Platform',
+      description: 'A comprehensive platform for social welfare organizations to manage campaigns, donations, volunteers, and events. Features include real-time tracking, reporting, and donor management.',
+      image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800',
+      tags: ['React', 'Express', 'MongoDB', 'Analytics'],
+      demoUrl: '#',
+      codeUrl: '#'
+    }
   ];
 
   const skills = [
@@ -184,6 +228,114 @@ const Home: React.FC = () => {
       description: 'Always meeting project deadlines'
     }
   ];
+
+  const processSteps = [
+    {
+      step: '01',
+      title: 'Discovery & Planning',
+      description: 'We start by understanding your vision, goals, and requirements. I analyze your needs and create a detailed project roadmap.',
+      icon: Lightbulb,
+      color: 'from-yellow-500 to-orange-500'
+    },
+    {
+      step: '02',
+      title: 'Design & Prototype',
+      description: 'I create stunning UI/UX designs and interactive prototypes to visualize the final product before development begins.',
+      icon: Palette,
+      color: 'from-pink-500 to-rose-500'
+    },
+    {
+      step: '03',
+      title: 'Development',
+      description: 'Using cutting-edge technologies, I build robust and scalable solutions with clean, maintainable code.',
+      icon: Hammer,
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
+      step: '04',
+      title: 'Testing & QA',
+      description: 'Rigorous testing ensures your application is bug-free, secure, and performs optimally across all devices.',
+      icon: Bug,
+      color: 'from-green-500 to-emerald-500'
+    },
+    {
+      step: '05',
+      title: 'Deployment & Launch',
+      description: 'I deploy your application to production servers and ensure a smooth launch with zero downtime.',
+      icon: Rocket,
+      color: 'from-purple-500 to-violet-500'
+    },
+    {
+      step: '06',
+      title: 'Support & Maintenance',
+      description: 'Post-launch support includes updates, optimizations, and ongoing maintenance to keep your app running perfectly.',
+      icon: Heart,
+      color: 'from-red-500 to-pink-500'
+    }
+  ];
+
+  const techStack = [
+    { name: 'React.js', icon: Layout, color: 'from-blue-400 to-blue-600' },
+    { name: 'Next.js', icon: Layers, color: 'from-gray-300 to-gray-500' },
+    { name: 'TypeScript', icon: FileText, color: 'from-blue-500 to-blue-700' },
+    { name: 'Node.js', icon: Server, color: 'from-green-500 to-green-700' },
+    { name: 'Express', icon: Package, color: 'from-gray-400 to-gray-600' },
+    { name: 'MongoDB', icon: Database, color: 'from-green-400 to-green-600' },
+    { name: 'PostgreSQL', icon: Database, color: 'from-blue-600 to-indigo-700' },
+    { name: 'AWS', icon: Cloud, color: 'from-orange-400 to-orange-600' },
+    { name: 'Docker', icon: Package, color: 'from-blue-500 to-cyan-500' },
+    { name: 'Tailwind CSS', icon: Palette, color: 'from-cyan-400 to-cyan-600' },
+    { name: 'GraphQL', icon: Zap, color: 'from-pink-500 to-rose-500' },
+    { name: 'Redis', icon: Server, color: 'from-red-500 to-red-700' }
+  ];
+
+  const faqs = [
+    {
+      question: 'What is your development process?',
+      answer: 'My development process follows a structured approach: Discovery & Planning, Design & Prototype, Development, Testing & QA, Deployment, and Post-launch Support. I keep you updated at every step and ensure transparent communication throughout the project lifecycle.'
+    },
+    {
+      question: 'How long does it take to build a project?',
+      answer: 'Project timeline depends on complexity and scope. A simple website takes 1-2 weeks, while complex web applications can take 2-6 months. I provide detailed timelines during the planning phase and keep you updated on progress.'
+    },
+    {
+      question: 'Do you offer post-launch support?',
+      answer: 'Yes! I offer comprehensive post-launch support including bug fixes, security updates, performance optimizations, and new feature implementations. We can discuss a maintenance plan that fits your needs.'
+    },
+    {
+      question: 'What technologies do you specialize in?',
+      answer: 'I specialize in modern web technologies including React.js, Next.js, TypeScript, Node.js, MongoDB, PostgreSQL, AWS, Docker, and more. I choose the best tech stack based on your project requirements.'
+    },
+    {
+      question: 'How do you handle payments and contracts?',
+      answer: 'I offer flexible payment structures including fixed-price projects and hourly rates. For large projects, I typically work with milestones: 30% upfront, 30% at midpoint, and 40% upon completion.'
+    },
+    {
+      question: 'Can you work with existing codebases?',
+      answer: 'Absolutely! I have experience taking over existing projects, understanding the current architecture, and making improvements or adding new features without disrupting existing functionality.'
+    }
+  ];
+
+  const partners = [
+    { name: 'Bhargava Clinic', logo: '🏥' },
+    { name: 'Sneh Jeet', logo: '🤝' },
+    { name: 'Azad Infrastructure', logo: '🏗️' },
+    { name: 'Shri Balaji', logo: '🏨' },
+    { name: 'Anjani Events', logo: '🎉' },
+    { name: 'Tripod Wellness', logo: '💆' }
+  ];
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubscribing(true);
+    // Simulate subscription
+    setTimeout(() => {
+      setIsSubscribing(false);
+      setEmail('');
+      alert('Thank you for subscribing!');
+    }, 1000);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -739,6 +891,247 @@ const Home: React.FC = () => {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              How I Work
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              A systematic approach to deliver exceptional results every time
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {processSteps.map((process, index) => {
+              const Icon = process.icon;
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300"
+                >
+                  <div className="absolute -top-3 -left-3 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {process.step}
+                  </div>
+                  <div className={`w-14 h-14 bg-gradient-to-r ${process.color} rounded-xl flex items-center justify-center mb-4 mt-2 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">{process.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{process.description}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Technology Stack Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Technology Stack
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Modern tools and frameworks I use to build powerful applications
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {techStack.map((tech, index) => {
+              const Icon = tech.icon;
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05, duration: 0.4 }}
+                  viewport={{ once: true }}
+                  className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10 hover:scale-110 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
+                >
+                  <div className={`w-12 h-12 bg-gradient-to-r ${tech.color} rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:rotate-12 transition-transform`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="text-center text-gray-300 text-sm font-medium">{tech.name}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Trusted By
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Organizations I've had the privilege to work with
+            </p>
+          </motion.div>
+
+          <div className="flex flex-wrap justify-center gap-8">
+            {partners.map((partner, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300 flex flex-col items-center gap-3 min-w-[150px]"
+              >
+                <span className="text-4xl">{partner.logo}</span>
+                <span className="text-gray-300 font-medium text-center">{partner.name}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Common questions about my services and working process
+            </p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="bg-white/5 backdrop-blur-lg rounded-xl border border-white/10 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="text-white font-semibold pr-4">{faq.question}</span>
+                  {openFaq === index ? (
+                    <ChevronUp className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  )}
+                </button>
+                {openFaq === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="px-6 pb-4"
+                  >
+                    <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-20 relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/10 text-center relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+            
+            <div className="relative z-10">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6"
+              >
+                <Mail className="w-8 h-8 text-white" />
+              </motion.div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Stay Updated
+              </h2>
+              <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
+                Subscribe to my newsletter for the latest tech insights, project updates, and exclusive content delivered to your inbox.
+              </p>
+              
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+                <div className="flex-1 relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    required
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors backdrop-blur-lg"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubscribing ? (
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      Subscribe
+                      <Send className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+              
+              <p className="text-gray-500 text-sm mt-4">
+                No spam, unsubscribe at any time. Your privacy is guaranteed.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 

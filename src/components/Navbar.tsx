@@ -20,15 +20,17 @@ const Navbar: React.FC = () => {
     { path: '/blog', label: 'Blog' },
     { path: '/projects', label: 'Projects' },
     { path: '/skills', label: 'Skills' },
-    { 
-      label: 'More', 
-      dropdown: [
-        { path: '/services', label: 'Services' },
-        { path: '/experience', label: 'Experience' },
+    { path: '/services', label: 'Services' },
+    { path: '/experience', label: 'Experience' },
+    // { 
+      // label: 'More', 
+      // dropdown: [
+        // { path: '/services', label: 'Services' },
+        // { path: '/experience', label: 'Experience' },
         // { path: '/testimonials', label: 'Testimonials' },
         // { path: '/blog', label: 'Blog' }
-      ]
-    },
+      // ]
+    // },
     { path: '/contact', label: 'Contact' }
   ];
 
