@@ -270,53 +270,145 @@ const BlogPost: React.FC = () => {
       // Update document title
       document.title = blog.seoTitle || blog.title || 'Blog Post';
       
-      // Update meta description
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', blog.seoDescription || blog.excerpt || '');
-      } else {
-        const meta = document.createElement('meta');
-        meta.name = 'description';
-        meta.content = blog.seoDescription || blog.excerpt || '';
-        document.head.appendChild(meta);
+      // Update or create meta description
+      let metaDescription = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!metaDescription) {
+        metaDescription = document.createElement('meta') as HTMLMetaElement;
+        metaDescription.name = 'description';
+        document.head.appendChild(metaDescription);
       }
+      metaDescription.content = blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '';
       
-      // Update meta keywords
-      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      // Update or create meta keywords
+      let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
       if (blog.seoKeywords) {
-        if (metaKeywords) {
-          metaKeywords.setAttribute('content', blog.seoKeywords);
-        } else {
-          const meta = document.createElement('meta');
-          meta.name = 'keywords';
-          meta.content = blog.seoKeywords;
-          document.head.appendChild(meta);
+        if (!metaKeywords) {
+          metaKeywords = document.createElement('meta') as HTMLMetaElement;
+          metaKeywords.name = 'keywords';
+          document.head.appendChild(metaKeywords);
         }
+        metaKeywords.content = blog.seoKeywords;
       }
+
+      // Update or create canonical URL
+      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (!canonicalLink) {
+        canonicalLink = document.createElement('link') as HTMLLinkElement;
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+      }
+      canonicalLink.href = window.location.href;
+
+      // Update or create robots meta
+      let metaRobots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+      if (!metaRobots) {
+        metaRobots = document.createElement('meta') as HTMLMetaElement;
+        metaRobots.name = 'robots';
+        document.head.appendChild(metaRobots);
+      }
+      metaRobots.content = 'index, follow';
+
+      // Update or create author meta
+      let metaAuthor = document.querySelector('meta[name="author"]') as HTMLMetaElement | null;
+      if (!metaAuthor) {
+        metaAuthor = document.createElement('meta') as HTMLMetaElement;
+        metaAuthor.name = 'author';
+        document.head.appendChild(metaAuthor);
+      }
+      metaAuthor.content = blog.author || 'Akash Raikwar';
 
       // Update Open Graph tags
       const updateOGTag = (property: string, content: string) => {
-        let ogTag = document.querySelector(`meta[property="${property}"]`);
-        if (ogTag) {
-          ogTag.setAttribute('content', content);
-        } else {
-          ogTag = document.createElement('meta');
+        let ogTag = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+        if (!ogTag) {
+          ogTag = document.createElement('meta') as HTMLMetaElement;
           ogTag.setAttribute('property', property);
-          ogTag.setAttribute('content', content);
           document.head.appendChild(ogTag);
         }
+        ogTag.content = content;
       };
 
       updateOGTag('og:title', blog.seoTitle || blog.title);
-      updateOGTag('og:description', blog.seoDescription || blog.excerpt);
+      updateOGTag('og:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
       updateOGTag('og:image', blog.image);
       updateOGTag('og:type', 'article');
       updateOGTag('og:url', window.location.href);
+      updateOGTag('og:site_name', 'Akash Raikwar - Portfolio');
+      updateOGTag('article:author', blog.author || 'Akash Raikwar');
+      updateOGTag('article:published_time', blog.publishedAt);
+      updateOGTag('article:tag', blog.category);
+
+      // Update Twitter Card tags
+      const updateTwitterTag = (name: string, content: string) => {
+        let twitterTag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+        if (!twitterTag) {
+          twitterTag = document.createElement('meta') as HTMLMetaElement;
+          twitterTag.setAttribute('name', name);
+          document.head.appendChild(twitterTag);
+        }
+        twitterTag.content = content;
+      };
+
+      updateTwitterTag('twitter:card', 'summary_large_image');
+      updateTwitterTag('twitter:title', blog.seoTitle || blog.title);
+      updateTwitterTag('twitter:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
+      updateTwitterTag('twitter:image', blog.image);
+      updateTwitterTag('twitter:creator', '@akashraikwar');
+      updateTwitterTag('twitter:site', '@akashraikwar');
+
+      // Add JSON-LD structured data for article
+      const scriptId = 'blog-post-structured-data';
+      let structuredDataScript = document.getElementById(scriptId) as HTMLScriptElement | null;
+      
+      if (!structuredDataScript) {
+        structuredDataScript = document.createElement('script') as HTMLScriptElement;
+        structuredDataScript.id = scriptId;
+        structuredDataScript.type = 'application/ld+json';
+        document.head.appendChild(structuredDataScript);
+      }
+
+      const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: blog.title,
+        description: blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '',
+        image: blog.image,
+        datePublished: blog.publishedAt,
+        dateModified: blog.publishedAt,
+        author: {
+          '@type': 'Person',
+          name: blog.author || 'Akash Raikwar',
+          url: 'https://akashraikwar.in'
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Akash Raikwar - Portfolio',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://akashraikwar.in/logo.png'
+          }
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': window.location.href
+        },
+        keywords: blog.seoKeywords || blog.tags?.join(', ') || '',
+        articleSection: blog.category,
+        wordCount: blog.content?.split(/\s+/).length || 0
+      };
+
+      structuredDataScript.textContent = JSON.stringify(structuredData);
     }
 
     // Cleanup function to reset title when component unmounts
     return () => {
       document.title = 'Akash Raikwar - Portfolio';
+      
+      // Remove structured data on unmount
+      const structuredDataScript = document.getElementById('blog-post-structured-data');
+      if (structuredDataScript) {
+        structuredDataScript.remove();
+      }
     };
   }, [blog]);
 
