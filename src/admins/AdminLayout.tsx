@@ -17,9 +17,26 @@ import {
 import { removeAuthToken, isTokenExpired } from '../utils/api';
 
 const AdminLayout: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  // Handle responsive sidebar state
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Set initial state based on screen size
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Check token expiration on mount and set up periodic checking
   useEffect(() => {
@@ -69,11 +86,8 @@ const AdminLayout: React.FC = () => {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.div
-        initial={false}
-        animate={{ x: sidebarOpen ? 0 : -300 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`bg-[#0A0F1C]/90 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] flex flex-col h-screen fixed md:relative z-50 inset-y-0 left-0 ${
+      <div
+        className={`bg-[#0A0F1C]/90 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] flex flex-col h-screen fixed md:static inset-y-0 left-0 z-50 transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
         style={{ width: isCollapsed ? '80px' : '280px' }}
@@ -130,7 +144,11 @@ const AdminLayout: React.FC = () => {
               <NavLink
                 key={item.to}
                 to={item.to}
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                  }
+                }}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-3 mb-2 text-sm font-medium rounded-xl transition-all duration-300 group relative overflow-hidden ${isActive
                     ? 'text-white shadow-[0_4px_20px_rgba(59,130,246,0.3)] ring-1 ring-white/10'
@@ -214,7 +232,7 @@ const AdminLayout: React.FC = () => {
               </AnimatePresence>
             </button>
           </div>
-        </motion.div>
+        </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full bg-[#070B14]">

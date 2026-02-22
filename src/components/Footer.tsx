@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Linkedin, Twitter, Mail, Heart, ArrowUp, Phone, MapPin, Instagram, Facebook } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail, ArrowUp, Phone, MapPin, Instagram, Facebook } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
   const services = [
     { path: '/services', label: 'Services' },
     { path: '/experience', label: 'Experience' },
-    { path: '/testimonials', label: 'Testimonials' },
+    // { path: '/testimonials', label: 'Testimonials' },
     { path: '/blog', label: 'Blog' }
   ];
 

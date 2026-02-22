@@ -118,31 +118,31 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 50 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative max-w-2xl w-full bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden shadow-2xl"
+            className="relative max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 text-white"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 text-white"
             >
               <X size={20} />
             </button>
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-6 border-b border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-2">Latest Blog Post</h2>
-              <p className="text-gray-300">Stay updated with our newest content</p>
+            <div className="bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-4 sm:p-6 border-b border-white/10">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Latest Blog Post</h2>
+              <p className="text-gray-300 text-sm sm:text-base">Stay updated with our newest content</p>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
+            {/* Content - Scrollable */}
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-120px)] sm:max-h-[calc(85vh-140px)]">
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <div className="flex items-center justify-center py-8 sm:py-12">
+                  <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500"></div>
                 </div>
               ) : error ? (
-                <div className="text-center py-12">
+                <div className="text-center py-8 sm:py-12">
                   <p className="text-red-400 mb-4">{error}</p>
                   <button
                     onClick={fetchLatestBlog}
@@ -158,10 +158,10 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
                     <img
                       src={normalizeImageUrl(blog.image)}
                       alt={blog.title}
-                      className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+                      className="w-full h-40 sm:h-48 object-cover transition-transform duration-300 hover:scale-105"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 bg-blue-500/80 backdrop-blur-sm text-white text-sm rounded-full">
+                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
+                      <span className="px-2 py-1 sm:px-3 sm:py-1 bg-blue-500/80 backdrop-blur-sm text-white text-xs sm:text-sm rounded-full">
                         {blog.category}
                       </span>
                     </div>
@@ -169,32 +169,32 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
 
                   {/* Blog Content */}
                   <div className="space-y-3">
-                    <h3 className="text-xl font-bold text-white leading-tight">
+                    <h3 className="text-lg sm:text-xl font-bold text-white leading-tight">
                       {blog.title}
                     </h3>
                     
-                    <p className="text-gray-300 overflow-hidden" style={{
-                      WebkitLineClamp: 3,
+                    <p className="text-gray-300 text-sm sm:text-base overflow-hidden" style={{
+                      WebkitLineClamp: 4,
                       WebkitBoxOrient: 'vertical'
                     }}>
                       {stripHtmlTags(blog.excerpt)}
                     </p>
 
                     {/* Meta Information */}
-                    <div className="flex items-center justify-between text-sm text-gray-400">
-                      <div className="flex items-center space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-gray-400 gap-2 sm:gap-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                         <div className="flex items-center space-x-2">
                           {getAuthorAvatar(blog.author, blog.authorProfilePic)}
-                          <span>{blog.author}</span>
+                          <span className="hidden sm:inline">{blog.author}</span>
                         </div>
                         
                         <div className="flex items-center space-x-1">
-                          <Calendar size={16} />
-                          <span>{formatDate(blog.publishedAt)}</span>
+                          <Calendar size={14} />
+                          <span className="hidden xs:inline">{formatDate(blog.publishedAt)}</span>
                         </div>
                         
                         <div className="flex items-center space-x-1">
-                          <Clock size={16} />
+                          <Clock size={14} />
                           <span>{blog.readTime}</span>
                         </div>
                       </div>
@@ -203,10 +203,10 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ isOpen, onClose }) => {
                     {/* Read More Button */}
                     <button
                       onClick={handleBlogClick}
-                      className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 group"
+                      className="w-full mt-4 sm:mt-6 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 group"
                     >
-                      <span>Read Full Article</span>
-                      <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
+                      <span className="text-sm sm:text-base">Read Full Article</span>
+                      <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
                     </button>
                   </div>
                 </div>
