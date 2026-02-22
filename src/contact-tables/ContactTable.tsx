@@ -507,7 +507,99 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
       {/* Table */}
       <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View - shown only on small screens */}
+        <div className="md:hidden">
+          {currentContacts.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400">No contacts found</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-700/50">
+              {currentContacts.map((contact) => {
+                const statusInfo = getStatusInfo(contact.status);
+                const StatusIcon = statusInfo.icon;
+                return (
+                  <motion.div
+                    key={contact._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-4 hover:bg-slate-700/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <div className="text-sm font-medium text-white">{contact.name}</div>
+                        <div className="text-xs text-gray-400">{contact.email}</div>
+                        {contact.mobile && (
+                          <div className="text-xs text-gray-400">{contact.mobile}</div>
+                        )}
+                      </div>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
+                        <StatusIcon className="w-3 h-3" />
+                        <span className="capitalize">{contact.status}</span>
+                      </span>
+                    </div>
+                    <div className="text-xs text-white mb-3 truncate" title={contact.subject}>
+                      {contact.subject}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${getPriorityColor(contact.priority)}`}>
+                          {contact.priority}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {formatDate(contact.createdAt)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            setSelectedContact(contact);
+                            setShowModal(true);
+                          }}
+                          className="p-1.5 text-blue-400 hover:text-blue-300 transition-colors"
+                          title="View"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingContact(contact);
+                            setShowEditModal(true);
+                          }}
+                          className="p-1.5 text-green-400 hover:text-green-300 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteContact(contact._id)}
+                          className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <select
+                          value={contact.status}
+                          onChange={(e) => updateContactStatus(contact._id, e.target.value)}
+                          className="text-xs bg-gray border border-white/20 rounded px-1.5 py-1 text-black focus:outline-none focus:border-blue-400 ml-1"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="review">Review</option>
+                          <option value="worked">Worked</option>
+                          <option value="done">Done</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View - hidden on small screens */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-900/50 border-b border-slate-700/50">
               <tr>
@@ -630,21 +722,21 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
         {/* Pagination */}
         {filteredContacts.length > 0 && (
-          <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-gray-400">
+          <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-900/30 border-t border-slate-700/50">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+              <div className="text-xs md:text-sm text-gray-400">
                 Showing {startIndex + 1} to {Math.min(endIndex, filteredContacts.length)} of {filteredContacts.length} contacts
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 md:p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 md:gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                     if (
                       page === 1 ||
@@ -655,20 +747,14 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${page === currentPage
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white/10 hover:bg-white/20 text-gray-300'
-                            }`}
+                          className={`min-w-[28px] md:min-w-[32px] px-1.5 md:px-3 py-1 rounded-lg text-xs md:text-sm transition-colors ${page === currentPage ? 'bg-blue-500 text-white' : 'bg-white/10 hover:bg-white/20 text-gray-300'}`}
                         >
                           {page}
                         </button>
                       );
-                    } else if (
-                      page === currentPage - 2 ||
-                      page === currentPage + 2
-                    ) {
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
-                        <span key={page} className="px-2 text-gray-500">
+                        <span key={page} className="px-1 text-gray-500 text-xs">
                           ...
                         </span>
                       );
@@ -680,7 +766,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 md:p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

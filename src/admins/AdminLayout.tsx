@@ -69,15 +69,15 @@ const AdminLayout: React.FC = () => {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          initial={{ x: -300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className={`fixed inset-y-0 left-0 z-50 bg-[#0A0F1C]/90 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] transform transition-all duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } md:translate-x-0 md:relative md:flex md:flex-col md:h-screen`}
-          style={{ width: isCollapsed ? 80 : 280 }}
-        >
+      <motion.div
+        initial={false}
+        animate={{ x: sidebarOpen ? 0 : -300 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={`bg-[#0A0F1C]/90 backdrop-blur-2xl border-r border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] flex flex-col h-screen fixed md:relative z-50 inset-y-0 left-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+        style={{ width: isCollapsed ? '80px' : '280px' }}
+      >
           {/* Logo Section */}
           <motion.div
             className="flex-shrink-0 flex items-center justify-between p-4 border-b border-slate-700/50"
@@ -215,7 +215,6 @@ const AdminLayout: React.FC = () => {
             </button>
           </div>
         </motion.div>
-      </AnimatePresence>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full bg-[#070B14]">

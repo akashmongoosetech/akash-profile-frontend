@@ -258,7 +258,47 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
       )}
 
       <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-slate-700/60 overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View - shown only on small screens */}
+        <div className="md:hidden">
+          {subscribers.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400">No subscribers found</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-700/50">
+              {currentSubscribers.map((subscriber) => {
+                const statusInfo = getStatusInfo(subscriber.status);
+                const StatusIcon = statusInfo.icon;
+                return (
+                  <div key={subscriber._id} className="p-4 hover:bg-slate-700/30 transition-colors">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{subscriber.email}</p>
+                        <p className="text-xs text-gray-500 mt-1">{formatDate(subscriber.createdAt)}</p>
+                      </div>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ml-2 ${statusInfo.bg} ${statusInfo.color}`}>
+                        <StatusIcon className="w-3 h-3" />
+                        <span className="capitalize">{subscriber.status}</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-end mt-2">
+                      <button
+                        onClick={() => deleteSubscriber(subscriber._id)}
+                        className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View - hidden on small screens */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-900/50 border-b border-slate-700/50">
               <tr>
@@ -307,21 +347,21 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
 
         {/* Pagination */}
         {subscribers.length > 0 && (
-          <div className="px-6 py-4 bg-slate-900/30 border-t border-slate-700/50">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-gray-400">
+          <div className="px-4 md:px-6 py-3 md:py-4 bg-slate-900/30 border-t border-slate-700/50">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+              <div className="text-xs md:text-sm text-gray-400 text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(endIndex, subscribers.length)} of {subscribers.length} subscribers
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 md:p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 md:gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                     if (
                       page === 1 ||
@@ -332,7 +372,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`px-3 py-1 rounded-lg text-sm transition-colors ${page === currentPage
+                          className={`min-w-[28px] md:min-w-[32px] px-1.5 md:px-3 py-1 rounded-lg text-xs md:text-sm transition-colors ${page === currentPage
                               ? 'bg-blue-500 text-white'
                               : 'bg-white/10 hover:bg-white/20 text-gray-300'
                             }`}
@@ -345,7 +385,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
                       page === currentPage + 2
                     ) {
                       return (
-                        <span key={page} className="px-2 text-gray-500">
+                        <span key={page} className="px-1 md:px-2 text-gray-500 text-xs md:text-sm">
                           ...
                         </span>
                       );
@@ -357,7 +397,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-1.5 md:p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

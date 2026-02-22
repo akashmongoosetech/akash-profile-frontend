@@ -269,7 +269,7 @@ const Admin: React.FC = () => {
         )}
 
         {/* Dashboard Cards Grid */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6 mb-6 md:mb-8">
           {statsConfig.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -289,21 +289,21 @@ const Admin: React.FC = () => {
         </motion.div>
 
         {/* Info Cards Row */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Recent Contacts Card */}
           <motion.div
             whileHover={{ scale: 1.01 }}
-            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
+            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50" />
 
-            <div className="flex items-center gap-3 mb-6 relative z-10">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+            <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Inbox className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Recent Contacts</h3>
-                <p className="text-sm text-slate-400">Latest submissions</p>
+                <h3 className="text-base md:text-lg font-semibold text-white">Recent Contacts</h3>
+                <p className="text-xs md:text-sm text-slate-400">Latest submissions</p>
               </div>
             </div>
             {loading ? (
@@ -344,20 +344,20 @@ const Admin: React.FC = () => {
           {/* Status Breakdown Card */}
           <motion.div
             whileHover={{ scale: 1.01 }}
-            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
+            className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-slate-700/60 shadow-2xl relative overflow-hidden group"
           >
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50" />
 
-            <div className="flex items-center gap-3 mb-6 relative z-10">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+            <div className="flex items-center gap-3 mb-4 md:mb-6 relative z-10">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Status Breakdown</h3>
-                <p className="text-sm text-slate-400">Contact status overview</p>
+                <h3 className="text-base md:text-lg font-semibold text-white">Status Breakdown</h3>
+                <p className="text-xs md:text-sm text-slate-400">Contact status overview</p>
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {[
                 { label: 'Pending', value: stats.pending, color: 'bg-yellow-500', text: 'text-yellow-400' },
                 { label: 'In Review', value: stats.review, color: 'bg-blue-500', text: 'text-blue-400' },
@@ -370,11 +370,11 @@ const Admin: React.FC = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-2 md:gap-3"
                 >
-                  <span className={`w-3 h-3 rounded-full shadow-[0_0_8px_currentColor] ${item.color}`} />
-                  <span className="text-slate-300 flex-1 font-medium tracking-wide text-sm">{item.label}</span>
-                  <div className="w-32 h-2 bg-slate-700/50 rounded-full overflow-hidden border border-slate-700/50">
+                  <span className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_0_8px_currentColor] ${item.color} flex-shrink-0`} />
+                  <span className="text-slate-300 flex-1 font-medium tracking-wide text-xs md:text-sm">{item.label}</span>
+                  <div className="w-20 md:w-32 h-1.5 md:h-2 bg-slate-700/50 rounded-full overflow-hidden border border-slate-700/50 flex-shrink-0">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${stats.totalContacts > 0 ? (item.value / stats.totalContacts) * 100 : 0}%` }}
@@ -382,7 +382,7 @@ const Admin: React.FC = () => {
                       className={`h-full ${item.color} shadow-[0_0_10px_currentColor]`}
                     />
                   </div>
-                  <span className={`${item.text} font-bold w-10 text-right`}>{item.value}</span>
+                  <span className={`${item.text} font-bold w-6 md:w-10 text-right text-xs md:text-sm`}>{item.value}</span>
                 </motion.div>
               ))}
             </div>

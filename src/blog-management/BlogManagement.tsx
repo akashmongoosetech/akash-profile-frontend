@@ -376,45 +376,45 @@ const BlogManagement: React.FC = () => {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         {/* Header */}
-        <motion.div variants={itemVariants} className="flex items-center justify-between mb-8">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Blog Management</h1>
-            <p className="text-slate-400">Create, edit, and manage your blog posts</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Blog Management</h1>
+            <p className="text-slate-400 text-sm md:text-base">Create, edit, and manage your blog posts</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/25"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/25 w-full sm:w-auto justify-center"
           >
             <Plus className="w-5 h-5" />
-            New Blog Post
+            <span className="whitespace-nowrap">New Blog Post</span>
           </motion.button>
         </motion.div>
 
         {/* Filters */}
         <motion.div variants={itemVariants} className="mb-8">
-          <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-2xl">
+          <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-slate-700/60 shadow-2xl">
             <div className="flex flex-col lg:flex-row gap-4 items-center">
               {/* Search */}
-              <div className="flex-1 w-full lg:w-auto">
+              <div className="flex-1 w-full lg:w-auto order-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 md:w-5 h-4 md:h-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search blog posts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-800/40 backdrop-blur-xl border border-slate-700/60 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300"
+                    className="w-full pl-9 md:pl-10 pr-4 py-2.5 md:py-3 bg-slate-800/40 backdrop-blur-xl border border-slate-700/60 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 shadow-inner transition-all duration-300 text-sm md:text-base"
                   />
                 </div>
               </div>
 
               {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-center order-2 w-full lg:w-auto">
                 <button
                   onClick={() => setSelectedCategory('')}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${selectedCategory === ''
+                  className={`px-3 py-2 rounded-xl text-xs md:text-sm font-medium transition-all duration-300 border ${selectedCategory === ''
                     ? 'bg-blue-500/20 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
                     : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50 hover:text-white'
                     }`}
@@ -425,7 +425,7 @@ const BlogManagement: React.FC = () => {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${selectedCategory === category
+                    className={`px-3 py-2 rounded-xl text-xs md:text-sm font-medium transition-all duration-300 border ${selectedCategory === category
                       ? 'bg-blue-500/20 border-blue-500/50 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
                       : 'bg-slate-800/50 border-slate-700/50 text-slate-400 hover:bg-slate-700/50 hover:text-white'
                       }`}
@@ -544,12 +544,12 @@ const BlogManagement: React.FC = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <motion.div variants={itemVariants} className="flex items-center justify-center gap-2">
+          <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-10 h-10 rounded-lg transition-all duration-200 ${page === currentPage
+                className={`w-8 h-8 md:w-10 md:h-10 rounded-lg transition-all duration-200 text-sm md:text-base ${page === currentPage
                   ? 'bg-blue-500 text-white'
                   : 'bg-white/10 hover:bg-white/20 text-gray-300'
                   }`}
