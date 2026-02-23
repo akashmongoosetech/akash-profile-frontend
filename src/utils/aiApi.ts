@@ -331,3 +331,143 @@ export const prepareBusinessPlanPDF = async (
     fileName: string;
   }>;
 };
+
+/**
+ * Format Medical Notes
+ * @param rawNotes - Raw clinical notes to format
+ * @param formatType - Format type (SOAP, Progress Note, Consultation Note, EMR Structured)
+ * @param specialty - Medical specialty
+ * @param includeICD - Whether to include ICD-style summary
+ * @returns Promise with formatted medical note
+ */
+export const formatMedicalNote = async (
+  rawNotes: string,
+  formatType: string,
+  specialty: string,
+  includeICD: boolean = false
+): Promise<{
+  formattedNote: string;
+  formatType: string;
+  specialty: string;
+  includeICD: boolean;
+  disclaimer: string;
+}> => {
+  return callAIEndpoint('/api/ai/medical-note-formatter', {
+    rawNotes,
+    formatType,
+    specialty,
+    includeICD,
+  }) as Promise<{
+    formattedNote: string;
+    formatType: string;
+    specialty: string;
+    includeICD: boolean;
+    disclaimer: string;
+  }>;
+};
+
+/**
+ * Generate Patient Discharge Summary
+ * @param patientAge - Patient's age
+ * @param patientGender - Patient's gender
+ * @param admissionReason - Reason for admission
+ * @param diagnosis - Diagnosis
+ * @param treatmentGiven - Treatment provided
+ * @param proceduresPerformed - Procedures performed
+ * @param medicationsPrescribed - Medications prescribed
+ * @param followUpInstructions - Follow-up instructions
+ * @param hospitalStayDuration - Duration of hospital stay
+ * @returns Promise with discharge summary
+ */
+export const generateDischargeSummary = async (
+  patientAge: string,
+  patientGender: string,
+  admissionReason: string,
+  diagnosis: string,
+  treatmentGiven?: string,
+  proceduresPerformed?: string,
+  medicationsPrescribed?: string,
+  followUpInstructions?: string,
+  hospitalStayDuration?: string
+): Promise<{
+  dischargeSummary: string;
+  patientInfo: {
+    patientAge: string;
+    patientGender: string;
+    hospitalStayDuration?: string;
+  };
+  disclaimer: string;
+}> => {
+  return callAIEndpoint('/api/ai/discharge-summary-generator', {
+    patientAge,
+    patientGender,
+    admissionReason,
+    diagnosis,
+    treatmentGiven,
+    proceduresPerformed,
+    medicationsPrescribed,
+    followUpInstructions,
+    hospitalStayDuration,
+  }) as Promise<{
+    dischargeSummary: string;
+    patientInfo: {
+      patientAge: string;
+      patientGender: string;
+      hospitalStayDuration?: string;
+    };
+    disclaimer: string;
+  }>;
+};
+
+/**
+ * Generate Clinic Website Content
+ * @param clinicName - Name of the clinic
+ * @param specialty - Medical specialty
+ * @param location - Clinic location
+ * @param yearsExperience - Years of experience
+ * @param servicesOffered - Services offered
+ * @param targetAudience - Target audience
+ * @param tone - Content tone (Professional, Friendly, Premium, Community-focused)
+ * @returns Promise with generated clinic content
+ */
+export const generateClinicContent = async (
+  clinicName: string,
+  specialty: string,
+  location: string,
+  yearsExperience?: string,
+  servicesOffered?: string,
+  targetAudience?: string,
+  tone: string = 'Professional'
+): Promise<{
+  content: string;
+  clinicInfo: {
+    clinicName: string;
+    specialty: string;
+    location: string;
+    tone: string;
+  };
+  meta: {
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/clinic-content-generator', {
+    clinicName,
+    specialty,
+    location,
+    yearsExperience,
+    servicesOffered,
+    targetAudience,
+    tone,
+  }) as Promise<{
+    content: string;
+    clinicInfo: {
+      clinicName: string;
+      specialty: string;
+      location: string;
+      tone: string;
+    };
+    meta: {
+      generatedAt: string;
+    };
+  }>;
+};

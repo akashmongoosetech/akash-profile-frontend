@@ -16,7 +16,10 @@ import {
   Linkedin,
   Lightbulb,
   Rocket,
-  Palette
+  Palette,
+  Stethoscope,
+  FileSpreadsheet,
+  Globe
 } from 'lucide-react';
 
 interface Tool {
@@ -142,6 +145,31 @@ const toolsData: Category[] = [
         description: 'Generate professional investor-ready business plans with financial projections',
         path: '/ai-business-plan-generator',
         icon: <FileText className="w-8 h-8" />
+      }
+    ]
+  },
+  {
+    name: 'Healthcare AI Tools',
+    icon: <Stethoscope className="w-6 h-6" />,
+    color: 'from-teal-500 to-cyan-500',
+    tools: [
+      {
+        name: 'AI Medical Note Formatter',
+        description: 'Transform raw clinical notes into structured SOAP, Progress Notes, and EMR formats',
+        path: '/ai-medical-note-formatter',
+        icon: <FileText className="w-8 h-8" />
+      },
+      {
+        name: 'AI Discharge Summary Generator',
+        description: 'Generate professional patient discharge summaries from case data',
+        path: '/ai-patient-discharge-summary-generator',
+        icon: <FileSpreadsheet className="w-8 h-8" />
+      },
+      {
+        name: 'AI Clinic Website Content Generator',
+        description: 'Create SEO-optimized website content for medical clinics',
+        path: '/ai-clinic-website-content-generator',
+        icon: <Globe className="w-8 h-8" />
       }
     ]
   }

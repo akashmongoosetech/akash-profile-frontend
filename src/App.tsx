@@ -33,6 +33,9 @@ import ProjectIdeaGenerator from './components/ProjectIdeaGenerator';
 import AIBusinessIdeaValidator from './components/AIBusinessIdeaValidator';
 import AIStartupNameGenerator from './components/AIStartupNameGenerator';
 import AIBusinessPlanGenerator from './components/AIBusinessPlanGenerator';
+import AIMedicalNoteFormatter from './components/AIMedicalNoteFormatter';
+import AIPatientDischargeSummaryGenerator from './components/AIPatientDischargeSummaryGenerator';
+import AIClinicWebsiteContentGenerator from './components/AIClinicWebsiteContentGenerator';
 import Tools from './Tools';
 
 function App() {
@@ -66,6 +69,9 @@ function App() {
             <Route path="ai-business-idea-validator" element={<AIBusinessIdeaValidator />} />
             <Route path="ai-startup-name-generator" element={<AIStartupNameGenerator />} />
             <Route path="ai-business-plan-generator" element={<AIBusinessPlanGenerator />} />
+            <Route path="ai-medical-note-formatter" element={<AIMedicalNoteFormatter />} />
+            <Route path="ai-patient-discharge-summary-generator" element={<AIPatientDischargeSummaryGenerator />} />
+            <Route path="ai-clinic-website-content-generator" element={<AIClinicWebsiteContentGenerator />} />
             <Route path="tools" element={<Tools />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />
