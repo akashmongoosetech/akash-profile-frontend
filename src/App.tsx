@@ -27,6 +27,9 @@ import ResumeBuilder from './components/ResumeBuilder';
 import MeetingAgendaGenerator from './components/MeetingAgendaGenerator';
 import ContractTemplateGenerator from './components/ContractTemplateGenerator';
 import FreelanceProposalGenerator from './components/FreelanceProposalGenerator';
+import AIEmailReplyGenerator from './components/AIEmailReplyGenerator';
+import LinkedInPostGenerator from './components/LinkedInPostGenerator';
+import ProjectIdeaGenerator from './components/ProjectIdeaGenerator';
 import Tools from './Tools';
 
 function App() {
@@ -54,6 +57,9 @@ function App() {
             <Route path="meeting-agenda-generator" element={<MeetingAgendaGenerator />} />
             <Route path="contract-template-generator" element={<ContractTemplateGenerator />} />
             <Route path="freelance-proposal-generator" element={<FreelanceProposalGenerator />} />
+            <Route path="ai-email-reply-generator" element={<AIEmailReplyGenerator />} />
+            <Route path="linkedIn-post-generator-for-developers" element={<LinkedInPostGenerator />} />
+            <Route path="project-idea-generator-for-students" element={<ProjectIdeaGenerator />} />
             <Route path="tools" element={<Tools />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />

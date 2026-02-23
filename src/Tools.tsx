@@ -11,7 +11,10 @@ import {
   Clock, 
   Briefcase,
   FileSignature,
-  Send
+  Send,
+  Sparkles,
+  Linkedin,
+  Lightbulb
 } from 'lucide-react';
 
 interface Tool {
@@ -94,6 +97,31 @@ const toolsData: Category[] = [
         description: 'Create compelling freelance proposals to win more clients',
         path: '/freelance-proposal-generator',
         icon: <Send className="w-8 h-8" />
+      }
+    ]
+  },
+  {
+    name: 'AI Tools',
+    icon: <Sparkles className="w-6 h-6" />,
+    color: 'from-indigo-500 to-purple-500',
+    tools: [
+      {
+        name: 'AI Email Reply Generator',
+        description: 'Generate contextual email replies with the perfect tone and length',
+        path: '/ai-email-reply-generator',
+        icon: <Send className="w-8 h-8" />
+      },
+      {
+        name: 'LinkedIn Post Generator',
+        description: 'Create engaging LinkedIn posts tailored for developers',
+        path: '/linkedIn-post-generator-for-developers',
+        icon: <Linkedin className="w-8 h-8" />
+      },
+      {
+        name: 'Project Idea Generator',
+        description: 'Generate creative project ideas for students based on technology and difficulty',
+        path: '/project-idea-generator-for-students',
+        icon: <Lightbulb className="w-8 h-8" />
       }
     ]
   }
