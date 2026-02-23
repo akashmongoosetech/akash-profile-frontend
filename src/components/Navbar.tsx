@@ -6,6 +6,12 @@ import { useTheme } from '../contexts/ThemeContext';
 import BlogPopupTrigger from './BlogPopupTrigger';
 import { useBlogPopup } from '../hooks/useBlogPopup';
 
+interface NavItem {
+  path?: string;
+  label: string;
+  dropdown?: NavItem[];
+}
+
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -17,21 +23,15 @@ const Navbar: React.FC = () => {
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
-    { path: '/blog', label: 'Blog' },
-    { path: '/projects', label: 'Projects' },
-    { path: '/skills', label: 'Skills' },
     { path: '/services', label: 'Services' },
     { path: '/experience', label: 'Experience' },
+    { path: '/tools', label: 'Tools' },
     { 
-      label: 'Tools', 
+      label: 'More', 
       dropdown: [
-        { path: '/website-cost-calculator', label: 'Website Cost Calculator' },
-        { path: '/emi-calculator', label: 'EMI Calculator' },
-        { path: '/seo-audit-mini-tool', label: 'SEO Audit Mini Tool' },
-        { path: '/quotation-generator', label: 'Quotation Generator' },
-        { path: '/resume-builder', label: 'Resume Builder' },
-        { path: '/invoice-generator', label: 'SEO Invoice Generator' },
-
+        { path: '/blog', label: 'Blog' },
+        { path: '/projects', label: 'Projects' },
+        { path: '/skills', label: 'Skills' },
         // { path: '/testimonials', label: 'Testimonials' },
       ]
     },
@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActiveDropdown = (dropdown: any[]) => {
+  const isActiveDropdown = (dropdown: NavItem[]) => {
     return dropdown.some(item => location.pathname === item.path);
   };
 

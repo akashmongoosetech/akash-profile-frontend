@@ -12,7 +12,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import jsPDF from 'jspdf';
-// @ts-ignore - jspdf-autotable adds autoTable to jsPDF prototype
+// @ts-expect-error - jspdf-autotable adds autoTable to jsPDF prototype
 import 'jspdf-autotable';
 
 /**
@@ -276,7 +276,7 @@ const InvoiceGenerator: React.FC = () => {
       ];
     });
 
-    // @ts-ignore - autoTable is added by jspdf-autotable
+    // @ts-expect-error - autoTable is added by jspdf-autotable
     autoTable(doc, {
       startY: 95,
       head: [['Description', 'Qty', 'Price', 'Disc%', 'Disc Amt', 'Tax%', 'Tax Amt', 'Total']],
@@ -292,7 +292,7 @@ const InvoiceGenerator: React.FC = () => {
 
     // Totals
     // Get the final Y position after the table
-    // @ts-ignore - lastAutoTable is added by jspdf-autotable
+    // @ts-expect-error - lastAutoTable is added by jspdf-autotable
     const tableResult = (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable;
     const finalY = tableResult ? tableResult.finalY + 10 : 200;
     

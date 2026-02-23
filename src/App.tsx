@@ -24,6 +24,10 @@ import SEOAuditMiniTool from './components/SEOAuditMiniTool';
 import InvoiceGenerator from './components/InvoiceGenerator';
 import QuotationGenerator from './components/QuotationGenerator';
 import ResumeBuilder from './components/ResumeBuilder';
+import MeetingAgendaGenerator from './components/MeetingAgendaGenerator';
+import ContractTemplateGenerator from './components/ContractTemplateGenerator';
+import FreelanceProposalGenerator from './components/FreelanceProposalGenerator';
+import Tools from './Tools';
 
 function App() {
   return (
@@ -47,6 +51,10 @@ function App() {
             <Route path="invoice-generator" element={<InvoiceGenerator />} />
             <Route path="quotation-generator" element={<QuotationGenerator />} />
             <Route path="resume-builder" element={<ResumeBuilder />} />
+            <Route path="meeting-agenda-generator" element={<MeetingAgendaGenerator />} />
+            <Route path="contract-template-generator" element={<ContractTemplateGenerator />} />
+            <Route path="freelance-proposal-generator" element={<FreelanceProposalGenerator />} />
+            <Route path="tools" element={<Tools />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={
