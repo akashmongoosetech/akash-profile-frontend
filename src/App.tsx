@@ -43,6 +43,7 @@ import AIPersonalStatementGenerator from './components/AIPersonalStatementGenera
 import AIPortfolioBioGenerator from './components/AIPortfolioBioGenerator';
 import AIMeetingSummaryGenerator from './components/AIMeetingSummaryGenerator';
 import Tools from './Tools';
+import AIChat from './components/AIChat';
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
             <Route path="ai-portfolio-bio-generator" element={<AIPortfolioBioGenerator />} />
             <Route path="ai-meeting-summary-generator" element={<AIMeetingSummaryGenerator />} />
             <Route path="tools" element={<Tools />} />
+            <Route path="ai-chat" element={<AIChat />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={

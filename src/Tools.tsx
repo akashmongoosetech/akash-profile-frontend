@@ -25,7 +25,8 @@ import {
   GraduationCap,
   Award,
   User,
-  MessageSquare
+  MessageSquare,
+  Bot
 } from 'lucide-react';
 
 interface Tool {
@@ -187,6 +188,12 @@ const toolsData: Category[] = [
         description: 'Transform meeting transcripts into organized summaries with action items',
         path: '/ai-meeting-summary-generator',
         icon: <MessageSquare className="w-8 h-8" />
+      },
+      {
+        name: 'AI Chat Assistant',
+        description: 'Chat with AI in real-time with streaming responses and markdown support',
+        path: '/ai-chat',
+        icon: <Bot className="w-8 h-8" />
       }
     ]
   },

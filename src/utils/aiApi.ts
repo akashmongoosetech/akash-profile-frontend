@@ -728,3 +728,41 @@ export const generateMeetingSummary = async (
     };
   }>;
 };
+
+/**
+ * Message type for chat
+ */
+export interface ChatMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
+
+/**
+ * Streaming Chat with AI
+ * @param messages - Previous conversation messages
+ * @param message - Current message to send
+ * @returns Promise with ReadableStream for streaming response
+ */
+export const streamChat = async (
+  messages: ChatMessage[],
+  message: string
+): Promise<ReadableStream<Uint8Array>> => {
+  const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ messages, message }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Failed to connect to AI service');
+  }
+
+  if (!response.body) {
+    throw new Error('No response body');
+  }
+
+  return response.body;
+};
