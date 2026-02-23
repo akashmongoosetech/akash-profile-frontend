@@ -146,3 +146,183 @@ export const generateProjectIdeas = async (
     };
   }>;
 };
+
+/**
+ * Validate Business Idea for Indian Market
+ * @param businessIdea - Description of the business idea
+ * @param location - Target location in India (City/State)
+ * @param targetAudience - Target audience description
+ * @param budget - Estimated budget in INR
+ * @param industryType - Industry type
+ * @param revenueModel - Revenue model (optional)
+ * @returns Promise with validation results
+ */
+export const validateBusinessIdea = async (
+  businessIdea: string,
+  location: string,
+  targetAudience: string,
+  budget: string,
+  industryType: string,
+  revenueModel?: string
+): Promise<{
+  validation: string;
+  metadata: {
+    businessIdea: string;
+    location: string;
+    targetAudience: string;
+    budget: string;
+    industryType: string;
+    revenueModel?: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/business-idea-validator', {
+    businessIdea,
+    location,
+    targetAudience,
+    budget,
+    industryType,
+    revenueModel,
+  }) as Promise<{
+    validation: string;
+    metadata: {
+      businessIdea: string;
+      location: string;
+      targetAudience: string;
+      budget: string;
+      industryType: string;
+      revenueModel?: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Startup Names
+ * @param industry - Industry sector
+ * @param brandPersonality - Brand personality (Modern, Premium, Bold, Minimal, Techy, Indian Cultural)
+ * @param targetAudience - Target audience description
+ * @param namePreference - One-word or Two-word preference
+ * @param checkDomain - Whether to check domain availability
+ * @returns Promise with generated names
+ */
+export const generateStartupNames = async (
+  industry: string,
+  brandPersonality: string,
+  targetAudience: string,
+  namePreference: string,
+  checkDomain: boolean
+): Promise<{
+  names: Array<{
+    name: string;
+    meaning: string;
+    positioning: string;
+    tagline: string;
+    domainStyle: string;
+  }>;
+  count: number;
+  metadata: {
+    industry: string;
+    brandPersonality: string;
+    targetAudience: string;
+    namePreference: string;
+    checkDomain: boolean;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/startup-name-generator', {
+    industry,
+    brandPersonality,
+    targetAudience,
+    namePreference,
+    checkDomain,
+  }) as Promise<{
+    names: Array<{
+      name: string;
+      meaning: string;
+      positioning: string;
+      tagline: string;
+      domainStyle: string;
+    }>;
+    count: number;
+    metadata: {
+      industry: string;
+      brandPersonality: string;
+      targetAudience: string;
+      namePreference: string;
+      checkDomain: boolean;
+    };
+  }>;
+};
+
+/**
+ * Generate Business Plan
+ * @param businessName - Name of the business
+ * @param industry - Industry sector
+ * @param location - Business location
+ * @param fundingRequired - Funding required in INR
+ * @param targetMarket - Target market description
+ * @param revenueModel - Revenue model
+ * @param businessDescription - Short business description
+ * @returns Promise with generated business plan
+ */
+export const generateBusinessPlan = async (
+  businessName: string,
+  industry: string,
+  location: string,
+  fundingRequired: string,
+  targetMarket: string,
+  revenueModel: string,
+  businessDescription: string
+): Promise<{
+  businessPlan: string;
+  metadata: {
+    businessName: string;
+    industry: string;
+    location: string;
+    fundingRequired: string;
+    targetMarket: string;
+    revenueModel: string;
+    businessDescription: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/business-plan-generator', {
+    businessName,
+    industry,
+    location,
+    fundingRequired,
+    targetMarket,
+    revenueModel,
+    businessDescription,
+  }) as Promise<{
+    businessPlan: string;
+    metadata: {
+      businessName: string;
+      industry: string;
+      location: string;
+      fundingRequired: string;
+      targetMarket: string;
+      revenueModel: string;
+      businessDescription: string;
+    };
+  }>;
+};
+
+/**
+ * Prepare Business Plan for PDF Download
+ * @param businessPlan - The business plan content
+ * @param businessName - Name of the business
+ * @returns Promise with file data
+ */
+export const prepareBusinessPlanPDF = async (
+  businessPlan: string,
+  businessName: string
+): Promise<{
+  content: string;
+  fileName: string;
+}> => {
+  return callAIEndpoint('/api/ai/business-plan-pdf', {
+    businessPlan,
+    businessName,
+  }) as Promise<{
+    content: string;
+    fileName: string;
+  }>;
+};

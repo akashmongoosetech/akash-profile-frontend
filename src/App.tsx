@@ -30,6 +30,9 @@ import FreelanceProposalGenerator from './components/FreelanceProposalGenerator'
 import AIEmailReplyGenerator from './components/AIEmailReplyGenerator';
 import LinkedInPostGenerator from './components/LinkedInPostGenerator';
 import ProjectIdeaGenerator from './components/ProjectIdeaGenerator';
+import AIBusinessIdeaValidator from './components/AIBusinessIdeaValidator';
+import AIStartupNameGenerator from './components/AIStartupNameGenerator';
+import AIBusinessPlanGenerator from './components/AIBusinessPlanGenerator';
 import Tools from './Tools';
 
 function App() {
@@ -60,6 +63,9 @@ function App() {
             <Route path="ai-email-reply-generator" element={<AIEmailReplyGenerator />} />
             <Route path="linkedIn-post-generator-for-developers" element={<LinkedInPostGenerator />} />
             <Route path="project-idea-generator-for-students" element={<ProjectIdeaGenerator />} />
+            <Route path="ai-business-idea-validator" element={<AIBusinessIdeaValidator />} />
+            <Route path="ai-startup-name-generator" element={<AIStartupNameGenerator />} />
+            <Route path="ai-business-plan-generator" element={<AIBusinessPlanGenerator />} />
             <Route path="tools" element={<Tools />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />

@@ -14,7 +14,9 @@ import {
   Send,
   Sparkles,
   Linkedin,
-  Lightbulb
+  Lightbulb,
+  Rocket,
+  Palette
 } from 'lucide-react';
 
 interface Tool {
@@ -122,6 +124,24 @@ const toolsData: Category[] = [
         description: 'Generate creative project ideas for students based on technology and difficulty',
         path: '/project-idea-generator-for-students',
         icon: <Lightbulb className="w-8 h-8" />
+      },
+      {
+        name: 'AI Business Idea Validator',
+        description: 'Validate your business idea with India-specific market analysis and viability scoring',
+        path: '/ai-business-idea-validator',
+        icon: <Rocket className="w-8 h-8" />
+      },
+      {
+        name: 'AI Startup Name Generator',
+        description: 'Generate creative startup names with meanings, taglines, and domain suggestions',
+        path: '/ai-startup-name-generator',
+        icon: <Palette className="w-8 h-8" />
+      },
+      {
+        name: 'AI Business Plan Generator',
+        description: 'Generate professional investor-ready business plans with financial projections',
+        path: '/ai-business-plan-generator',
+        icon: <FileText className="w-8 h-8" />
       }
     ]
   }
