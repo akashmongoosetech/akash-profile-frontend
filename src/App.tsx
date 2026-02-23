@@ -18,6 +18,12 @@ import AdminLayout from './admins/AdminLayout';
 import ContactTable from './contact-tables/ContactTable';
 import SubscriberTable from './subscriber-tables/SubscriberTable';
 import BlogManagement from './blog-management/BlogManagement';
+import WebsiteCostCalculator from './components/WebsiteCostCalculator';
+import EMICalculator from './components/EMICalculator';
+import SEOAuditMiniTool from './components/SEOAuditMiniTool';
+import InvoiceGenerator from './components/InvoiceGenerator';
+import QuotationGenerator from './components/QuotationGenerator';
+import ResumeBuilder from './components/ResumeBuilder';
 
 function App() {
   return (
@@ -35,6 +41,12 @@ function App() {
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="website-cost-calculator" element={<WebsiteCostCalculator />} />
+            <Route path="emi-calculator" element={<EMICalculator />} />
+            <Route path="seo-audit-mini-tool" element={<SEOAuditMiniTool />} />
+            <Route path="invoice-generator" element={<InvoiceGenerator />} />
+            <Route path="quotation-generator" element={<QuotationGenerator />} />
+            <Route path="resume-builder" element={<ResumeBuilder />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={

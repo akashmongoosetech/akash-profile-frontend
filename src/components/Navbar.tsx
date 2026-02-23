@@ -22,15 +22,19 @@ const Navbar: React.FC = () => {
     { path: '/skills', label: 'Skills' },
     { path: '/services', label: 'Services' },
     { path: '/experience', label: 'Experience' },
-    // { 
-      // label: 'More', 
-      // dropdown: [
-        // { path: '/services', label: 'Services' },
-        // { path: '/experience', label: 'Experience' },
+    { 
+      label: 'Tools', 
+      dropdown: [
+        { path: '/website-cost-calculator', label: 'Website Cost Calculator' },
+        { path: '/emi-calculator', label: 'EMI Calculator' },
+        { path: '/seo-audit-mini-tool', label: 'SEO Audit Mini Tool' },
+        { path: '/quotation-generator', label: 'Quotation Generator' },
+        { path: '/resume-builder', label: 'Resume Builder' },
+        { path: '/invoice-generator', label: 'SEO Invoice Generator' },
+
         // { path: '/testimonials', label: 'Testimonials' },
-        // { path: '/blog', label: 'Blog' }
-      // ]
-    // },
+      ]
+    },
     { path: '/contact', label: 'Contact' }
   ];
 

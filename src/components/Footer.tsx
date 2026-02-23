@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
         setSubscriptionStatus('error');
         setErrorMessage(data.message || 'Failed to subscribe. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setSubscriptionStatus('error');
       setErrorMessage('Network error. Please check your connection and try again.');
     } finally {
