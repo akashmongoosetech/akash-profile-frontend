@@ -36,6 +36,12 @@ import AIBusinessPlanGenerator from './components/AIBusinessPlanGenerator';
 import AIMedicalNoteFormatter from './components/AIMedicalNoteFormatter';
 import AIPatientDischargeSummaryGenerator from './components/AIPatientDischargeSummaryGenerator';
 import AIClinicWebsiteContentGenerator from './components/AIClinicWebsiteContentGenerator';
+import AISQLQueryGenerator from './components/AISQLQueryGenerator';
+import AIProjectDescriptionGenerator from './components/AIProjectDescriptionGenerator';
+import AIInternshipCoverLetterGenerator from './components/AIInternshipCoverLetterGenerator';
+import AIPersonalStatementGenerator from './components/AIPersonalStatementGenerator';
+import AIPortfolioBioGenerator from './components/AIPortfolioBioGenerator';
+import AIMeetingSummaryGenerator from './components/AIMeetingSummaryGenerator';
 import Tools from './Tools';
 
 function App() {
@@ -72,6 +78,12 @@ function App() {
             <Route path="ai-medical-note-formatter" element={<AIMedicalNoteFormatter />} />
             <Route path="ai-patient-discharge-summary-generator" element={<AIPatientDischargeSummaryGenerator />} />
             <Route path="ai-clinic-website-content-generator" element={<AIClinicWebsiteContentGenerator />} />
+            <Route path="ai-sql-query-generator" element={<AISQLQueryGenerator />} />
+            <Route path="ai-project-description-generator" element={<AIProjectDescriptionGenerator />} />
+            <Route path="ai-internship-cover-letter-generator" element={<AIInternshipCoverLetterGenerator />} />
+            <Route path="ai-personal-statement-generator" element={<AIPersonalStatementGenerator />} />
+            <Route path="ai-portfolio-bio-generator" element={<AIPortfolioBioGenerator />} />
+            <Route path="ai-meeting-summary-generator" element={<AIMeetingSummaryGenerator />} />
             <Route path="tools" element={<Tools />} />
           </Route>
           <Route path="/admin/login" element={<AdminLogin />} />

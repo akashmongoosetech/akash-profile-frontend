@@ -471,3 +471,260 @@ export const generateClinicContent = async (
     };
   }>;
 };
+
+/**
+ * Generate SQL Query
+ * @param databaseType - Database type (MySQL, PostgreSQL, SQLite, SQL Server)
+ * @param tableSchema - Table schema definition
+ * @param queryRequirement - Natural language query requirement
+ * @param complexityLevel - Complexity level (Basic, Intermediate, Advanced)
+ * @returns Promise with generated SQL query
+ */
+export const generateSQLQuery = async (
+  databaseType: string,
+  tableSchema: string,
+  queryRequirement: string,
+  complexityLevel: string = 'Basic'
+): Promise<{
+  result: string;
+  metadata: {
+    databaseType: string;
+    complexityLevel: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-sql', {
+    databaseType,
+    tableSchema,
+    queryRequirement,
+    complexityLevel,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      databaseType: string;
+      complexityLevel: string;
+      generatedAt: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Project Description
+ * @param projectName - Name of the project
+ * @param technologyStack - Technology stack used
+ * @param purpose - Project purpose
+ * @param features - Key features
+ * @param targetAudience - Target audience
+ * @param tone - Tone (Technical, Professional, Investor-ready, Resume-friendly)
+ * @returns Promise with generated project description
+ */
+export const generateProjectDescription = async (
+  projectName: string,
+  technologyStack: string,
+  purpose: string,
+  features?: string,
+  targetAudience?: string,
+  tone: string = 'Technical'
+): Promise<{
+  result: string;
+  metadata: {
+    projectName: string;
+    technologyStack: string;
+    tone: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-project-description', {
+    projectName,
+    technologyStack,
+    purpose,
+    features,
+    targetAudience,
+    tone,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      projectName: string;
+      technologyStack: string;
+      tone: string;
+      generatedAt: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Internship Cover Letter
+ * @param studentName - Student's name
+ * @param degree - Degree/Diploma
+ * @param college - College/University name
+ * @param skills - Skills list
+ * @param targetCompany - Target company name
+ * @param internshipRole - Internship role
+ * @param experienceLevel - Experience level
+ * @param tone - Tone (Formal, Confident, Enthusiastic)
+ * @returns Promise with generated cover letter
+ */
+export const generateCoverLetter = async (
+  studentName: string,
+  degree: string,
+  college: string,
+  skills: string,
+  targetCompany: string,
+  internshipRole: string,
+  experienceLevel?: string,
+  tone: string = 'Formal'
+): Promise<{
+  result: string;
+  metadata: {
+    studentName: string;
+    degree: string;
+    targetCompany: string;
+    internshipRole: string;
+    tone: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-cover-letter', {
+    studentName,
+    degree,
+    college,
+    skills,
+    targetCompany,
+    internshipRole,
+    experienceLevel,
+    tone,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      studentName: string;
+      degree: string;
+      targetCompany: string;
+      internshipRole: string;
+      tone: string;
+      generatedAt: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Personal Statement
+ * @param name - Applicant's name
+ * @param fieldOfStudy - Field of study
+ * @param academicAchievements - Academic achievements
+ * @param careerGoals - Career goals
+ * @param targetUniversity - Target university/program
+ * @param tone - Tone (Inspirational, Academic, Professional)
+ * @returns Promise with generated personal statement
+ */
+export const generatePersonalStatement = async (
+  name: string,
+  fieldOfStudy: string,
+  academicAchievements: string,
+  careerGoals: string,
+  targetUniversity?: string,
+  tone: string = 'Academic'
+): Promise<{
+  result: string;
+  metadata: {
+    name: string;
+    fieldOfStudy: string;
+    targetUniversity: string;
+    tone: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-personal-statement', {
+    name,
+    fieldOfStudy,
+    academicAchievements,
+    careerGoals,
+    targetUniversity,
+    tone,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      name: string;
+      fieldOfStudy: string;
+      targetUniversity: string;
+      tone: string;
+      generatedAt: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Portfolio Bio
+ * @param name - Person's name
+ * @param role - Professional role
+ * @param skills - Skills list
+ * @param yearsOfExperience - Years of experience
+ * @param achievements - Achievements
+ * @param tone - Tone (Professional, Friendly, Bold, Minimal)
+ * @returns Promise with generated portfolio bio
+ */
+export const generatePortfolioBio = async (
+  name: string,
+  role: string,
+  skills: string,
+  yearsOfExperience?: string,
+  achievements?: string,
+  tone: string = 'Professional'
+): Promise<{
+  result: string;
+  metadata: {
+    name: string;
+    role: string;
+    tone: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-portfolio-bio', {
+    name,
+    role,
+    skills,
+    yearsOfExperience,
+    achievements,
+    tone,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      name: string;
+      role: string;
+      tone: string;
+      generatedAt: string;
+    };
+  }>;
+};
+
+/**
+ * Generate Meeting Summary
+ * @param meetingTranscript - Meeting transcript
+ * @param meetingType - Meeting type (Client, Internal, Sales, Scrum)
+ * @param outputStyle - Output style (Bullet Summary, Detailed Report, Action Items Only)
+ * @returns Promise with generated meeting summary
+ */
+export const generateMeetingSummary = async (
+  meetingTranscript: string,
+  meetingType: string,
+  outputStyle: string = 'Bullet Summary'
+): Promise<{
+  result: string;
+  metadata: {
+    meetingType: string;
+    outputStyle: string;
+    generatedAt: string;
+  };
+}> => {
+  return callAIEndpoint('/api/ai/generate-meeting-summary', {
+    meetingTranscript,
+    meetingType,
+    outputStyle,
+  }) as Promise<{
+    result: string;
+    metadata: {
+      meetingType: string;
+      outputStyle: string;
+      generatedAt: string;
+    };
+  }>;
+};

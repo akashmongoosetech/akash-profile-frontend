@@ -19,7 +19,13 @@ import {
   Palette,
   Stethoscope,
   FileSpreadsheet,
-  Globe
+  Globe,
+  Database,
+  FolderKanban,
+  GraduationCap,
+  Award,
+  User,
+  MessageSquare
 } from 'lucide-react';
 
 interface Tool {
@@ -145,6 +151,42 @@ const toolsData: Category[] = [
         description: 'Generate professional investor-ready business plans with financial projections',
         path: '/ai-business-plan-generator',
         icon: <FileText className="w-8 h-8" />
+      },
+      {
+        name: 'AI SQL Query Generator',
+        description: 'Transform natural language requirements into optimized SQL queries',
+        path: '/ai-sql-query-generator',
+        icon: <Database className="w-8 h-8" />
+      },
+      {
+        name: 'AI Project Description Generator',
+        description: 'Create compelling project descriptions for resumes and portfolios',
+        path: '/ai-project-description-generator',
+        icon: <FolderKanban className="w-8 h-8" />
+      },
+      {
+        name: 'AI Internship Cover Letter Generator',
+        description: 'Generate personalized cover letters for internship applications',
+        path: '/ai-internship-cover-letter-generator',
+        icon: <GraduationCap className="w-8 h-8" />
+      },
+      {
+        name: 'AI Personal Statement Generator',
+        description: 'Write powerful personal statements for university applications',
+        path: '/ai-personal-statement-generator',
+        icon: <Award className="w-8 h-8" />
+      },
+      {
+        name: 'AI Portfolio Bio Generator',
+        description: 'Create professional bios for websites, LinkedIn, and freelance profiles',
+        path: '/ai-portfolio-bio-generator',
+        icon: <User className="w-8 h-8" />
+      },
+      {
+        name: 'AI Meeting Summary Generator',
+        description: 'Transform meeting transcripts into organized summaries with action items',
+        path: '/ai-meeting-summary-generator',
+        icon: <MessageSquare className="w-8 h-8" />
       }
     ]
   },

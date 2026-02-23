@@ -301,7 +301,6 @@ const QuotationGenerator: React.FC = () => {
       theme: 'striped',
       headStyles: { fillColor: [66, 66, 66] },
       styles: { fontSize: 9 },
-      // @ts-expect-error - columnStyles is a valid option in jspdf-autotable
       columnStyles: {
         0: { cellWidth: 45 },
         6: { fontStyle: 'bold' }
@@ -309,7 +308,6 @@ const QuotationGenerator: React.FC = () => {
     });
 
     // Totals
-    // @ts-expect-error - lastAutoTable is added by jspdf-autotable
     const tableResult = doc.lastAutoTable;
     const finalY = tableResult ? tableResult.finalY + 10 : 200;
     
