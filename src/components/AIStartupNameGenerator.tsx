@@ -14,7 +14,7 @@
  * - Copy to clipboard functionality
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Copy, 
@@ -34,7 +34,8 @@ import {
   BookOpen,
   HelpCircle,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
+  Download
 } from 'lucide-react';
 import { generateStartupNames } from '../utils/aiApi';
 
@@ -44,7 +45,18 @@ interface StartupName {
   positioning: string;
   tagline: string;
   domainStyle: string;
+  isFavorite?: boolean;
 }
+
+// Number of names options
+const nameCountOptions = [
+  { value: 5, label: '5 Names' },
+  { value: 10, label: '10 Names' },
+  { value: 15, label: '15 Names' },
+  { value: 20, label: '20 Names' },
+  { value: 25, label: '25 Names' },
+  { value: 'custom', label: 'Custom' },
+];
 
 const AIStartupNameGenerator: React.FC = () => {
   // Form state
@@ -53,10 +65,16 @@ const AIStartupNameGenerator: React.FC = () => {
   const [targetAudience, setTargetAudience] = useState('');
   const [namePreference, setNamePreference] = useState('Two-word');
   const [checkDomain, setCheckDomain] = useState(false);
+  const [numberOfNames, setNumberOfNames] = useState<number | 'custom'>(10);
+  const [customNumber, setCustomNumber] = useState<number>(15);
   
   // Response state
   const [names, setNames] = useState<StartupName[]>([]);
+  const [filteredNames, setFilteredNames] = useState<StartupName[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState<StartupName[]>([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [nameFilter, setNameFilter] = useState<'all' | 'one-word' | 'two-word'>('all');
   
   // UI state
   const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +115,38 @@ const AIStartupNameGenerator: React.FC = () => {
     { value: 'Either', label: 'Either', description: 'Mix of both styles' },
   ];
 
+  // Load favorites from localStorage
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('startupNameFavorites');
+    if (savedFavorites) {
+      try {
+        setFavorites(JSON.parse(savedFavorites));
+      } catch (e) {
+        console.error('Failed to parse favorites:', e);
+      }
+    }
+  }, []);
+
+  // Save favorites to localStorage
+  useEffect(() => {
+    localStorage.setItem('startupNameFavorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  // Filter names when filter or names change
+  useEffect(() => {
+    if (showFavorites) {
+      setFilteredNames(favorites);
+    } else {
+      let filtered = [...names];
+      if (nameFilter === 'one-word') {
+        filtered = filtered.filter(name => !name.name.includes(' ') && !name.name.includes('-'));
+      } else if (nameFilter === 'two-word') {
+        filtered = filtered.filter(name => name.name.includes(' ') || name.name.includes('-'));
+      }
+      setFilteredNames(filtered);
+    }
+  }, [names, nameFilter, showFavorites, favorites]);
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,6 +168,9 @@ const AIStartupNameGenerator: React.FC = () => {
     setError('');
     setIsLoading(true);
     setNames([]);
+    setShowFavorites(false);
+
+    const count = numberOfNames === 'custom' ? customNumber : numberOfNames;
 
     try {
       const result = await generateStartupNames(
@@ -125,14 +178,52 @@ const AIStartupNameGenerator: React.FC = () => {
         brandPersonality,
         targetAudience,
         namePreference,
-        checkDomain
+        checkDomain,
+        count
       );
-      setNames(result.names);
+      
+      // Add favorites status to names
+      const namesWithFavorites = result.names.map((name: StartupName) => ({
+        ...name,
+        isFavorite: favorites.some(f => f.name === name.name)
+      }));
+      setNames(namesWithFavorites);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate startup names');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Toggle favorite
+  const toggleFavorite = (name: StartupName) => {
+    setFavorites(prev => {
+      const isFav = prev.some(f => f.name === name.name);
+      if (isFav) {
+        return prev.filter(f => f.name !== name.name);
+      }
+      return [...prev, { ...name, isFavorite: true }];
+    });
+    
+    // Update names list
+    setNames(prev => prev.map(n => 
+      n.name === name.name ? { ...n, isFavorite: !n.isFavorite } : n
+    ));
+  };
+
+  // Download favorites as text
+  const downloadFavorites = () => {
+    const content = favorites.map(f => 
+      `🚀 ${f.name}\n📖 Meaning: ${f.meaning}\n🎯 Positioning: ${f.positioning}\n💬 Tagline: ${f.tagline}\n🌐 Domain: ${f.domainStyle}\n---\n`
+    ).join('\n');
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'startup-names-favorites.txt';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // Copy single name to clipboard
@@ -281,6 +372,45 @@ const AIStartupNameGenerator: React.FC = () => {
                 </div>
               </div>
 
+              {/* Number of Names to Generate */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  How Many Names?
+                </label>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                  {nameCountOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setNumberOfNames(option.value as number | 'custom')}
+                      className={`p-2 rounded-lg border-2 text-center text-sm transition-all ${
+                        numberOfNames === option.value
+                          ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-pink-300'
+                      }`}
+                    >
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {option.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {numberOfNames === 'custom' && (
+                  <div className="mt-3">
+                    <input
+                      type="number"
+                      min={1}
+                      max={50}
+                      value={customNumber}
+                      onChange={(e) => setCustomNumber(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      placeholder="Enter number (1-50)"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Enter a number between 1 and 50</p>
+                  </div>
+                )}
+              </div>
+
               {/* Domain Check Toggle */}
               <div className="flex items-center gap-3">
                 <button
@@ -334,58 +464,169 @@ const AIStartupNameGenerator: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            {names.length > 0 ? (
+            {names.length > 0 || favorites.length > 0 ? (
               <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                    {names.length} Name Suggestions
-                  </h2>
-                  <button
-                    onClick={handleSubmit}
-                    className="flex items-center gap-2 px-4 py-2 text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Regenerate
-                  </button>
+                {/* Filter and Controls Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                      {showFavorites ? `${favorites.length} Favorites` : `${names.length} Name Suggestions`}
+                    </h2>
+                    {!showFavorites && (
+                      <span className="text-sm text-gray-500">({filteredNames.length} shown)</span>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Filter Buttons */}
+                    {!showFavorites && (
+                      <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                        <button
+                          onClick={() => setNameFilter('all')}
+                          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                            nameFilter === 'all'
+                              ? 'bg-pink-500 text-white'
+                              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          All
+                        </button>
+                        <button
+                          onClick={() => setNameFilter('one-word')}
+                          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                            nameFilter === 'one-word'
+                              ? 'bg-pink-500 text-white'
+                              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          One-word
+                        </button>
+                        <button
+                          onClick={() => setNameFilter('two-word')}
+                          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                            nameFilter === 'two-word'
+                              ? 'bg-pink-500 text-white'
+                              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          Two-word
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Favorites Toggle */}
+                    <button
+                      onClick={() => {
+                        setShowFavorites(!showFavorites);
+                        if (!showFavorites) {
+                          setFilteredNames(favorites);
+                        } else {
+                          setFilteredNames(names);
+                        }
+                      }}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        showFavorites
+                          ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-pink-50 dark:hover:bg-pink-900/20'
+                      }`}
+                    >
+                      <Heart className={`w-4 h-4 ${favorites.length > 0 ? 'fill-pink-500' : ''}`} />
+                      {favorites.length > 0 && (
+                        <span className="text-sm font-medium">{favorites.length}</span>
+                      )}
+                    </button>
+                    
+                    {/* Download Favorites */}
+                    {favorites.length > 0 && (
+                      <button
+                        onClick={downloadFavorites}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    )}
+                    
+                    {/* Regenerate */}
+                    {!showFavorites && (
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 px-4 py-2 text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                      </button>
+                    )}
+                  </div>
                 </div>
-                {names.map((name, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-2">
-                          {name.name}
-                        </h3>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-start gap-2">
-                            <BookOpen className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-600 dark:text-gray-300">
-                              <span className="font-medium">Meaning:</span> {name.meaning}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <Target className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-600 dark:text-gray-300">
-                              <span className="font-medium">Positioning:</span> {name.positioning}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <Tag className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-600 dark:text-gray-300">
-                              <span className="font-medium">Tagline:</span> {name.tagline}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <Globe className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-600 dark:text-gray-300">
-                              <span className="font-medium">Domain:</span> {name.domainStyle}
-                            </span>
-                          </div>
+                
+                {showFavorites && favorites.length === 0 ? (
+                  <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
+                    <Heart className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      No favorites yet
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      Click the heart icon on any name to save it to your favorites
+                    </p>
+                    <button
+                      onClick={() => setShowFavorites(false)}
+                      className="mt-4 px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+                    >
+                      Generate Names
+                    </button>
+                  </div>
+                ) : (
+                  (showFavorites ? filteredNames : names).map((name, index) => (
+                    <motion.div
+                      key={showFavorites ? name.name : index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow relative group"
+                    >
+                      {/* Favorite Button */}
+                      <button
+                        onClick={() => toggleFavorite(name)}
+                        className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${
+                          name.isFavorite || showFavorites
+                            ? 'text-pink-500 bg-pink-50 dark:bg-pink-900/30'
+                            : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 opacity-0 group-hover:opacity-100'
+                        }`}
+                        title={name.isFavorite || showFavorites ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Heart className={`w-5 h-5 ${name.isFavorite || showFavorites ? 'fill-current' : ''}`} />
+                      </button>
+                      
+                      <div className="flex items-start justify-between pr-12">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-2">
+                            {name.name}
+                          </h3>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-start gap-2">
+                              <BookOpen className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-600 dark:text-gray-300">
+                                <span className="font-medium">Meaning:</span> {name.meaning}
+                              </span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <Target className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-600 dark:text-gray-300">
+                                <span className="font-medium">Positioning:</span> {name.positioning}
+                              </span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <Tag className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-600 dark:text-gray-300">
+                                <span className="font-medium">Tagline:</span> {name.tagline}
+                              </span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <Globe className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-600 dark:text-gray-300">
+                                <span className="font-medium">Domain:</span> {name.domainStyle}
+                              </span>
+                            </div>
                         </div>
                       </div>
                       <button
@@ -400,7 +641,7 @@ const AIStartupNameGenerator: React.FC = () => {
                       </button>
                     </div>
                   </motion.div>
-                ))}
+                )))}
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">

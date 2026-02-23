@@ -202,6 +202,7 @@ export const validateBusinessIdea = async (
  * @param targetAudience - Target audience description
  * @param namePreference - One-word or Two-word preference
  * @param checkDomain - Whether to check domain availability
+ * @param numberOfNames - Number of names to generate (1-30)
  * @returns Promise with generated names
  */
 export const generateStartupNames = async (
@@ -209,7 +210,8 @@ export const generateStartupNames = async (
   brandPersonality: string,
   targetAudience: string,
   namePreference: string,
-  checkDomain: boolean
+  checkDomain: boolean,
+  numberOfNames: number = 10
 ): Promise<{
   names: Array<{
     name: string;
@@ -225,6 +227,7 @@ export const generateStartupNames = async (
     targetAudience: string;
     namePreference: string;
     checkDomain: boolean;
+    numberOfNames: number;
   };
 }> => {
   return callAIEndpoint('/api/ai/startup-name-generator', {
@@ -233,6 +236,7 @@ export const generateStartupNames = async (
     targetAudience,
     namePreference,
     checkDomain,
+    numberOfNames,
   }) as Promise<{
     names: Array<{
       name: string;
@@ -248,6 +252,7 @@ export const generateStartupNames = async (
       targetAudience: string;
       namePreference: string;
       checkDomain: boolean;
+      numberOfNames: number;
     };
   }>;
 };
