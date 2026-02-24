@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import ParticleBackground from './ParticleBackground';
@@ -13,6 +13,10 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { isPopupOpen, closePopup } = useBlogPopup();
+  const location = useLocation();
+  
+  // Hide footer on AI Chat page
+  const isAIChatPage = location.pathname === '/ai-chat';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-gray-900 dark:via-blue-900 dark:to-gray-900 relative overflow-x-hidden">
@@ -22,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="relative z-10">
         {children ? children : <Outlet />}
       </main>
-      <Footer />
+      {!isAIChatPage && <Footer />}
       
       {/* Blog Popup */}
       <BlogPopup isOpen={isPopupOpen} onClose={closePopup} />

@@ -85,7 +85,10 @@ const AIChat: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if there are messages and not loading
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
   }, [messages, scrollToBottom]);
 
   // Auto-resize textarea
@@ -372,7 +375,7 @@ const AIChat: React.FC = () => {
     const isCopied = copiedCode === codeId;
 
     return (
-      <div className="relative group my-4 rounded-lg overflow-hidden mt-[500px]">
+      <div className="relative group my-4 rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-2 bg-gray-700 text-gray-300 text-xs">
           <span>{language || 'code'}</span>
           <button
