@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sun, Moon, Code, ChevronDown } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
-import BlogPopupTrigger from './BlogPopupTrigger';
-import { useBlogPopup } from '../hooks/useBlogPopup';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Sun, Moon, Code, ChevronDown } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
+import BlogPopupTrigger from "./BlogPopupTrigger";
+import { useBlogPopup } from "../hooks/useBlogPopup";
+import { Bot } from "lucide-react";
 
 interface NavItem {
   path?: string;
@@ -21,33 +22,33 @@ const Navbar: React.FC = () => {
   const { openPopup } = useBlogPopup();
 
   const navItems = [
-    { path: '/', label: 'Home' },
-    { path: '/about', label: 'About' },
-    { path: '/services', label: 'Services' },
-    { path: '/experience', label: 'Experience' },
-    { path: '/tools', label: 'Tools' },
-    { 
-      label: 'More', 
+    { path: "/", label: "Home" },
+    { path: "/about", label: "About" },
+    { path: "/services", label: "Services" },
+    { path: "/experience", label: "Experience" },
+    { path: "/tools", label: "AI Tools" },
+    {
+      label: "More",
       dropdown: [
-        { path: '/blog', label: 'Blog' },
-        { path: '/projects', label: 'Projects' },
-        { path: '/skills', label: 'Skills' },
+        { path: "/blog", label: "Blog" },
+        { path: "/projects", label: "Projects" },
+        { path: "/skills", label: "Skills" },
         // { path: '/testimonials', label: 'Testimonials' },
-      ]
+      ],
     },
-    { path: '/contact', label: 'Contact' }
+    { path: "/contact", label: "Contact" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const isActiveDropdown = (dropdown: NavItem[]) => {
-    return dropdown.some(item => location.pathname === item.path);
+    return dropdown.some((item) => location.pathname === item.path);
   };
 
   return (
@@ -55,7 +56,9 @@ const Navbar: React.FC = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/10 dark:bg-gray-900/10 backdrop-blur-lg border-b border-white/20' : ''
+        scrolled
+          ? "bg-white/10 dark:bg-gray-900/10 backdrop-blur-lg border-b border-white/20"
+          : ""
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,14 +86,14 @@ const Navbar: React.FC = () => {
                     <button
                       className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
                         isActiveDropdown(item.dropdown)
-                          ? 'text-blue-400'
-                          : 'text-gray-300 hover:text-white'
+                          ? "text-blue-400"
+                          : "text-gray-300 hover:text-white"
                       }`}
                     >
                       {item.label}
                       <ChevronDown className="w-4 h-4" />
                     </button>
-                    
+
                     <AnimatePresence>
                       {showDropdown && (
                         <motion.div
@@ -105,10 +108,12 @@ const Navbar: React.FC = () => {
                               to={dropdownItem.path}
                               className={`block px-4 py-3 text-sm transition-colors ${
                                 location.pathname === dropdownItem.path
-                                  ? 'text-blue-400 bg-blue-500/10'
-                                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-                              } ${dropdownIndex === 0 ? 'rounded-t-lg' : ''} ${
-                                dropdownIndex === item.dropdown.length - 1 ? 'rounded-b-lg' : ''
+                                  ? "text-blue-400 bg-blue-500/10"
+                                  : "text-gray-300 hover:text-white hover:bg-white/10"
+                              } ${dropdownIndex === 0 ? "rounded-t-lg" : ""} ${
+                                dropdownIndex === item.dropdown.length - 1
+                                  ? "rounded-b-lg"
+                                  : ""
                               }`}
                             >
                               {dropdownItem.label}
@@ -123,8 +128,8 @@ const Navbar: React.FC = () => {
                     to={item.path}
                     className={`relative px-3 py-2 rounded-lg transition-all duration-200 ${
                       location.pathname === item.path
-                        ? 'text-blue-400'
-                        : 'text-gray-300 hover:text-white'
+                        ? "text-blue-400"
+                        : "text-gray-300 hover:text-white"
                     }`}
                   >
                     {item.label}
@@ -133,27 +138,39 @@ const Navbar: React.FC = () => {
                         layoutId="activeTab"
                         className="absolute inset-0 bg-white/10 rounded-lg border border-white/20"
                         initial={false}
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        transition={{
+                          type: "spring",
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
                       />
                     )}
                   </Link>
                 )}
               </div>
             ))}
-            
+
+            <Link
+              to="/ai-chat"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transition duration-300 inline-flex items-center gap-2"
+            >
+              <Bot className="w-5 h-5" />
+              Chat with AI
+            </Link>
+
             {/* Blog Popup Trigger */}
-            <BlogPopupTrigger 
+            <BlogPopupTrigger
               onTrigger={openPopup}
               variant="icon"
               className="hover:scale-110"
             />
-            
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 hover:scale-110"
             >
-              {theme === 'dark' ? (
+              {theme === "dark" ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <Moon className="w-5 h-5 text-blue-400" />
@@ -167,7 +184,7 @@ const Navbar: React.FC = () => {
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
             >
-              {theme === 'dark' ? (
+              {theme === "dark" ? (
                 <Sun className="w-5 h-5 text-yellow-400" />
               ) : (
                 <Moon className="w-5 h-5 text-blue-400" />
@@ -177,7 +194,11 @@ const Navbar: React.FC = () => {
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -188,7 +209,7 @@ const Navbar: React.FC = () => {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-gray-900/95 backdrop-blur-lg border-b border-white/20"
           >
@@ -212,8 +233,8 @@ const Navbar: React.FC = () => {
                             onClick={() => setIsOpen(false)}
                             className={`block px-6 py-2 rounded-lg transition-all duration-200 ${
                               location.pathname === dropdownItem.path
-                                ? 'bg-blue-500/20 text-blue-400'
-                                : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                                ? "bg-blue-500/20 text-blue-400"
+                                : "text-gray-300 hover:bg-white/10 hover:text-white"
                             }`}
                           >
                             {dropdownItem.label}
@@ -232,8 +253,8 @@ const Navbar: React.FC = () => {
                         onClick={() => setIsOpen(false)}
                         className={`block px-4 py-2 rounded-lg transition-all duration-200 ${
                           location.pathname === item.path
-                            ? 'bg-blue-500/20 text-blue-400'
-                            : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                            ? "bg-blue-500/20 text-blue-400"
+                            : "text-gray-300 hover:bg-white/10 hover:text-white"
                         }`}
                       >
                         {item.label}
