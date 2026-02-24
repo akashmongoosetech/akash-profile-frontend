@@ -20,6 +20,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { streamChat, ChatMessage } from '../utils/aiApi';
+import DeleteModal from './DeleteModal';
 
 interface Message {
   id: string;
@@ -46,6 +47,8 @@ const AIChat: React.FC = () => {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -148,24 +151,32 @@ const AIChat: React.FC = () => {
 
   const handleDeleteConversation = (e: React.MouseEvent, conversationId: string) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this conversation?')) {
-      const updatedConversations = conversations.filter(c => c.id !== conversationId);
-      setConversations(updatedConversations);
-      
-      if (activeConversationId === conversationId) {
-        if (updatedConversations.length > 0) {
-          setActiveConversationId(updatedConversations[0].id);
-          setMessages(updatedConversations[0].messages);
-        } else {
-          setActiveConversationId(null);
-          setMessages([]);
-        }
-      }
-      
-      if (updatedConversations.length === 0) {
-        localStorage.removeItem('ai-chat-conversations');
+    setConversationToDelete(conversationId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteConversation = () => {
+    if (!conversationToDelete) return;
+    
+    const updatedConversations = conversations.filter(c => c.id !== conversationToDelete);
+    setConversations(updatedConversations);
+    
+    if (activeConversationId === conversationToDelete) {
+      if (updatedConversations.length > 0) {
+        setActiveConversationId(updatedConversations[0].id);
+        setMessages(updatedConversations[0].messages);
+      } else {
+        setActiveConversationId(null);
+        setMessages([]);
       }
     }
+    
+    if (updatedConversations.length === 0) {
+      localStorage.removeItem('ai-chat-conversations');
+    }
+    
+    setIsDeleteModalOpen(false);
+    setConversationToDelete(null);
   };
 
   const handleClearChat = () => {
@@ -411,7 +422,7 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex pt-16">
+    <div className="min-h-screen bg-gray-100 flex">
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isMobileSidebarOpen && (
@@ -492,14 +503,14 @@ const AIChat: React.FC = () => {
             </div>
 
             {/* Sidebar Footer */}
-            <div className="p-4 border-t border-gray-700">
+            {/* <div className="p-4 border-t border-gray-700">
               <div className="flex items-center gap-3 text-gray-400 text-sm">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <span>Guest User</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Close Sidebar Button (Mobile) */}
             <button
@@ -699,6 +710,19 @@ const AIChat: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setConversationToDelete(null);
+        }}
+        onDelete={confirmDeleteConversation}
+        title="Delete Conversation"
+        itemName={conversations.find(c => c.id === conversationToDelete)?.title}
+        itemDescription={`Created on ${conversations.find(c => c.id === conversationToDelete) ? new Date(conversations.find(c => c.id === conversationToDelete)!.createdAt).toLocaleDateString() : ''}`}
+      />
     </div>
   );
 };
