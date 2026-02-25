@@ -214,6 +214,22 @@ const Navbar: React.FC = () => {
             className="md:hidden bg-gray-900/95 backdrop-blur-lg border-b border-white/20"
           >
             <div className="px-4 py-4 space-y-2">
+              {/* Chat with AI - Mobile */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: navItems.length * 0.1 }}
+              >
+                <Link
+                  to="/ai-chat"
+                  onClick={() => setIsOpen(false)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transition duration-300 inline-flex items-center gap-2 w-full justify-center"
+                >
+                  <Bot className="w-5 h-5" />
+                  Chat with AI
+                </Link>
+              </motion.div>
+
               {navItems.map((item, index) => (
                 <div key={index}>
                   {item.dropdown ? (

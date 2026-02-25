@@ -49,9 +49,28 @@ const AIChat: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [conversationToDelete, setConversationToDelete] = useState<string | null>(null);
+  const [isDesktop, setIsDesktop] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      if (desktop && isMobileSidebarOpen) {
+        setIsMobileSidebarOpen(false);
+      }
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, [isMobileSidebarOpen]);
+
+  // Determine if sidebar should be visible
+  const isSidebarVisible = isDesktop ? isSidebarOpen : isMobileSidebarOpen;
 
   // Load conversations from localStorage on mount
   useEffect(() => {
@@ -386,43 +405,46 @@ const AIChat: React.FC = () => {
     const isCopied = copiedCode === codeId;
 
     return (
-      <div className="relative group my-4 rounded-lg overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-700 text-gray-300 text-xs">
-          <span>{language || 'code'}</span>
+      <div className="relative group my-2 sm:my-4 rounded-lg overflow-hidden">
+        <div className="flex items-center justify-between px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-700 text-gray-300 text-xs">
+          <span className="truncate">{language || 'code'}</span>
           <button
             onClick={() => handleCopyCode(code, codeId)}
-            className="flex items-center gap-1 hover:text-white transition-colors"
+            className="flex items-center gap-1 hover:text-white transition-colors flex-shrink-0 ml-2"
           >
             {isCopied ? (
               <>
                 <Check className="w-3 h-3" />
-                <span>Copied!</span>
+                <span className="hidden sm:inline">Copied!</span>
               </>
             ) : (
               <>
                 <Copy className="w-3 h-3" />
-                <span>Copy</span>
+                <span className="hidden sm:inline">Copy</span>
               </>
             )}
           </button>
         </div>
-        <SyntaxHighlighter
-          language={language || 'text'}
-          style={oneDark}
-          customStyle={{
-            margin: 0,
-            borderRadius: 0,
-            fontSize: '0.875rem'
-          }}
-        >
-          {code}
-        </SyntaxHighlighter>
+        <div className="overflow-x-auto">
+          <SyntaxHighlighter
+            language={language || 'text'}
+            style={oneDark}
+            customStyle={{
+              margin: 0,
+              borderRadius: 0,
+              fontSize: '0.75rem',
+              minWidth: 'fit-content'
+            }}
+          >
+            {code}
+          </SyntaxHighlighter>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex overflow-x-hidden">
       {/* Mobile Overlay */}
       <AnimatePresence>
         {isMobileSidebarOpen && (
@@ -438,32 +460,33 @@ const AIChat: React.FC = () => {
 
       {/* Sidebar */}
       <AnimatePresence mode="wait">
-        {(isSidebarOpen || isMobileSidebarOpen) && (
+        {isSidebarVisible && (
           <motion.aside
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.2 }}
-            className={`bg-gray-800 border-r border-gray-700 flex flex-col h-screen fixed lg:relative z-50 w-[280px]`}
+            className={`bg-gray-800 border-r border-gray-700 flex flex-col h-screen fixed lg:relative z-50 w-64 sm:w-72 md:w-80 ${isMobileSidebarOpen ? 'inset-0' : ''}`}
           >
             {/* Sidebar Header */}
-            <div className="p-4 border-b border-gray-700">
+            <div className="p-3 sm:p-4 border-b border-gray-700">
               <button
                 onClick={createNewChat}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-medium"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-medium text-sm sm:text-base"
               >
-                <Plus className="w-5 h-5" />
-                New Chat
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">New Chat</span>
+                <span className="sm:hidden">New</span>
               </button>
             </div>
 
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto p-2">
-              <div className="text-xs text-gray-400 px-3 py-2 uppercase tracking-wider">
+              <div className="text-xs text-gray-400 px-2 sm:px-3 py-2 uppercase tracking-wider">
                 Chat History
               </div>
               {conversations.length === 0 ? (
-                <div className="px-3 py-8 text-center text-gray-500 text-sm">
+                <div className="px-2 sm:px-3 py-6 sm:py-8 text-center text-gray-500 text-xs sm:text-sm">
                   No conversations yet. Start a new chat!
                 </div>
               ) : (
@@ -472,29 +495,28 @@ const AIChat: React.FC = () => {
                     <div
                       key={conversation.id}
                       onClick={() => handleSelectConversation(conversation.id)}
-                      className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
-                        activeConversationId === conversation.id
+                      className={`group flex items-center justify-between px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-colors ${activeConversationId === conversation.id
                           ? 'bg-gray-700 text-white'
                           : 'text-gray-300 hover:bg-gray-700/50'
                       }`}
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <MessageSquare className="w-4 h-4 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate">
+                          <div className="text-xs sm:text-sm font-medium truncate">
                             {conversation.title}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 hidden sm:block">
                             {formatDate(conversation.updatedAt)}
                           </div>
                         </div>
                       </div>
                       <button
                         onClick={(e) => handleDeleteConversation(e, conversation.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 hover:text-red-400 rounded transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1 sm:p-1.5 hover:bg-red-500/20 hover:text-red-400 rounded transition-all"
                         title="Delete conversation"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </button>
                     </div>
                   ))}
@@ -512,10 +534,10 @@ const AIChat: React.FC = () => {
               </div>
             </div> */}
 
-            {/* Close Sidebar Button (Mobile) */}
+            {/* Close Sidebar Button */}
             <button
-              onClick={() => setIsMobileSidebarOpen(false)}
-              className="absolute top-3 right-3 p-2 lg:hidden hover:bg-gray-700 rounded-lg"
+              onClick={() => isDesktop ? setIsSidebarOpen(false) : setIsMobileSidebarOpen(false)}
+              className="absolute top-3 right-3 p-2 hover:bg-gray-700 rounded-lg"
             >
               <X className="w-5 h-5 text-gray-400" />
             </button>
@@ -524,61 +546,66 @@ const AIChat: React.FC = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col h-screen min-h-screen">
+      <div className={`flex-1 flex flex-col h-screen min-h-screen transition-all duration-200 ${isSidebarVisible ? 'lg:ml-0' : 'lg:ml-0'}`}>
         {/* Header */}
-        <header className="h-14 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 flex-shrink-0">
+        <header className="h-14 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-2 sm:px-4 flex-shrink-0">
           <div className="flex items-center gap-3">
+            {/* Mobile Menu Button - visible on small screens */}
             <button
               onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
               className="p-2 hover:bg-gray-700 rounded-lg lg:hidden"
             >
               <Menu className="w-5 h-5 text-gray-300" />
             </button>
+            {/* Desktop Sidebar Toggle - visible on large screens */}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-gray-700 rounded-lg hidden lg:block"
+              className="p-2 hover:bg-gray-700 rounded-lg hidden lg:flex"
               title={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
             >
-              <ChevronLeft className={`w-5 h-5 text-gray-300 transition-transform ${isSidebarOpen ? '' : 'rotate-180'}`} />
+              <ChevronLeft className={`w-5 h-5 text-gray-300 transition-transform duration-200 ${isSidebarOpen ? '' : 'rotate-180'}`} />
             </button>
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-lg font-semibold text-white">AI Chat</h1>
+              <div className="">
+                <h1 className="text-lg font-semibold text-white">AI Chat</h1>
+                <p className='text-sm md:text-[12px] text-gray-300'>Powered By Sky AI</p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={createNewChat}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium"
               title="New Chat"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">New Chat</span>
             </button>
             <button
               onClick={handleClearChat}
               disabled={messages.length === 0}
-              className="p-2 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               title="Clear chat"
             >
-              <Trash2 className="w-5 h-5 text-gray-300" />
+              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300" />
             </button>
           </div>
         </header>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-4 space-y-3 sm:space-y-4 bg-gray-900">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-20 h-20 mb-4 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <Bot className="w-10 h-10 text-white" />
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <div className="w-14 h-14 sm:w-20 sm:h-20 mb-3 sm:mb-4 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <Bot className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-lg sm:text-2xl font-bold text-white mb-2">
                 How can I help you today?
               </h2>
-              <p className="text-gray-400 max-w-md">
+              <p className="text-gray-400 max-w-md text-sm sm:text-base">
                 Ask me anything! I can help with coding, writing, analysis, questions, and more.
               </p>
             </div>
@@ -589,27 +616,26 @@ const AIChat: React.FC = () => {
               key={message.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+              className={`flex gap-2 sm:gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
               {/* Avatar */}
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+              <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
                 message.role === 'user' 
                   ? 'bg-blue-500' 
                   : 'bg-gradient-to-br from-purple-500 to-pink-500'
               }`}>
                 {message.role === 'user' ? (
-                  <User className="w-5 h-5 text-white" />
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 ) : (
-                  <Bot className="w-5 h-5 text-white" />
+                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 )}
               </div>
 
               {/* Message Bubble */}
-              <div className={`flex-1 max-w-[80%] ${
-                message.role === 'user' 
-                  ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' 
-                  : 'bg-gray-800 text-gray-100 rounded-2xl rounded-tl-sm border border-gray-700'
-              } px-4 py-3`}>
+              <div className={`flex-1 min-w-0 max-w-[85%] sm:max-w-[80%] ${message.role === 'user' 
+                ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' 
+                : 'bg-gray-800 text-gray-100 rounded-2xl rounded-tl-sm border border-gray-700'
+              } px-3 py-2.5 sm:px-4 sm:py-3 overflow-hidden`}>
                 <div className="prose prose-sm max-w-none dark:prose-invert">
                   <ReactMarkdown
                     components={{
@@ -679,8 +705,8 @@ const AIChat: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-gray-800 border-t border-gray-700">
-          <div className="flex items-end gap-3 max-w-4xl mx-auto">
+        <div className="p-2 sm:p-4 bg-gray-800 border-t border-gray-700">
+          <div className="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">
             <div className="flex-1 relative">
               <textarea
                 ref={textareaRef}
@@ -690,22 +716,22 @@ const AIChat: React.FC = () => {
                 placeholder="Type your message..."
                 disabled={isLoading}
                 rows={1}
-                className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-100 placeholder-gray-500"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 sm:pr-12 bg-gray-900 border border-gray-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed text-gray-100 placeholder-gray-500 text-sm sm:text-base"
               />
             </div>
             <button
               onClick={handleSendMessage}
               disabled={!input.trim() || isLoading}
-              className="flex-shrink-0 p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl transition-colors"
+              className="flex-shrink-0 p-2.5 sm:p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl transition-colors"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Send className="w-5 h-5 text-white" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               )}
             </button>
           </div>
-          <p className="mt-2 text-xs text-gray-500 text-center">
+          <p className="mt-1 sm:mt-2 text-xs text-gray-500 text-center hidden sm:block">
             Press Enter to send, Shift + Enter for new line
           </p>
         </div>
