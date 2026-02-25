@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Github, Filter } from 'lucide-react';
 
@@ -89,7 +90,17 @@ const Projects: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Projects — Akash Raikwar</title>
+        <meta name="title" content="Projects — Akash Raikwar" />
+        <meta name="description" content="Explore my portfolio of web development projects. View case studies of web applications, React apps, Node.js projects, and more." />
+        <meta property="og:title" content="Projects — Akash Raikwar" />
+        <meta property="og:description" content="Explore my portfolio of web development projects. View case studies of web applications, React apps, Node.js projects, and more." />
+        <meta property="twitter:title" content="Projects — Akash Raikwar" />
+        <meta property="twitter:description" content="Explore my portfolio of web development projects. View case studies of web applications, React apps, Node.js projects, and more." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -218,6 +229,7 @@ const Projects: React.FC = () => {
         )}
       </motion.div>
     </div>
+    </>
   );
 };
 

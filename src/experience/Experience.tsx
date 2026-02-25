@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
   Briefcase, 
@@ -169,7 +170,17 @@ const Experience: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Experience — Akash Raikwar</title>
+        <meta name="title" content="Experience — Akash Raikwar" />
+        <meta name="description" content="View my professional experience and work history. Learn about my roles as a full-stack developer and software engineer." />
+        <meta property="og:title" content="Experience — Akash Raikwar" />
+        <meta property="og:description" content="View my professional experience and work history. Learn about my roles as a full-stack developer and software engineer." />
+        <meta property="twitter:title" content="Experience — Akash Raikwar" />
+        <meta property="twitter:description" content="View my professional experience and work history. Learn about my roles as a full-stack developer and software engineer." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -396,6 +407,7 @@ const Experience: React.FC = () => {
         
       </motion.div>
     </div>
+    </>
   );
 };
 

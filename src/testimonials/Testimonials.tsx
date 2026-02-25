@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote, ChevronLeft, ChevronRight, Users, Briefcase, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -138,7 +139,17 @@ const Testimonials: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16 relative overflow-hidden">
+    <>
+      <Helmet>
+        <title>Testimonials — Akash Raikwar</title>
+        <meta name="title" content="Testimonials — Akash Raikwar" />
+        <meta name="description" content="Read what clients and colleagues say about working with Akash Raikwar. View testimonials for web development projects and collaborations." />
+        <meta property="og:title" content="Testimonials — Akash Raikwar" />
+        <meta property="og:description" content="Read what clients and colleagues say about working with Akash Raikwar. View testimonials for web development projects and collaborations." />
+        <meta property="twitter:title" content="Testimonials — Akash Raikwar" />
+        <meta property="twitter:description" content="Read what clients and colleagues say about working with Akash Raikwar. View testimonials for web development projects and collaborations." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16 relative overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute top-20 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
@@ -413,6 +424,7 @@ const Testimonials: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, MessageCircle } from 'lucide-react';
 
@@ -115,7 +116,17 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Contact — Akash Raikwar</title>
+        <meta name="title" content="Contact — Akash Raikwar" />
+        <meta name="description" content="Get in touch with Akash Raikwar. Contact for web development projects, collaborations, or inquiries. Available for freelance work and full-time opportunities." />
+        <meta property="og:title" content="Contact — Akash Raikwar" />
+        <meta property="og:description" content="Get in touch with Akash Raikwar. Contact for web development projects, collaborations, or inquiries. Available for freelance work and full-time opportunities." />
+        <meta property="twitter:title" content="Contact — Akash Raikwar" />
+        <meta property="twitter:description" content="Get in touch with Akash Raikwar. Contact for web development projects, collaborations, or inquiries. Available for freelance work and full-time opportunities." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -344,6 +355,7 @@ const Contact: React.FC = () => {
         </div>
       </motion.div>
     </div>
+    </>
   );
 };
 

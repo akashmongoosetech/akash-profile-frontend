@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
   Code, 
@@ -110,7 +111,17 @@ const Services: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Services — Akash Raikwar</title>
+        <meta name="title" content="Services — Akash Raikwar" />
+        <meta name="description" content="Professional web development services including frontend development, backend development, full-stack solutions, and custom web applications." />
+        <meta property="og:title" content="Services — Akash Raikwar" />
+        <meta property="og:description" content="Professional web development services including frontend development, backend development, full-stack solutions, and custom web applications." />
+        <meta property="twitter:title" content="Services — Akash Raikwar" />
+        <meta property="twitter:description" content="Professional web development services including frontend development, backend development, full-stack solutions, and custom web applications." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -264,6 +275,7 @@ const Services: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 };
 

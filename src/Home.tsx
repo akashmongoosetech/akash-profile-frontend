@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -79,7 +80,7 @@ const Home: React.FC = () => {
   };
 
   const stats = [
-    { icon: Award, value: '4+', label: 'Years Experience', color: 'from-blue-500 to-cyan-500' },
+    { icon: Award, value: '2+', label: 'Years Experience', color: 'from-blue-500 to-cyan-500' },
     { icon: Users, value: '50+', label: 'Projects Completed', color: 'from-green-500 to-emerald-500' },
     { icon: Star, value: '25+', label: 'Happy Clients', color: 'from-purple-500 to-violet-500' },
     { icon: Coffee, value: '1000+', label: 'Cups of Coffee', color: 'from-orange-500 to-red-500' }
@@ -345,7 +346,17 @@ const Home: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <>
+      <Helmet>
+        <title>Akash Raikwar — Full Stack Developer</title>
+        <meta name="title" content="Akash Raikwar — Full Stack Developer" />
+        <meta name="description" content="Full-stack software engineer specializing in React, Node.js, TypeScript, and MongoDB. I build scalable, responsive web apps and APIs." />
+        <meta property="og:title" content="Akash Raikwar — Full Stack Developer" />
+        <meta property="og:description" content="Full-stack software engineer specializing in React, Node.js, TypeScript, and MongoDB. I build scalable, responsive web apps and APIs." />
+        <meta property="twitter:title" content="Akash Raikwar — Full Stack Developer" />
+        <meta property="twitter:description" content="Full-stack software engineer specializing in React, Node.js, TypeScript, and MongoDB. I build scalable, responsive web apps and APIs." />
+      </Helmet>
+      <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
         {/* Enhanced Floating shapes */}
@@ -1300,6 +1311,7 @@ const Home: React.FC = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

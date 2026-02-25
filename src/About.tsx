@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Code, Award, Users } from 'lucide-react';
 
@@ -24,7 +25,7 @@ const About: React.FC = () => {
   };
 
   const stats = [
-    { icon: Code, value: '4+', label: 'Years Experience' },
+    { icon: Code, value: '2+', label: 'Years Experience' },
     { icon: Award, value: '50+', label: 'Projects Completed' },
     { icon: Users, value: '20+', label: 'Happy Clients' },
   ];
@@ -92,7 +93,17 @@ const About: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>About Me — Akash Raikwar</title>
+        <meta name="title" content="About Me — Akash Raikwar" />
+        <meta name="description" content="Learn about Akash Raikwar, a full-stack software engineer with expertise in React, Node.js, TypeScript, and MongoDB. View education, experience, and skills." />
+        <meta property="og:title" content="About Me — Akash Raikwar" />
+        <meta property="og:description" content="Learn about Akash Raikwar, a full-stack software engineer with expertise in React, Node.js, TypeScript, and MongoDB. View education, experience, and skills." />
+        <meta property="twitter:title" content="About Me — Akash Raikwar" />
+        <meta property="twitter:description" content="Learn about Akash Raikwar, a full-stack software engineer with expertise in React, Node.js, TypeScript, and MongoDB. View education, experience, and skills." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -240,6 +251,7 @@ const About: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 };
 

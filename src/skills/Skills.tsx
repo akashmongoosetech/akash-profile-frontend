@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Code, Database, Cloud, Palette, Globe, Smartphone } from 'lucide-react';
 
@@ -97,7 +98,17 @@ const Skills: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Skills — Akash Raikwar</title>
+        <meta name="title" content="Skills — Akash Raikwar" />
+        <meta name="description" content="Explore my technical skills in React, Node.js, TypeScript, MongoDB, and more. View my expertise in full-stack web development." />
+        <meta property="og:title" content="Skills — Akash Raikwar" />
+        <meta property="og:description" content="Explore my technical skills in React, Node.js, TypeScript, MongoDB, and more. View my expertise in full-stack web development." />
+        <meta property="twitter:title" content="Skills — Akash Raikwar" />
+        <meta property="twitter:description" content="Explore my technical skills in React, Node.js, TypeScript, MongoDB, and more. View my expertise in full-stack web development." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -218,6 +229,7 @@ const Skills: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 };
 

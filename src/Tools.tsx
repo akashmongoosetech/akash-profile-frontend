@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -226,7 +227,17 @@ const toolsData: Category[] = [
 
 const Tools: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 pb-12">
+    <>
+      <Helmet>
+        <title>Free Tools — Akash Raikwar</title>
+        <meta name="title" content="Free Tools — Akash Raikwar" />
+        <meta name="description" content="Access free online tools including EMI calculator, SEO audit tool, invoice generator, resume builder, and more. Boost your productivity with these free utilities." />
+        <meta property="og:title" content="Free Tools — Akash Raikwar" />
+        <meta property="og:description" content="Access free online tools including EMI calculator, SEO audit tool, invoice generator, resume builder, and more. Boost your productivity with these free utilities." />
+        <meta property="twitter:title" content="Free Tools — Akash Raikwar" />
+        <meta property="twitter:description" content="Access free online tools including EMI calculator, SEO audit tool, invoice generator, resume builder, and more. Boost your productivity with these free utilities." />
+      </Helmet>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -304,6 +315,7 @@ const Tools: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

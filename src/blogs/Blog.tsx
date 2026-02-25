@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -244,7 +245,17 @@ const Blog: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <Helmet>
+        <title>Blog — Akash Raikwar</title>
+        <meta name="title" content="Blog — Akash Raikwar" />
+        <meta name="description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+        <meta property="og:title" content="Blog — Akash Raikwar" />
+        <meta property="og:description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+        <meta property="twitter:title" content="Blog — Akash Raikwar" />
+        <meta property="twitter:description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+      </Helmet>
+      <div className="min-h-screen pt-20 pb-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -616,6 +627,7 @@ const Blog: React.FC = () => {
         </motion.div>
       </motion.div>
     </div>
+    </>
   );
 };
 
