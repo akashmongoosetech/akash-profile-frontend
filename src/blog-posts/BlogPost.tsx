@@ -734,14 +734,12 @@ const BlogPost: React.FC = () => {
 
         {/* Article Content */}
         <motion.article variants={itemVariants} className="mb-12">
-          <div className="prose prose-lg prose-invert max-w-none">
-            <div
-              className="text-gray-300 leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: blog.content
-              }}
-            />
-          </div>
+          <div
+            className="blog-content"
+            dangerouslySetInnerHTML={{
+              __html: blog.content
+            }}
+          />
         </motion.article>
 
         {/* Additional Content Sections */}
@@ -759,14 +757,12 @@ const BlogPost: React.FC = () => {
                   
                   <div className="space-y-6">
                     {section.content && (
-                      <div className="prose prose-lg prose-invert max-w-none">
-                        <div
-                          className="text-gray-300 leading-relaxed"
-                          dangerouslySetInnerHTML={{
-                            __html: section.content
-                          }}
-                        />
-                      </div>
+                      <div
+                        className="blog-content"
+                        dangerouslySetInnerHTML={{
+                          __html: section.content
+                        }}
+                      />
                     )}
                     
                     {section.image && (
