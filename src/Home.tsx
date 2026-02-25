@@ -135,7 +135,7 @@ const Home: React.FC = () => {
       name: 'Rajesh Verma',
       position: 'Director & CEO, Azad Infrastructure',
       image: 'https://gos3.ibcdn.com/28165e14-1544-49fa-a88e-e0e6e3707244.jpeg',
-      text: 'Akash transformed our outdated application into a modern, responsive platform. The results speak for themselves.',
+      text: 'Akash transformed our outdated web application into a modern, responsive platform. His expertise in React and UI/UX design principles resulted in a 60% improvement in user engagement. Highly recommend for any web development project.',
       rating: 5
     }
   ];

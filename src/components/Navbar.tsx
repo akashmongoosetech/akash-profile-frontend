@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon, Code, ChevronDown } from "lucide-react";
+import { Menu, X, Sun, Moon, Code, ChevronDown, BookOpen, FolderKanban, Wrench, UsersRound } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import BlogPopupTrigger from "./BlogPopupTrigger";
 import { useBlogPopup } from "../hooks/useBlogPopup";
@@ -11,6 +11,7 @@ interface NavItem {
   path?: string;
   label: string;
   dropdown?: NavItem[];
+  icon?: React.ElementType;
 }
 
 const Navbar: React.FC = () => {
@@ -30,10 +31,10 @@ const Navbar: React.FC = () => {
     {
       label: "More",
       dropdown: [
-        { path: "/blog", label: "Blog" },
-        { path: "/projects", label: "Projects" },
-        { path: "/skills", label: "Skills" },
-        // { path: '/testimonials', label: 'Testimonials' },
+        { path: "/blog", label: "Blog", icon: BookOpen },
+        { path: "/projects", label: "Projects", icon: FolderKanban },
+        { path: "/skills", label: "Skills", icon: Wrench },
+        { path: '/testimonials', label: 'Testimonials', icon: UsersRound },
       ],
     },
     { path: "/contact", label: "Contact" },
@@ -84,41 +85,77 @@ const Navbar: React.FC = () => {
                     onMouseLeave={() => setShowDropdown(false)}
                   >
                     <button
-                      className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                      className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200 group ${
                         isActiveDropdown(item.dropdown)
                           ? "text-blue-400"
                           : "text-gray-300 hover:text-white"
                       }`}
                     >
                       {item.label}
-                      <ChevronDown className="w-4 h-4" />
+                      <ChevronDown 
+                        className={`w-4 h-4 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} 
+                      />
                     </button>
 
                     <AnimatePresence>
                       {showDropdown && (
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-lg rounded-lg border border-white/20 shadow-xl"
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full left-0 mt-2 w-56 bg-gray-900/95 backdrop-blur-lg rounded-xl border border-white/10 shadow-2xl overflow-hidden"
                         >
-                          {item.dropdown.map((dropdownItem, dropdownIndex) => (
-                            <Link
-                              key={dropdownIndex}
-                              to={dropdownItem.path}
-                              className={`block px-4 py-3 text-sm transition-colors ${
-                                location.pathname === dropdownItem.path
-                                  ? "text-blue-400 bg-blue-500/10"
-                                  : "text-gray-300 hover:text-white hover:bg-white/10"
-                              } ${dropdownIndex === 0 ? "rounded-t-lg" : ""} ${
-                                dropdownIndex === item.dropdown.length - 1
-                                  ? "rounded-b-lg"
-                                  : ""
-                              }`}
-                            >
-                              {dropdownItem.label}
-                            </Link>
-                          ))}
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+                          
+                          {item.dropdown.map((dropdownItem, dropdownIndex) => {
+                            const IconComponent = dropdownItem.icon;
+                            return (
+                              <motion.div
+                                key={dropdownIndex}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: dropdownIndex * 0.05 }}
+                              >
+                                <Link
+                                  to={dropdownItem.path}
+                                  className={`group flex items-center gap-3 px-4 py-3 transition-all duration-200 relative overflow-hidden ${
+                                    location.pathname === dropdownItem.path
+                                      ? "text-blue-400 bg-blue-500/10"
+                                      : "text-gray-300 hover:text-white hover:bg-white/10"
+                                  }`}
+                                >
+                                  {/* Hover indicator */}
+                                  <div className={`absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 to-purple-500 transition-all duration-300 ${
+                                    location.pathname === dropdownItem.path || location.pathname === dropdownItem.path
+                                      ? 'opacity-100'
+                                      : 'opacity-0 group-hover:opacity-100'
+                                  }`} />
+                                  
+                                  {/* Icon */}
+                                  {IconComponent && (
+                                    <div className={`p-2 rounded-lg transition-all duration-300 ${
+                                      location.pathname === dropdownItem.path
+                                        ? "bg-blue-500/20 text-blue-400"
+                                        : "bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white"
+                                    }`}>
+                                      <IconComponent className="w-4 h-4" />
+                                    </div>
+                                  )}
+                                  
+                                  {/* Label */}
+                                  <span className="font-medium text-sm">{dropdownItem.label}</span>
+                                  
+                                  {/* Arrow indicator */}
+                                  <ChevronDown className="w-3 h-3 ml-auto opacity-0 -rotate-90 group-hover:opacity-100 group-hover:rotate-0 transition-all duration-300 text-gray-400" />
+                                </Link>
+                              </motion.div>
+                            );
+                          })}
+                          
+                          {/* Bottom decorative line */}
+                          <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                         </motion.div>
                       )}
                     </AnimatePresence>
