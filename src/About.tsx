@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Code, Award, Users } from 'lucide-react';
+import { Calendar, MapPin, Code, Award, Users, Globe, Shield, Gauge, Heart, Terminal } from 'lucide-react';
 
 const About: React.FC = () => {
   const containerVariants = {
@@ -28,6 +28,79 @@ const About: React.FC = () => {
     { icon: Code, value: '2+', label: 'Years Experience' },
     { icon: Award, value: '50+', label: 'Projects Completed' },
     { icon: Users, value: '20+', label: 'Happy Clients' },
+  ];
+
+  const expertiseSections = [
+    {
+      title: 'Core Technical Expertise',
+      icon: Code,
+      color: 'from-blue-500 to-cyan-500',
+      items: [
+        'Frontend: React.js, JavaScript (ES6+), HTML5, CSS3, Bootstrap',
+        'Backend: Node.js, Express.js',
+        'Database: MongoDB',
+        'REST API Development & Integration',
+        'JWT Authentication & Role-Based Access Control'
+      ]
+    },
+    {
+      title: 'Complete Website Development',
+      icon: Globe,
+      color: 'from-purple-500 to-pink-500',
+      items: [
+        'End-to-end website development (Frontend + Backend + Database)',
+        'Dynamic & static website development',
+        'Corporate websites, portfolio websites, admin dashboards',
+        'E-commerce & business websites',
+        'Custom web applications'
+      ]
+    },
+    {
+      title: 'Secure & Optimized Development',
+      icon: Shield,
+      color: 'from-green-500 to-emerald-500',
+      items: [
+        'Secure authentication & authorization implementation',
+        'API protection & token-based security',
+        'Input validation & error handling',
+        'Secure environment configuration',
+        'Performance optimization (lazy loading, API optimization, caching)'
+      ]
+    },
+    {
+      title: 'Performance & Scalability',
+      icon: Gauge,
+      color: 'from-orange-500 to-red-500',
+      items: [
+        'Optimized backend architecture',
+        'Efficient database schema design',
+        'Reduced unnecessary API calls',
+        'Clean and reusable component structure',
+        'Code splitting & lazy loading'
+      ]
+    },
+    {
+      title: 'Development Methodology',
+      icon: Terminal,
+      color: 'from-indigo-500 to-violet-500',
+      items: [
+        'Agile methodology practitioner',
+        'Git version control & team collaboration',
+        'Debugging & problem-solving mindset',
+        'Writing clean, maintainable, and scalable code'
+      ]
+    },
+    {
+      title: 'Professional Strengths',
+      icon: Heart,
+      color: 'from-pink-500 to-rose-500',
+      items: [
+        'Passionate about clean UI & user-friendly design',
+        'Focused on responsive and cross-browser compatibility',
+        'Strong understanding of frontend-backend communication',
+        'Continuous learner of modern web technologies'
+      ]
+    }
   ];
 
   const timeline = [
@@ -247,6 +320,41 @@ const About: React.FC = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+
+        {/* Expertise Sections */}
+        <motion.div variants={itemVariants} className="mt-20">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
+            Technical Expertise
+          </h2>
+          <p className="text-gray-400 text-center max-w-2xl mx-auto mb-12">
+            Comprehensive skills and capabilities in modern web development
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {expertiseSections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-[1.02]"
+                >
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center mb-4`}>
+                    <Icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4">{section.title}</h3>
+                  <ul className="space-y-2">
+                    {section.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="text-gray-300 text-sm flex items-start gap-2">
+                        <span className="text-blue-400 mt-0.5">▹</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </motion.div>

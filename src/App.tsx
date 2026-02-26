@@ -13,6 +13,7 @@ import Blog from './blogs/Blog';
 import BlogPost from './blog-posts/BlogPost';
 import Contact from './contacts/Contact';
 import Admin from './admins/Admin';
+import CaseStudies from './case-studies/CaseStudies';
 import AdminLogin from './admins/AdminLogin';
 import AdminLayout from './admins/AdminLayout';
 import ContactTable from './contact-tables/ContactTable';
@@ -61,6 +62,7 @@ function App() {
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="case-studies" element={<CaseStudies />} />
             <Route path="website-cost-calculator" element={<WebsiteCostCalculator />} />
             <Route path="emi-calculator" element={<EMICalculator />} />
             <Route path="seo-audit-mini-tool" element={<SEOAuditMiniTool />} />

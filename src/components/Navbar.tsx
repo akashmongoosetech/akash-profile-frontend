@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon, Code, ChevronDown, BookOpen, FolderKanban, Wrench, UsersRound } from "lucide-react";
+import { Menu, X, Sun, Moon, Code, ChevronDown, BookOpen, FolderKanban, Wrench, UsersRound, FileText } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import BlogPopupTrigger from "./BlogPopupTrigger";
 import { useBlogPopup } from "../hooks/useBlogPopup";
@@ -32,6 +32,7 @@ const Navbar: React.FC = () => {
       label: "More",
       dropdown: [
         { path: "/blog", label: "Blog", icon: BookOpen },
+        { path: "/case-studies", label: "Case Studies", icon: FileText },
         { path: "/projects", label: "Projects", icon: FolderKanban },
         { path: "/skills", label: "Skills", icon: Wrench },
         { path: '/testimonials', label: 'Testimonials', icon: UsersRound },
