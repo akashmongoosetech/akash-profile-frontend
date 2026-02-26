@@ -105,58 +105,87 @@ const Navbar: React.FC = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 mt-2 w-56 bg-gray-900/95 backdrop-blur-lg rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+                          className="absolute top-full left-0 mt-3 w-72 bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
                         >
-                          {/* Gradient overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+                          {/* Gradient border effect */}
+                          <div className="absolute inset-0 rounded-2xl p-px bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 -z-10" />
                           
-                          {item.dropdown.map((dropdownItem, dropdownIndex) => {
-                            const IconComponent = dropdownItem.icon;
-                            return (
-                              <motion.div
-                                key={dropdownIndex}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: dropdownIndex * 0.05 }}
-                              >
-                                <Link
-                                  to={dropdownItem.path}
-                                  className={`group flex items-center gap-3 px-4 py-3 transition-all duration-200 relative overflow-hidden ${
-                                    location.pathname === dropdownItem.path
-                                      ? "text-blue-400 bg-blue-500/10"
-                                      : "text-gray-300 hover:text-white hover:bg-white/10"
-                                  }`}
+                          {/* Top gradient overlay */}
+                          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none" />
+                          
+                          {/* Dropdown Header */}
+                          <div className="px-4 pt-4 pb-2">
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 animate-pulse" />
+                              Explore
+                            </h3>
+                          </div>
+                          
+                          <div className="px-3 pb-3 grid grid-cols-2 gap-1">
+                            {item.dropdown.map((dropdownItem, dropdownIndex) => {
+                              const IconComponent = dropdownItem.icon;
+                              const isActive = location.pathname === dropdownItem.path;
+                              return (
+                                <motion.div
+                                  key={dropdownIndex}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: dropdownIndex * 0.05 }}
                                 >
-                                  {/* Hover indicator */}
-                                  <div className={`absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 to-purple-500 transition-all duration-300 ${
-                                    location.pathname === dropdownItem.path || location.pathname === dropdownItem.path
-                                      ? 'opacity-100'
-                                      : 'opacity-0 group-hover:opacity-100'
-                                  }`} />
-                                  
-                                  {/* Icon */}
-                                  {IconComponent && (
-                                    <div className={`p-2 rounded-lg transition-all duration-300 ${
-                                      location.pathname === dropdownItem.path
-                                        ? "bg-blue-500/20 text-blue-400"
-                                        : "bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white"
+                                  <Link
+                                    to={dropdownItem.path}
+                                    className={`group flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all duration-300 relative overflow-hidden ${
+                                      isActive
+                                        ? "text-white"
+                                        : "text-gray-300 hover:text-white"
+                                    }`}
+                                  >
+                                    {/* Active/Hover background */}
+                                    <div className={`absolute inset-0 rounded-xl transition-all duration-300 ${
+                                      isActive 
+                                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20" 
+                                        : "bg-white/5 group-hover:bg-white/10"
+                                    }`} />
+                                    
+                                    {/* Left accent bar */}
+                                    <div className={`absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-gradient-to-b from-blue-400 to-purple-500 transition-all duration-300 ${
+                                      isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                    }`} />
+                                    
+                                    {/* Icon with gradient background */}
+                                    {IconComponent && (
+                                      <div className={`relative p-2 rounded-lg transition-all duration-300 ${
+                                        isActive
+                                          ? "bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/25"
+                                          : "bg-white/10 group-hover:bg-gradient-to-br group-hover:from-blue-500/20 group-hover:to-purple-500/20"
+                                      }`}>
+                                        <IconComponent className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
+                                      </div>
+                                    )}
+                                    
+                                    {/* Label */}
+                                    <span className={`font-medium text-xs truncate transition-all duration-300 ${
+                                      isActive ? 'text-white' : 'text-gray-200 group-hover:text-white'
                                     }`}>
-                                      <IconComponent className="w-4 h-4" />
-                                    </div>
-                                  )}
-                                  
-                                  {/* Label */}
-                                  <span className="font-medium text-sm">{dropdownItem.label}</span>
-                                  
-                                  {/* Arrow indicator */}
-                                  <ChevronDown className="w-3 h-3 ml-auto opacity-0 -rotate-90 group-hover:opacity-100 group-hover:rotate-0 transition-all duration-300 text-gray-400" />
-                                </Link>
-                              </motion.div>
-                            );
-                          })}
+                                      {dropdownItem.label}
+                                    </span>
+                                  </Link>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
                           
-                          {/* Bottom decorative line */}
-                          <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          {/* Bottom decorative element */}
+                          <div className="px-4 pb-4 pt-2 border-t border-white/5">
+                            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                              <span className="w-8 h-0.5 bg-gradient-to-r from-transparent to-white/20 rounded-full" />
+                              <span className="flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500/50 animate-pulse" />
+                                Discover more
+                              </span>
+                              <span className="w-8 h-0.5 bg-gradient-to-l from-transparent to-white/20 rounded-full" />
+                            </div>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
