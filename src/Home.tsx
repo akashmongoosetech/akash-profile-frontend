@@ -41,6 +41,10 @@ import {
   FileText,
   Server,
   Package
+  ,
+  Activity,
+  Gauge,
+  GitBranch
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -205,6 +209,79 @@ const Home: React.FC = () => {
     { name: 'AWS', level: 85, color: 'from-orange-500 to-red-500' },
     { name: 'MongoDB', level: 88, color: 'from-pink-500 to-rose-500' },
     { name: 'Docker', level: 82, color: 'from-indigo-500 to-purple-500' }
+  ];
+
+  const deliveryPipeline = [
+    {
+      project: 'Clinic Management Platform',
+      stage: 'Development',
+      progress: 72,
+      eta: '2 weeks',
+      status: 'On Track'
+    },
+    {
+      project: 'Event Booking Suite',
+      stage: 'QA & UAT',
+      progress: 88,
+      eta: '5 days',
+      status: 'On Track'
+    },
+    {
+      project: 'Hotel Reservation Engine',
+      stage: 'Discovery',
+      progress: 28,
+      eta: '3 weeks',
+      status: 'Planning'
+    },
+    {
+      project: 'E-commerce Dashboard',
+      stage: 'Deployment',
+      progress: 96,
+      eta: '2 days',
+      status: 'Launching'
+    }
+  ];
+
+  const architectureSnapshots = [
+    {
+      title: 'Healthcare Workflow System',
+      summary: 'Secure patient data flow with role-based access and automated PDF outputs.',
+      flow: ['React Client', 'Node API', 'MongoDB + Redis', 'AWS + Backups']
+    },
+    {
+      title: 'High-Traffic Booking Platform',
+      summary: 'Designed for peak-hour spikes with cache-first reads and resilient queue processing.',
+      flow: ['Next.js Frontend', 'Gateway + Services', 'PostgreSQL', 'CDN + Cloud Monitoring']
+    },
+    {
+      title: 'Analytics-Driven Business Portal',
+      summary: 'Real-time metrics pipeline with event tracking and actionable dashboards.',
+      flow: ['React Admin', 'Express API', 'MongoDB Aggregations', 'Scheduled Reports']
+    }
+  ];
+
+  const reliabilityMetrics = [
+    {
+      label: 'Avg Lighthouse Performance',
+      value: '92+',
+      note: 'Across recent production builds',
+      icon: Gauge,
+      color: 'from-cyan-500 to-blue-600'
+    },
+    {
+      label: 'API Success Rate',
+      value: '99.3%',
+      note: 'Measured on stable deployments',
+      icon: Activity,
+      color: 'from-emerald-500 to-green-600'
+    },
+    {
+      label: 'Release Frequency',
+      value: 'Weekly',
+      note: 'Small, low-risk incremental updates',
+      icon: GitBranch,
+      color: 'from-purple-500 to-violet-600'
+    }
   ];
 
   const achievements = [
@@ -860,6 +937,156 @@ const Home: React.FC = () => {
               <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Live Project Pipeline Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Live Project Pipeline
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Real delivery visibility from discovery to launch across active engagements
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {deliveryPipeline.map((item, index) => (
+              <motion.div
+                key={item.project}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6"
+              >
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{item.project}</h3>
+                    <p className="text-sm text-blue-300">{item.stage}</p>
+                  </div>
+                  <span className="text-xs px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    {item.status}
+                  </span>
+                </div>
+
+                <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden mb-3">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${item.progress}%` }}
+                    transition={{ delay: index * 0.1 + 0.2, duration: 1.2 }}
+                    viewport={{ once: true }}
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-300">{item.progress}% completed</span>
+                  <span className="text-gray-400">ETA: {item.eta}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Architecture Snapshot Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Architecture Snapshots
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Technical blueprints showing how products are structured for scale, reliability, and speed
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {architectureSnapshots.map((snapshot, index) => (
+              <motion.div
+                key={snapshot.title}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6"
+              >
+                <h3 className="text-xl font-bold text-white mb-2">{snapshot.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed mb-5">{snapshot.summary}</p>
+
+                <div className="space-y-3">
+                  {snapshot.flow.map((layer, flowIndex) => (
+                    <div key={layer} className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold flex items-center justify-center">
+                        {flowIndex + 1}
+                      </div>
+                      <div className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-200">
+                        {layer}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Performance & Reliability Section */}
+      <section className="py-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Performance & Reliability
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Engineering quality benchmarks used to keep user experience fast and dependable
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {reliabilityMetrics.map((metric, index) => {
+              const Icon = metric.icon;
+              return (
+                <motion.div
+                  key={metric.label}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="text-center bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+                >
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${metric.color} flex items-center justify-center mx-auto mb-5`}>
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="text-gray-400 text-sm mb-2">{metric.label}</p>
+                  <h3 className="text-3xl font-bold text-white mb-3">{metric.value}</h3>
+                  <p className="text-gray-400 text-sm">{metric.note}</p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
