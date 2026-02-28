@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   Settings,
   Shield,
-  Bell
+  Bell,
+  Calendar
 } from 'lucide-react';
 import { removeAuthToken, isTokenExpired } from '../utils/api';
 
@@ -61,6 +62,7 @@ const AdminLayout: React.FC = () => {
   const navItems = [
     { to: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { to: '/admin/blog-management', label: 'Blog Management', icon: <BookOpen className="w-5 h-5" /> },
+    { to: '/admin/event-management', label: 'Event Management', icon: <Calendar className="w-5 h-5" /> },
     { to: '/admin/contact-table', label: 'Contact Table', icon: <Mail className="w-5 h-5" /> },
     { to: '/admin/subscriber-table', label: 'Subscriber Table', icon: <Users className="w-5 h-5" /> },
   ];

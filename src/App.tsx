@@ -19,6 +19,7 @@ import AdminLayout from './admins/AdminLayout';
 import ContactTable from './contact-tables/ContactTable';
 import SubscriberTable from './subscriber-tables/SubscriberTable';
 import BlogManagement from './blog-management/BlogManagement';
+import EventManagement from './event-management/EventManagement';
 import WebsiteCostCalculator from './components/WebsiteCostCalculator';
 import EMICalculator from './components/EMICalculator';
 import SEOAuditMiniTool from './components/SEOAuditMiniTool';
@@ -45,6 +46,8 @@ import AIPortfolioBioGenerator from './components/AIPortfolioBioGenerator';
 import AIMeetingSummaryGenerator from './components/AIMeetingSummaryGenerator';
 import Tools from './Tools';
 import AIChat from './components/AIChat';
+import Events from './events/Events';
+import EventDetail from './events/EventDetail';
 
 function App() {
   return (
@@ -61,6 +64,8 @@ function App() {
             <Route path="testimonials" element={<Testimonials />} />
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
+            <Route path="events" element={<Events />} />
+            <Route path="events/:slug" element={<EventDetail />} />
             <Route path="contact" element={<Contact />} />
             <Route path="case-studies" element={<CaseStudies />} />
             <Route path="website-cost-calculator" element={<WebsiteCostCalculator />} />
@@ -98,6 +103,7 @@ function App() {
           }>
             <Route index element={<Admin />} />
             <Route path="blog-management" element={<BlogManagement />} />
+            <Route path="event-management" element={<EventManagement />} />
             <Route path="contact-table" element={<ContactTable />} />
             <Route path="subscriber-table" element={<SubscriberTable />} />
           </Route>
