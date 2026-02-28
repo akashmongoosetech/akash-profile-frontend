@@ -6,12 +6,7 @@ import {
   Github, 
   Mail, 
   Star, 
-  Users, 
-  Award, 
-  Coffee, 
-  Code,
   Shield,
-  Smartphone,
   Database,
   Cloud,
   CheckCircle,
@@ -42,51 +37,15 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeroSection from './home/Herosection';
+import StatsSection from './home/Statssection';
+import ServicesSection from './home/Servicessection';
+import SkillsSection from './home/Skillssection';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
-
-
-  const stats = [
-    { icon: Award, value: '2+', label: 'Years Experience', color: 'from-blue-500 to-cyan-500' },
-    { icon: Users, value: '50+', label: 'Projects Completed', color: 'from-green-500 to-emerald-500' },
-    { icon: Star, value: '25+', label: 'Happy Clients', color: 'from-purple-500 to-violet-500' },
-    { icon: Coffee, value: '1000+', label: 'Cups of Coffee', color: 'from-orange-500 to-red-500' }
-  ];
-
-  const services = [
-    {
-      title: 'Frontend Development',
-      description: 'Modern, responsive web applications using React, Next.js, and TypeScript',
-      icon: Code,
-      color: 'from-blue-500 to-cyan-500',
-      features: ['React & Next.js', 'TypeScript', 'Tailwind CSS', 'PWA Development']
-    },
-    {
-      title: 'Backend Development',
-      description: 'Scalable APIs and server-side solutions with Node.js and Python',
-      icon: Database,
-      color: 'from-green-500 to-emerald-500',
-      features: ['Node.js & Express', 'Python & Django', 'RESTful APIs', 'GraphQL']
-    },
-    {
-      title: 'Mobile Development',
-      description: 'Cross-platform mobile apps with React Native and Flutter',
-      icon: Smartphone,
-      color: 'from-purple-500 to-violet-500',
-      features: ['React Native', 'Flutter', 'iOS & Android', 'App Store Deployment']
-    },
-    {
-      title: 'Cloud & DevOps',
-      description: 'AWS deployment, Docker containerization, and CI/CD pipelines',
-      icon: Cloud,
-      color: 'from-orange-500 to-red-500',
-      features: ['AWS & Azure', 'Docker & Kubernetes', 'CI/CD Pipelines', 'Monitoring']
-    }
-  ];
 
   const testimonials = [
     {
@@ -167,15 +126,6 @@ const Home: React.FC = () => {
       demoUrl: '#',
       codeUrl: '#'
     }
-  ];
-
-  const skills = [
-    { name: 'React.js', level: 95, color: 'from-blue-500 to-cyan-500' },
-    { name: 'Node.js', level: 92, color: 'from-green-500 to-emerald-500' },
-    { name: 'TypeScript', level: 90, color: 'from-purple-500 to-violet-500' },
-    { name: 'AWS', level: 85, color: 'from-orange-500 to-red-500' },
-    { name: 'MongoDB', level: 88, color: 'from-pink-500 to-rose-500' },
-    { name: 'Docker', level: 82, color: 'from-indigo-500 to-purple-500' }
   ];
 
   const deliveryPipeline = [
@@ -405,178 +355,13 @@ const Home: React.FC = () => {
       <HeroSection />
 
       {/* Enhanced Stats Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Numbers That Matter
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Here's what I've accomplished in my journey as a developer
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="text-center bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300 group"
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <StatsSection/>
 
       {/* Enhanced Services Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              What I Do Best
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Comprehensive development services to transform your ideas into powerful digital solutions
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 hover:scale-105 transition-all duration-300 group"
-                >
-                  <div className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">{service.title}</h3>
-                  <p className="text-gray-400 mb-6 leading-relaxed">{service.description}</p>
-                  
-                  <div className="space-y-3">
-                    {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                        <span className="text-gray-300 text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <Link
-              to="/services"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
-            >
-              View All Services
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <ServicesSection/>
 
       {/* Skills Preview Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Technical Expertise
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Proficiency in modern technologies and frameworks
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {skills.map((skill, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-white font-semibold text-lg">{skill.name}</span>
-                  <span className="text-gray-400 text-sm">{skill.level}%</span>
-                </div>
-                <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${skill.level}%` }}
-                    transition={{ delay: index * 0.1 + 0.5, duration: 1.5, ease: "easeOut" }}
-                    viewport={{ once: true }}
-                    className={`h-full bg-gradient-to-r ${skill.color} rounded-full relative`}
-                  >
-                    <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <Link
-              to="/skills"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-white/20"
-            >
-              View All Skills
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <SkillsSection/>
 
       {/* Featured Projects Section */}
       <section className="py-20 relative">
