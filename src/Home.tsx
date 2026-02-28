@@ -4,16 +4,11 @@ import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
   Github, 
-  Linkedin, 
-  Instagram,
-  Facebook,
   Mail, 
   Star, 
   Users, 
   Award, 
   Coffee, 
-  MapPin, 
-  Calendar,
   Code,
   Shield,
   Smartphone,
@@ -47,6 +42,7 @@ import {
   GitBranch
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import HeroSection from './Herosection';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -54,34 +50,6 @@ const Home: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  };
-
-  const imageVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.8, ease: "easeOut" }
-    }
-  };
 
   const stats = [
     { icon: Award, value: '2+', label: 'Years Experience', color: 'from-blue-500 to-cyan-500' },
@@ -435,248 +403,7 @@ const Home: React.FC = () => {
       </Helmet>
       <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
-        {/* Enhanced Floating shapes */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            animate={{
-              y: [-20, 20, -20],
-              rotate: [0, 180, 360],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{
-              y: [20, -20, 20],
-              rotate: [360, 180, 0],
-              scale: [1, 0.8, 1]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-xl"
-          />
-          <motion.div
-            animate={{
-              x: [-30, 30, -30],
-              y: [10, -10, 10],
-              rotate: [0, 90, 180, 270, 360]
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-lg"
-          />
-          <motion.div
-            animate={{
-              x: [20, -20, 20],
-              y: [-15, 15, -15],
-              scale: [1, 1.2, 1]
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/3 right-1/3 w-24 h-24 bg-gradient-to-r from-green-500/15 to-teal-500/15 rounded-full blur-xl"
-          />
-        </div>
-
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Enhanced Text Content */}
-            <div className="space-y-8 order-2 lg:order-1">
-              <motion.div variants={itemVariants} className="space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.6 }}
-                  className="flex items-center gap-3"
-                >
-                  <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
-                  <p className="text-blue-400 font-medium text-lg">Hello, I'm</p>
-                </motion.div>
-                
-                <motion.h1
-                  className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.8 }}
-                >
-                  <span className="bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
-                    Akash
-                  </span>
-                  <br />
-                  <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Raikwar
-                  </span>
-                </motion.h1>
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="space-y-6">
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-200">
-                  Software Engineer &
-                  <span className="block text-blue-400">Full Stack Developer</span>
-                </h2>
-                <p className="text-lg sm:text-xl text-gray-400 max-w-2xl leading-relaxed">
-                  Crafting scalable and modern web solutions with passion for clean code and innovative technologies. 
-                  Specializing in React, Node.js, and cloud architecture.
-                </p>
-              </motion.div>
-
-              {/* Enhanced Quick Info */}
-              <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 bg-white/5 backdrop-blur-lg rounded-lg p-3 border border-white/10">
-                  <MapPin className="w-5 h-5 text-blue-400" />
-                  <span className="text-gray-300">Ujjain, India</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/5 backdrop-blur-lg rounded-lg p-3 border border-white/10">
-                  <Calendar className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300"><a href="tel:+919685533878">Available for hire</a></span>
-                </div>
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 group"
-                >
-                  Hire Me
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  to="/projects"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-white/20"
-                >
-                  View Projects
-                </Link>
-                {/* <button className="inline-flex items-center justify-center gap-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-lg border border-green-500/30">
-                  <Download className="w-5 h-5" />
-                  Resume
-                </button> */}
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="flex gap-5">
-                {[
-                  { icon: Github, href: 'https://github.com/akash007123', color: 'hover:text-gray-400' },
-                  { icon: Linkedin, href: 'https://www.linkedin.com/in/akash-raikwar-4a67bb171/', color: 'hover:text-blue-400' },
-                  { icon: Mail, href: 'mailto:akashraikwar763@gmail.com', color: 'hover:text-red-400' },
-                  { icon: Instagram, href: 'https://www.instagram.com/akashraikwar_007', color: 'hover:text-pink-400' },
-                  { icon: Facebook, href: 'https://www.facebook.com/akashraikwar007', color: 'hover:text-blue-400' },
-                ].map((social, index) => {
-                  const Icon = social.icon;
-                  return (
-                    <a
-                      key={index}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`w-12 h-12 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-lg border border-white/20 group ${social.color}`}
-                    >
-                      <Icon className="w-6 h-6 transition-colors" />
-                    </a>
-                  );
-                })}
-              </motion.div>
-            </div>
-
-            {/* Enhanced Profile Image */}
-            <motion.div
-              variants={imageVariants}
-              className="relative order-1 lg:order-2 flex justify-center"
-            >
-              <div className="relative w-80 h-80 lg:w-96 lg:h-96">
-                {/* Multiple Animated rings */}
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 rounded-full border-2 border-blue-500/30 border-dashed"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-4 rounded-full border-2 border-purple-500/30 border-dashed"
-                />
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-8 rounded-full border border-pink-500/20 border-dotted"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-10 rounded-full border border-cyan-500/15 border-dotted"
-                />
-                
-                {/* Enhanced Profile image container */}
-                <div className="absolute inset-12 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg border border-white/20 overflow-hidden shadow-2xl">
-                  <img
-                    src="./my-pic.jpg"
-                    alt="Akash Raikwar"
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
-                </div>
-
-                {/* Enhanced Floating icons */}
-                <motion.div
-                  animate={{ 
-                    y: [-10, 10, -10],
-                    rotate: [0, 5, -5, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg border border-white/20"
-                >
-                  <span className="text-2xl">⚡</span>
-                </motion.div>
-                <motion.div
-                  animate={{ 
-                    y: [10, -10, 10],
-                    rotate: [0, -5, 5, 0],
-                    scale: [1, 1.1, 1]
-                  }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg border border-white/20"
-                >
-                  <span className="text-2xl">🚀</span>
-                </motion.div>
-                <motion.div
-                  animate={{ 
-                    x: [-5, 5, -5],
-                    y: [5, -5, 5],
-                    rotate: [0, 10, -10, 0]
-                  }}
-                  transition={{ duration: 5, repeat: Infinity }}
-                  className="absolute top-1/2 -left-8 w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg flex items-center justify-center shadow-lg border border-white/20"
-                >
-                  <span className="text-xl">💡</span>
-                </motion.div>
-                <motion.div
-                  animate={{ 
-                    x: [5, -5, 5],
-                    y: [-5, 5, -5],
-                    rotate: [0, -10, 10, 0]
-                  }}
-                  transition={{ duration: 6, repeat: Infinity }}
-                  className="absolute top-1/4 -right-8 w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center shadow-lg border border-white/20"
-                >
-                  <span className="text-xl">🎯</span>
-                </motion.div>
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 15, -15, 0]
-                  }}
-                  transition={{ duration: 7, repeat: Infinity }}
-                  className="absolute bottom-1/4 -right-6 w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-lg flex items-center justify-center shadow-lg border border-white/20"
-                >
-                  <span className="text-lg">✨</span>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
+      <HeroSection />
 
       {/* Enhanced Stats Section */}
       <section className="py-20 relative">
