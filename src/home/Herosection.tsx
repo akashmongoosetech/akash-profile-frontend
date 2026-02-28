@@ -227,14 +227,14 @@ export default function HeroSection() {
           border: 1px solid rgba(255,255,255,0.12);
         }
 
-        /* Orbit ring animation */
-        @keyframes orbit { from { transform: rotate(0deg) translateX(140px) rotate(0deg); } to { transform: rotate(360deg) translateX(140px) rotate(-360deg); } }
-        @keyframes orbit2 { from { transform: rotate(120deg) translateX(155px) rotate(-120deg); } to { transform: rotate(480deg) translateX(155px) rotate(-480deg); } }
-        @keyframes orbit3 { from { transform: rotate(240deg) translateX(165px) rotate(-240deg); } to { transform: rotate(600deg) translateX(165px) rotate(-600deg); } }
-
-        .orbit-dot-1 { animation: orbit 8s linear infinite; }
-        .orbit-dot-2 { animation: orbit2 12s linear infinite; }
-        .orbit-dot-3 { animation: orbit3 10s linear infinite; }
+        /* Orbit ring animations */
+        @keyframes orbitClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes orbitCounterClockwise { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+        @keyframes orbitPulse { 
+          0% { transform: rotate(0deg) scale(1); opacity: 0.4; }
+          50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+          100% { transform: rotate(360deg) scale(1); opacity: 0.4; }
+        }
 
         .noise-overlay {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
@@ -254,6 +254,23 @@ export default function HeroSection() {
 
         .available-pulse { animation: pulse-green 2s ease-in-out infinite; }
         @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.5);} 50%{box-shadow:0 0 0 8px rgba(16,185,129,0);} }
+        
+        /* Dotted circle styles */
+        .dotted-circle {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+        }
+        
+        .dotted-circle::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: radial-gradient(circle at 50% 50%, transparent 95%, rgba(255,255,255,0.1) 96%, transparent 100%);
+          background-size: 20px 20px;
+        }
       `}</style>
 
       {/* Grid background */}
@@ -349,26 +366,6 @@ export default function HeroSection() {
               <span className="text-white font-medium">actually work.</span>
             </motion.p>
 
-            {/* Tags */}
-            {/* <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-wrap gap-2"
-            >
-              {["React.js", "Node.js", "TypeScript", "AWS", "MongoDB", "Docker"].map((tag, i) => (
-                <motion.span
-                  key={tag}
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.65 + i * 0.06, duration: 0.4 }}
-                  className="tag-badge px-3 py-1 rounded-full text-xs mono font-bold tracking-wide"
-                >
-                  {tag}
-                </motion.span>
-              ))}
-            </motion.div> */}
-
             {/* CTA buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -444,7 +441,7 @@ export default function HeroSection() {
             </motion.div>
           </motion.div>
 
-          {/* RIGHT COLUMN — Avatar */}
+          {/* RIGHT COLUMN — Avatar with 3 new circular dotted lines */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -460,27 +457,91 @@ export default function HeroSection() {
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
 
-            {/* Orbit rings */}
+            {/* THREE NEW CIRCULAR DOTTED LINES - Each moving in different directions */}
+
+            {/* Dotted Circle 1 - Blue - Clockwise rotation with large dots */}
             <motion.div
-              className="absolute rounded-full border border-indigo-500/20"
-              style={{ width: 340, height: 340 }}
+              className="absolute dotted-circle"
+              style={{
+                width: 320,
+                height: 320,
+                border: '2px dotted rgba(59, 130, 246, 0.6)',
+                borderRadius: '50%',
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)'
+              }}
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             />
+
+            {/* Dotted Circle 2 - Purple - Counter-clockwise rotation with smaller dots */}
             <motion.div
-              className="absolute rounded-full border border-purple-500/15"
-              style={{ width: 400, height: 400 }}
+              className="absolute dotted-circle"
+              style={{
+                width: 360,
+                height: 360,
+                border: '3px dotted rgba(168, 85, 247, 0.5)',
+                borderRadius: '50%',
+                boxShadow: '0 0 25px rgba(168, 85, 247, 0.3)',
+                borderStyle: 'dashed'
+              }}
               animate={{ rotate: -360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute rounded-full border border-pink-500/10"
-              style={{ width: 460, height: 460 }}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
             />
 
-            {/* Orbiting dots */}
+            {/* Dotted Circle 3 - Pink - Pulsing rotation with gradient dots */}
+            <motion.div
+              className="absolute dotted-circle"
+              style={{
+                width: 400,
+                height: 400,
+                border: '2px dotted rgba(236, 72, 153, 0.5)',
+                borderRadius: '50%',
+                boxShadow: '0 0 30px rgba(236, 72, 153, 0.3)',
+                borderStyle: 'dotted'
+              }}
+              animate={{ 
+                rotate: [0, 360],
+                scale: [1, 1.05, 1],
+                borderColor: ['rgba(236, 72, 153, 0.5)', 'rgba(139, 92, 246, 0.5)', 'rgba(236, 72, 153, 0.5)']
+              }}
+              transition={{ 
+                rotate: { duration: 25, repeat: Infinity, ease: "linear" },
+                scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                borderColor: { duration: 5, repeat: Infinity, ease: "linear" }
+              }}
+            />
+
+            {/* Additional decorative small dots on the circles */}
+            {[320, 360, 400].map((size, index) => (
+              <div key={`dots-${index}`} className="absolute" style={{ width: size, height: size }}>
+                {[...Array(12)].map((_, i) => (
+                  <motion.div
+                    key={`dot-${index}-${i}`}
+                    className="absolute w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: index === 0 ? '#3b82f6' : index === 1 ? '#a855f7' : '#ec4899',
+                      top: '50%',
+                      left: '50%',
+                      transform: `rotate(${i * 30}deg) translateY(-${size/2}px)`,
+                      boxShadow: `0 0 10px ${index === 0 ? '#3b82f6' : index === 1 ? '#a855f7' : '#ec4899'}`,
+                      opacity: 0.6
+                    }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.6, 1, 0.6]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.1,
+                      ease: "easeInOut"
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+
+            {/* Original orbiting dots (keeping them for backward compatibility) */}
             <div className="absolute" style={{ width: 340, height: 340 }}>
               <motion.div
                 className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full bg-indigo-400"

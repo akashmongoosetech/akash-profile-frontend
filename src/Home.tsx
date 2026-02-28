@@ -35,14 +35,13 @@ import {
   Layers,
   FileText,
   Server,
-  Package
-  ,
+  Package,
   Activity,
   Gauge,
   GitBranch
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import HeroSection from './Herosection';
+import HeroSection from './home/Herosection';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
