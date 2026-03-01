@@ -3,49 +3,38 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, 
-  Github, 
-  Mail, 
   Star, 
-  Shield,
   Database,
   Cloud,
   CheckCircle,
   Quote,
-  ExternalLink,
   MessageCircle,
-  TrendingUp,
-  Target,
   Rocket,
-  Lightbulb,
   Palette,
-  Hammer,
-  Bug,
   Zap,
-  Heart,
-  Send,
   ChevronDown,
   ChevronUp,
-  RefreshCw,
   Layout,
   Layers,
   FileText,
   Server,
   Package,
-  Activity,
-  Gauge,
-  GitBranch
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeroSection from './home/Herosection';
 import StatsSection from './home/Statssection';
 import ServicesSection from './home/Servicessection';
 import SkillsSection from './home/Skillssection';
+import Projectssection from './home/Projectssection';
+import PipelineSection from './home/Pipelinesection';
+import ArchitectureSection from './home/Architecturesection';
+import PerformanceSection from './home/Performancesection';
+import AchievementsSection from './home/Achievementssection';
+import ProcessSection from './home/Processsection';
 
 const Home: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [email, setEmail] = useState('');
-  const [isSubscribing, setIsSubscribing] = useState(false);
 
   const testimonials = [
     {
@@ -68,204 +57,6 @@ const Home: React.FC = () => {
       image: 'https://gos3.ibcdn.com/28165e14-1544-49fa-a88e-e0e6e3707244.jpeg',
       text: 'Akash transformed our outdated web application into a modern, responsive platform. His expertise in React and UI/UX design principles resulted in a 60% improvement in user engagement. Highly recommend for any web development project.',
       rating: 5
-    }
-  ];
-
-  const featuredProjects = [
-    {
-      id: 1,
-      title: 'Hotel Management & Booking System',
-      description: 'A full-stack hotel management and booking platform developed using React, Node.js, and MongoDB. The system enables customers to browse rooms, check real-time availability, make secure online bookings, and manage reservations. The admin panel provides complete control over room management, pricing, booking status, customer data, and analytics.',
-      image: 'https://ik.imagekit.io/sentyaztie/WhatsApp%20Image%202026-02-21%20at%2010.33.36%20AM.jpeg?updatedAt=1771650381217',
-      tags: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-      demoUrl: 'http://shribalajihomestay.in',
-      codeUrl: '#'
-    },
-    {
-      id: 2,
-      title: 'Event & Catering Management',
-      description: 'A full-stack event management and catering platform with a modern, responsive design. The system allows clients to book events, select catering services, customize menus, and track event details in real time. The admin panel provides complete control over event scheduling, package management, customer data, payments, and analytics.',
-      image: 'https://ik.imagekit.io/sentyaztie/eve.jpeg?updatedAt=1771650621892',
-      tags: ['React', 'Tailwind CSS', 'Sass', 'Shadcn UI', 'Chart.js'],
-      demoUrl: 'https://anjanievents.in/',
-      codeUrl: '#'
-    },
-    {
-      id: 3,
-      title: 'Massage & SPA',
-      description: 'A beautifully designed and fully responsive massage & spa website built with a modern UI/UX approach. The platform allows customers to explore services, book appointments online, view therapist profiles, and make secure payments. The admin panel enables complete control over services, pricing, therapist schedules, customer bookings, and business analytics.',
-      image: 'https://ik.imagekit.io/sentyaztie/tri.jpeg?updatedAt=1771651123575',
-      tags: ['React', 'API Integration', 'Charts', 'MongoDB', 'Frame-Motion'],
-      demoUrl: 'https://tripod-wellness.netlify.app/',
-      codeUrl: '#'
-    },
-    {
-      id: 4,
-      title: 'Prescription Generator',
-      description: 'A comprehensive prescription generator system for healthcare providers. Features include patient management, prescription creation, drug interaction checking, PDF generation, and print-friendly layouts. Built with modern React and Node.js technologies.',
-      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800',
-      tags: ['React', 'Node.js', 'MongoDB', 'PDF'],
-      demoUrl: '#',
-      codeUrl: '#'
-    },
-    {
-      id: 5,
-      title: 'E-Commerce Platform',
-      description: 'A full-featured e-commerce platform with product catalog, shopping cart, payment integration, order management, and admin dashboard. Includes user authentication, wishlist, reviews, and responsive design for all devices.',
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800',
-      tags: ['React', 'Node.js', 'Stripe', 'MongoDB'],
-      demoUrl: '#',
-      codeUrl: '#'
-    },
-    {
-      id: 6,
-      title: 'Social Welfare Platform',
-      description: 'A comprehensive platform for social welfare organizations to manage campaigns, donations, volunteers, and events. Features include real-time tracking, reporting, and donor management.',
-      image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800',
-      tags: ['React', 'Express', 'MongoDB', 'Analytics'],
-      demoUrl: '#',
-      codeUrl: '#'
-    }
-  ];
-
-  const deliveryPipeline = [
-    {
-      project: 'Clinic Management Platform',
-      stage: 'Development',
-      progress: 72,
-      eta: '2 weeks',
-      status: 'On Track'
-    },
-    {
-      project: 'Event Booking Suite',
-      stage: 'QA & UAT',
-      progress: 88,
-      eta: '5 days',
-      status: 'On Track'
-    },
-    {
-      project: 'Hotel Reservation Engine',
-      stage: 'Discovery',
-      progress: 28,
-      eta: '3 weeks',
-      status: 'Planning'
-    },
-    {
-      project: 'E-commerce Dashboard',
-      stage: 'Deployment',
-      progress: 96,
-      eta: '2 days',
-      status: 'Launching'
-    }
-  ];
-
-  const architectureSnapshots = [
-    {
-      title: 'Healthcare Workflow System',
-      summary: 'Secure patient data flow with role-based access and automated PDF outputs.',
-      flow: ['React Client', 'Node API', 'MongoDB + Redis', 'AWS + Backups']
-    },
-    {
-      title: 'High-Traffic Booking Platform',
-      summary: 'Designed for peak-hour spikes with cache-first reads and resilient queue processing.',
-      flow: ['Next.js Frontend', 'Gateway + Services', 'PostgreSQL', 'CDN + Cloud Monitoring']
-    },
-    {
-      title: 'Analytics-Driven Business Portal',
-      summary: 'Real-time metrics pipeline with event tracking and actionable dashboards.',
-      flow: ['React Admin', 'Express API', 'MongoDB Aggregations', 'Scheduled Reports']
-    }
-  ];
-
-  const reliabilityMetrics = [
-    {
-      label: 'Avg Lighthouse Performance',
-      value: '92+',
-      note: 'Across recent production builds',
-      icon: Gauge,
-      color: 'from-cyan-500 to-blue-600'
-    },
-    {
-      label: 'API Success Rate',
-      value: '99.3%',
-      note: 'Measured on stable deployments',
-      icon: Activity,
-      color: 'from-emerald-500 to-green-600'
-    },
-    {
-      label: 'Release Frequency',
-      value: 'Weekly',
-      note: 'Small, low-risk incremental updates',
-      icon: GitBranch,
-      color: 'from-purple-500 to-violet-600'
-    }
-  ];
-
-  const achievements = [
-    {
-      icon: TrendingUp,
-      title: '200% Performance Boost',
-      description: 'Optimized applications for better user experience'
-    },
-    {
-      icon: Shield,
-      title: 'Zero Security Issues',
-      description: 'Implemented robust security measures'
-    },
-    {
-      icon: Target,
-      title: '98% Client Satisfaction',
-      description: 'Consistently delivering quality solutions'
-    },
-    {
-      icon: Rocket,
-      title: 'Fast Delivery',
-      description: 'Always meeting project deadlines'
-    }
-  ];
-
-  const processSteps = [
-    {
-      step: '01',
-      title: 'Discovery & Planning',
-      description: 'We start by understanding your vision, goals, and requirements. I analyze your needs and create a detailed project roadmap.',
-      icon: Lightbulb,
-      color: 'from-yellow-500 to-orange-500'
-    },
-    {
-      step: '02',
-      title: 'Design & Prototype',
-      description: 'I create stunning UI/UX designs and interactive prototypes to visualize the final product before development begins.',
-      icon: Palette,
-      color: 'from-pink-500 to-rose-500'
-    },
-    {
-      step: '03',
-      title: 'Development',
-      description: 'Using cutting-edge technologies, I build robust and scalable solutions with clean, maintainable code.',
-      icon: Hammer,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      step: '04',
-      title: 'Testing & QA',
-      description: 'Rigorous testing ensures your application is bug-free, secure, and performs optimally across all devices.',
-      icon: Bug,
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      step: '05',
-      title: 'Deployment & Launch',
-      description: 'I deploy your application to production servers and ensure a smooth launch with zero downtime.',
-      icon: Rocket,
-      color: 'from-purple-500 to-violet-500'
-    },
-    {
-      step: '06',
-      title: 'Support & Maintenance',
-      description: 'Post-launch support includes updates, optimizations, and ongoing maintenance to keep your app running perfectly.',
-      icon: Heart,
-      color: 'from-red-500 to-pink-500'
     }
   ];
 
@@ -320,17 +111,6 @@ const Home: React.FC = () => {
     { name: 'Tripod Wellness', logo: '💆' }
   ];
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setIsSubscribing(true);
-    // Simulate subscription
-    setTimeout(() => {
-      setIsSubscribing(false);
-      setEmail('');
-      alert('Thank you for subscribing!');
-    }, 1000);
-  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -352,7 +132,9 @@ const Home: React.FC = () => {
       </Helmet>
       <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <HeroSection />
+      <div className="mt-1">
+        <HeroSection />
+      </div>
 
       {/* Enhanced Stats Section */}
       <StatsSection/>
@@ -364,329 +146,22 @@ const Home: React.FC = () => {
       <SkillsSection/>
 
       {/* Featured Projects Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Featured Projects
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              A showcase of my recent work and innovative solutions
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="group bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 overflow-hidden hover:scale-105 transition-all duration-300"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <a
-                      href={project.demoUrl}
-                      className="w-8 h-8 bg-white/20 backdrop-blur-lg rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4 text-white" />
-                    </a>
-                    <a
-                      href={project.codeUrl}
-                      className="w-8 h-8 bg-white/20 backdrop-blur-lg rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors"
-                    >
-                      <Github className="w-4 h-4 text-white" />
-                    </a>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                  <p className="text-gray-400 mb-4 text-sm leading-relaxed">{project.description}</p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {project.tags.map((tag, tagIndex) => (
-                      <span
-                        key={tagIndex}
-                        className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mt-12"
-          >
-            <Link
-              to="/projects"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
-            >
-              View All Projects
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <Projectssection/>
 
       {/* Live Project Pipeline Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Live Project Pipeline
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Real delivery visibility from discovery to launch across active engagements
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {deliveryPipeline.map((item, index) => (
-              <motion.div
-                key={item.project}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6"
-              >
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{item.project}</h3>
-                    <p className="text-sm text-blue-300">{item.stage}</p>
-                  </div>
-                  <span className="text-xs px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    {item.status}
-                  </span>
-                </div>
-
-                <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden mb-3">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${item.progress}%` }}
-                    transition={{ delay: index * 0.1 + 0.2, duration: 1.2 }}
-                    viewport={{ once: true }}
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300">{item.progress}% completed</span>
-                  <span className="text-gray-400">ETA: {item.eta}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PipelineSection/>
 
       {/* Architecture Snapshot Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Architecture Snapshots
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Technical blueprints showing how products are structured for scale, reliability, and speed
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {architectureSnapshots.map((snapshot, index) => (
-              <motion.div
-                key={snapshot.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-6"
-              >
-                <h3 className="text-xl font-bold text-white mb-2">{snapshot.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed mb-5">{snapshot.summary}</p>
-
-                <div className="space-y-3">
-                  {snapshot.flow.map((layer, flowIndex) => (
-                    <div key={layer} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold flex items-center justify-center">
-                        {flowIndex + 1}
-                      </div>
-                      <div className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-200">
-                        {layer}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ArchitectureSection/>
 
       {/* Performance & Reliability Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Performance & Reliability
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Engineering quality benchmarks used to keep user experience fast and dependable
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {reliabilityMetrics.map((metric, index) => {
-              const Icon = metric.icon;
-              return (
-                <motion.div
-                  key={metric.label}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="text-center bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
-                >
-                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${metric.color} flex items-center justify-center mx-auto mb-5`}>
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <p className="text-gray-400 text-sm mb-2">{metric.label}</p>
-                  <h3 className="text-3xl font-bold text-white mb-3">{metric.value}</h3>
-                  <p className="text-gray-400 text-sm">{metric.note}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <PerformanceSection/>
 
       {/* Achievements Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              Key Achievements
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Results that demonstrate my commitment to excellence
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {achievements.map((achievement, index) => {
-              const Icon = achievement.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="text-center bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300 group"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{achievement.title}</h3>
-                  <p className="text-gray-400 text-sm">{achievement.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <AchievementsSection/>
 
       {/* Process Section */}
-      <section className="py-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-              How I Work
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              A systematic approach to deliver exceptional results every time
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {processSteps.map((process, index) => {
-              const Icon = process.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="group relative bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:scale-105 transition-all duration-300"
-                >
-                  <div className="absolute -top-3 -left-3 w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {process.step}
-                  </div>
-                  <div className={`w-14 h-14 bg-gradient-to-r ${process.color} rounded-xl flex items-center justify-center mb-4 mt-2 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{process.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{process.description}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <ProcessSection/>
 
       {/* Technology Stack Section */}
       <section className="py-20 relative">
@@ -817,70 +292,6 @@ const Home: React.FC = () => {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-20 relative">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/10 text-center relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5"></div>
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-            
-            <div className="relative z-10">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6"
-              >
-                <Mail className="w-8 h-8 text-white" />
-              </motion.div>
-              
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Stay Updated
-              </h2>
-              <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                Subscribe to my newsletter for the latest tech insights, project updates, and exclusive content delivered to your inbox.
-              </p>
-              
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-                <div className="flex-1 relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    required
-                    className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors backdrop-blur-lg"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubscribing}
-                  className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isSubscribing ? (
-                    <RefreshCw className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Subscribe
-                      <Send className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-              </form>
-              
-              <p className="text-gray-500 text-sm mt-4">
-                No spam, unsubscribe at any time. Your privacy is guaranteed.
-              </p>
-            </div>
-          </motion.div>
         </div>
       </section>
 
