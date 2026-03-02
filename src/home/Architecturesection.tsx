@@ -264,7 +264,7 @@ function ArchCard({ snapshot, index, inView }: { snapshot: ArchitectureSnapshot;
           transition={{ duration: 0.5 }}
         />
 
-        <div className="relative z-10 p-7 flex flex-col gap-5 h-full">
+        <div className="relative z-10 p-4 sm:p-7 flex flex-col gap-4 sm:gap-5 h-full">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
@@ -371,7 +371,7 @@ export default function ArchitectureSection() {
   return (
     <section
       ref={ref}
-      className="relative py-28 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-28 overflow-hidden"
       style={{ background: "#020209" }}
     >
       <style>{`
@@ -400,36 +400,36 @@ export default function ArchitectureSection() {
         transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
 
         {/* Header */}
         <motion.div
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
-            className="inline-flex items-center gap-3 mb-6"
+            className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.1, duration: 0.5 }}
           >
-            <div className="h-px w-10 bg-gradient-to-r from-transparent to-indigo-500" />
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-r from-transparent to-indigo-500" />
             <span
               className="text-xs font-bold tracking-widest uppercase text-indigo-400"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               System Design
             </span>
-            <div className="h-px w-10 bg-gradient-to-l from-transparent to-indigo-500" />
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-l from-transparent to-indigo-500" />
           </motion.div>
 
           <h2
-            className="font-black leading-tight mb-5"
+            className="font-black leading-tight mb-3 sm:mb-5 px-2"
             style={{
               fontFamily: "'Sora', sans-serif",
-              fontSize: "clamp(2.5rem, 5vw, 4rem)",
+              fontSize: "clamp(1.75rem, 5vw, 4rem)",
               letterSpacing: "-0.04em",
               background: "linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.4) 100%)",
               WebkitBackgroundClip: "text",
@@ -441,7 +441,7 @@ export default function ArchitectureSection() {
           </h2>
 
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="text-sm sm:text-lg max-w-2xl mx-auto px-4"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               color: "rgba(255,255,255,0.38)",
@@ -455,7 +455,7 @@ export default function ArchitectureSection() {
         </motion.div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {architectureSnapshots.map((snapshot, i) => (
             <ArchCard key={snapshot.title} snapshot={snapshot} index={i} inView={inView} />
           ))}

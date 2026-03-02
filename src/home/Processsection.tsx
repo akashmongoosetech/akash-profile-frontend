@@ -335,7 +335,7 @@ export default function ProcessSection() {
   return (
     <section
       ref={ref}
-      className="relative py-28 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-28 overflow-hidden"
       style={{ background: "#020209" }}
     >
       <style>{`
@@ -369,27 +369,27 @@ export default function ProcessSection() {
         transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
 
         {/* ── Header ── */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-12 sm:mb-16"
           initial={{ opacity: 0, y: 36 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="inline-flex items-center gap-3 mb-5">
-            <div className="h-px w-10 bg-gradient-to-r from-transparent to-indigo-500" />
+          <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-r from-transparent to-indigo-500" />
             <span className="text-xs font-bold tracking-widest uppercase text-indigo-400" style={{ fontFamily: "'Space Mono', monospace" }}>
               How I Work
             </span>
-            <div className="h-px w-10 bg-gradient-to-l from-transparent to-indigo-500" />
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-l from-transparent to-indigo-500" />
           </div>
           <h2
-            className="font-black leading-tight mb-4"
+            className="font-black leading-tight mb-3 sm:mb-4 px-2"
             style={{
               fontFamily: "'Sora', sans-serif",
-              fontSize: "clamp(2.5rem,5vw,4rem)",
+              fontSize: "clamp(1.75rem,5vw,4rem)",
               letterSpacing: "-0.04em",
               background: "linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.4) 100%)",
               WebkitBackgroundClip: "text",
@@ -400,7 +400,7 @@ export default function ProcessSection() {
             The Process
           </h2>
           <p
-            className="text-lg max-w-xl mx-auto"
+            className="text-sm sm:text-lg max-w-xl mx-auto px-4"
             style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.38)", fontWeight: 300, lineHeight: 1.8 }}
           >
             Six repeatable phases that turn ideas into production-ready products — every time.

@@ -298,8 +298,8 @@ export default function HeroSection() {
       />
 
       {/* Main content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center min-h-screen py-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-screen py-16 sm:py-20 lg:py-24">
 
           {/* LEFT COLUMN */}
           <motion.div
@@ -333,8 +333,8 @@ export default function HeroSection() {
             >
               <div className="text-gray-500 mono text-sm mb-3 tracking-wider">const developer = {`{`}</div>
               <h1 className="hero-name leading-none">
-                <span className="text-shimmer block text-[clamp(4rem,9vw,7rem)]">Akash</span>
-                <span className="text-white block text-[clamp(4rem,9vw,7rem)]">Raikwar</span>
+                <span className="text-shimmer block text-[clamp(2.5rem,8vw,7rem)]">Akash</span>
+                <span className="text-white block text-[clamp(2.5rem,8vw,7rem)]">Raikwar</span>
               </h1>
               <div className="text-gray-500 mono text-sm mt-3">{"}"}</div>
             </motion.div>
@@ -347,7 +347,7 @@ export default function HeroSection() {
               className="flex items-center gap-3"
             >
               <div className="w-8 h-px bg-indigo-500" />
-              <span className="text-indigo-300 text-xl font-semibold" style={{ fontFamily: 'Sora, sans-serif', minWidth: '260px' }}>
+              <span className="text-indigo-300 text-base sm:text-xl font-semibold" style={{ fontFamily: 'Sora, sans-serif', minWidth: '200px' }}>
                 {typedText}
                 <span className="cursor-blink text-indigo-400 ml-0.5">|</span>
               </span>
@@ -358,7 +358,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.7 }}
-              className="text-gray-400 text-lg leading-relaxed max-w-lg"
+              className="text-gray-400 text-sm sm:text-lg leading-relaxed max-w-lg"
               style={{ fontFamily: 'DM Sans, sans-serif', fontWeight: 300 }}
             >
               Crafting scalable, blazing-fast web experiences with obsessive attention to detail.
@@ -376,7 +376,7 @@ export default function HeroSection() {
               <MagneticButton
                 as="a"
                 href="/contact"
-                className="cta-primary text-white px-8 py-4 rounded-2xl font-bold text-base cursor-pointer flex items-center gap-2.5 no-underline"
+                className="cta-primary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base cursor-pointer flex items-center gap-2 no-underline"
                 style={{ fontFamily: 'Sora, sans-serif' }}
               >
                 <span>Hire Me</span>
@@ -389,7 +389,7 @@ export default function HeroSection() {
               <MagneticButton
                 as="a"
                 href="/projects"
-                className="cta-secondary text-white px-8 py-4 rounded-2xl font-bold text-base cursor-pointer flex items-center gap-2 no-underline"
+                className="cta-secondary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base cursor-pointer flex items-center gap-2 no-underline"
                 style={{ fontFamily: 'Sora, sans-serif' }}
               >
                 View Projects
@@ -401,9 +401,9 @@ export default function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.85, duration: 0.6 }}
-              className="flex items-center gap-8 pt-2"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:pt-2"
             >
-              <div className="flex gap-2">
+              <div className="flex gap-2 order-2 sm:order-1">
                 {socialLinks.map((s, i) => (
                   <motion.a
                     key={i}
@@ -422,9 +422,9 @@ export default function HeroSection() {
                 ))}
               </div>
 
-              <div className="w-px h-10 bg-white/10" />
+              <div className="w-px h-10 bg-white/10 hidden sm:block" />
 
-              <div className="flex gap-6">
+              <div className="flex gap-4 sm:gap-6 order-1 sm:order-2">
                 {stats.map((s, i) => (
                   <motion.div
                     key={s.label}

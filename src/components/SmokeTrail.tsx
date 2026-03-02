@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 
-const NUM_PARTICLES = 30;
 const TRAIL_LENGTH = 30;
 const HEAD_COLOR = 'rgba(255,255,200,1)'; // bright yellowish white
 const TAIL_COLORS = [
@@ -28,10 +27,12 @@ const SmokeTrail: React.FC = () => {
 
     const resizeCanvas = () => {
       if (!canvas) return;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
       canvas.style.width = window.innerWidth + 'px';
       canvas.style.height = window.innerHeight + 'px';
+      ctx.scale(dpr, dpr);
     };
 
     resizeCanvas();
@@ -46,15 +47,14 @@ const SmokeTrail: React.FC = () => {
     // Touch support for mobile/small screens
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches && e.touches.length > 0) {
-        console.log('touchmove', e.touches[0].clientX, e.touches[0].clientY);
         mouse.current.x = e.touches[0].clientX;
         mouse.current.y = e.touches[0].clientY;
       }
     };
-    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     // Initialize trail
-    trail.current = Array(TRAIL_LENGTH).fill({ x: mouse.current.x, y: mouse.current.y });
+    trail.current = Array.from({ length: TRAIL_LENGTH }, () => ({ x: mouse.current.x, y: mouse.current.y }));
 
     function drawComet() {
       if (!canvas || !ctx) return;

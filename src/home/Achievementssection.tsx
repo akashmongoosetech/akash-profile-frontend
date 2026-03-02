@@ -66,7 +66,7 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
     <div className="relative flex items-center gap-0">
 
       {/* ── LEFT SIDE ── */}
-      <div className={`flex-1 flex ${isEven ? "justify-end pr-10" : "justify-start pl-10 order-3"}`}>
+      <div className={`flex-1 flex ${isEven ? "justify-end pr-4 sm:pr-10" : "justify-start pl-4 sm:pl-10 order-3"} hidden sm:flex`}>
         <motion.div
           initial={{ opacity: 0, x: isEven ? 40 : -40 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -106,20 +106,20 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
               }}
             />
 
-            <div className="relative z-10 p-6 flex gap-4">
+            <div className="relative z-10 p-4 sm:p-6 flex gap-3 sm:gap-4">
               {/* Icon */}
               <motion.div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
                 style={{ background: item.gradient }}
                 animate={{ scale: hovered ? 1.1 : 1, rotate: hovered ? 8 : 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <Icon className="w-5 h-5 text-white" strokeWidth={1.8} />
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={1.8} />
               </motion.div>
 
               <div className="flex-1 min-w-0">
                 {/* Tag + year */}
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-1.5 mb-1">
                   <span
                     className="text-xs font-bold tracking-widest uppercase"
                     style={{ fontFamily: "'Space Mono', monospace", color: item.accent }}
@@ -136,8 +136,8 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
 
                 {/* Title */}
                 <h3
-                  className="font-black text-white mb-2 leading-tight"
-                  style={{ fontFamily: "'Sora', sans-serif", fontSize: "1rem", letterSpacing: "-0.03em" }}
+                  className="font-black text-white mb-1.5 sm:mb-2 leading-tight"
+                  style={{ fontFamily: "'Sora', sans-serif", fontSize: "0.85rem sm:1rem", letterSpacing: "-0.03em" }}
                 >
                   {item.title}
                 </h3>
@@ -147,7 +147,7 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     color: "rgba(255,255,255,0.35)",
-                    fontSize: "0.82rem",
+                    fontSize: "0.75rem sm:0.82rem",
                     lineHeight: 1.7,
                     fontWeight: 300,
                   }}
@@ -169,8 +169,102 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
         </motion.div>
       </div>
 
-      {/* ── CENTER SPINE ── */}
-      <div className="flex-shrink-0 w-px flex flex-col items-center order-2 relative" style={{ zIndex: 10 }}>
+      {/* ── MOBILE CARD (shown only on mobile) ── */}
+      <div className="flex-1 w-full sm:hidden px-3 py-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          className="relative group w-full"
+        >
+          {/* Glow border */}
+          <motion.div
+            className="absolute -inset-px rounded-2xl pointer-events-none"
+            style={{ background: item.gradient }}
+            animate={{ opacity: hovered ? 0.6 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+
+          <motion.div
+            className="relative rounded-2xl overflow-hidden"
+            style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.07)" }}
+            animate={{ y: hovered ? -4 : 0 }}
+            transition={{ type: "spring", stiffness: 280, damping: 26 }}
+          >
+            {/* Top strip */}
+            <motion.div
+              className="absolute top-0 left-0 right-0 h-0.5"
+              style={{ background: item.gradient }}
+              animate={{ scaleX: hovered ? 1 : 0.25, opacity: hovered ? 1 : 0.4 }}
+              transition={{ duration: 0.4 }}
+            />
+
+            <div className="relative z-10 p-4 flex gap-3">
+              {/* Icon */}
+              <motion.div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: item.gradient }}
+                animate={{ scale: hovered ? 1.1 : 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                <Icon className="w-5 h-5 text-white" strokeWidth={1.8} />
+              </motion.div>
+
+              <div className="flex-1 min-w-0">
+                {/* Tag + year + metric */}
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="text-xs font-bold tracking-widest uppercase"
+                      style={{ fontFamily: "'Space Mono', monospace", color: item.accent }}
+                    >
+                      {item.tag}
+                    </span>
+                    <span
+                      className="text-xs"
+                      style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.2)" }}
+                    >
+                      · {item.year}
+                    </span>
+                  </div>
+                  <span
+                    className="font-black text-xs"
+                    style={{ fontFamily: "'Sora', sans-serif", color: item.accent }}
+                  >
+                    {item.metric}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3
+                  className="font-black text-white mb-1 leading-tight"
+                  style={{ fontFamily: "'Sora', sans-serif", fontSize: "0.95rem", letterSpacing: "-0.03em" }}
+                >
+                  {item.title}
+                </h3>
+
+                {/* Description */}
+                <p
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: "rgba(255,255,255,0.35)",
+                    fontSize: "0.8rem",
+                    lineHeight: 1.6,
+                    fontWeight: 300,
+                  }}
+                >
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* ── CENTER SPINE (desktop only) ── */}
+      <div className="hidden sm:flex flex-shrink-0 w-px flex-col items-center order-2 relative" style={{ zIndex: 10 }}>
         {/* Node */}
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
@@ -242,7 +336,7 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
       </div>
 
       {/* ── RIGHT SIDE spacer (empty on alternating rows) ── */}
-      <div className={`flex-1 ${isEven ? "order-3" : "order-1"}`} />
+      <div className={`flex-1 ${isEven ? "order-3" : "order-1"} hidden sm:block`} />
     </div>
   );
 }
@@ -250,7 +344,7 @@ function AchievementRow({ item, index, inView }: { item: Achievement; index: num
 // ── Spine line segment between nodes ─────────────────────────────────────────
 function SpineSegment({ fromAccent, toAccent, inView, delay }: { fromAccent: string; toAccent: string; inView: boolean; delay: number }) {
   return (
-    <div className="flex justify-center relative" style={{ height: 64, zIndex: 5 }}>
+    <div className="hidden sm:flex justify-center relative" style={{ height: 64, zIndex: 5 }}>
       {/* Center line */}
       <motion.div
         className="w-px"
@@ -297,7 +391,7 @@ export default function AchievementsSection() {
   return (
     <section
       ref={ref}
-      className="relative py-28 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-28 overflow-hidden"
       style={{ background: "#020209" }}
     >
       <style>{`
@@ -324,36 +418,36 @@ export default function AchievementsSection() {
         transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-12">
 
         {/* Header */}
         <motion.div
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
-            className="inline-flex items-center gap-3 mb-6"
+            className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.1, duration: 0.5 }}
           >
-            <div className="h-px w-10 bg-gradient-to-r from-transparent to-indigo-500" />
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-r from-transparent to-indigo-500" />
             <span
               className="text-xs font-bold tracking-widest uppercase text-indigo-400"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               Proven Results
             </span>
-            <div className="h-px w-10 bg-gradient-to-l from-transparent to-indigo-500" />
+            <div className="h-px w-6 sm:w-10 bg-gradient-to-l from-transparent to-indigo-500" />
           </motion.div>
 
           <h2
-            className="font-black leading-tight mb-5"
+            className="font-black leading-tight mb-3 sm:mb-5 px-2"
             style={{
               fontFamily: "'Sora', sans-serif",
-              fontSize: "clamp(2.5rem,5vw,4rem)",
+              fontSize: "clamp(1.75rem, 5vw, 4rem)",
               letterSpacing: "-0.04em",
               background: "linear-gradient(135deg,#fff 30%,rgba(255,255,255,0.4) 100%)",
               WebkitBackgroundClip: "text",
@@ -365,7 +459,7 @@ export default function AchievementsSection() {
           </h2>
 
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="text-sm sm:text-lg max-w-2xl mx-auto px-4"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               color: "rgba(255,255,255,0.38)",

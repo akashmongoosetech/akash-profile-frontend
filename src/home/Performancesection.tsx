@@ -483,7 +483,7 @@ export default function PerformanceSection() {
   return (
     <section
       ref={ref}
-      className="relative py-28 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-28 overflow-hidden"
       style={{ background: "#020209" }}
     >
       <style>{`
@@ -511,7 +511,7 @@ export default function PerformanceSection() {
         transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
 
         {/* Header */}
         <motion.div
