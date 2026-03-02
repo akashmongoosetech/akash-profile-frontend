@@ -1,8 +1,33 @@
-import { useRef, useState } from "react";
+import { useRef, useState, CSSProperties } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 
-const faqs = [
+// ── Type definitions ──────────────────────────────────────────────────────────
+interface Faq {
+  question: string;
+  answer: string;
+  accent: string;
+  gradient: string;
+  tag: string;
+}
+
+interface FaqItemProps {
+  faq: Faq;
+  index: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  inView: boolean;
+}
+
+interface OrbProps {
+  style?: CSSProperties;
+  color: string;
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+const faqs: Faq[] = [
   {
     question: "What is your development process?",
     answer: "My development process follows a structured approach: Discovery & Planning, Design & Prototype, Development, Testing & QA, Deployment, and Post-launch Support. I keep you updated at every step and ensure transparent communication throughout the project lifecycle.",
@@ -48,7 +73,7 @@ const faqs = [
 ];
 
 // ── FAQ item ──────────────────────────────────────────────────────────────────
-function FaqItem({ faq, index, isOpen, onToggle, inView }) {
+function FaqItem({ faq, index, isOpen, onToggle, inView }: FaqItemProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -201,7 +226,7 @@ function FaqItem({ faq, index, isOpen, onToggle, inView }) {
 }
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
-function Orb({ style, color, size, dur, delay }) {
+function Orb({ style, color, size, dur, delay }: OrbProps) {
   return (
     <motion.div
       className="absolute rounded-full blur-3xl pointer-events-none"
@@ -216,9 +241,9 @@ function Orb({ style, color, size, dur, delay }) {
 export default function FaqSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const toggle = (i) => setOpenIndex(openIndex === i ? null : i);
+  const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
     <section

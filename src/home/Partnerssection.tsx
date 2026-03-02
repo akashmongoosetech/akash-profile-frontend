@@ -1,7 +1,37 @@
-import { useRef, useState } from "react";
+import { useRef, useState, CSSProperties } from "react";
 import { motion, useInView } from "framer-motion";
 
-const partners = [
+// ── Type definitions ──────────────────────────────────────────────────────────
+interface Partner {
+  name: string;
+  emoji: string;
+  desc: string;
+  accent: string;
+  gradient: string;
+  year: string;
+}
+
+interface PartnerCardProps {
+  partner: Partner;
+  index: number;
+  inView: boolean;
+}
+
+interface MarqueeRowProps {
+  items: Partner[];
+  direction?: number;
+  speed?: number;
+}
+
+interface OrbProps {
+  style?: CSSProperties;
+  color: string;
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+const partners: Partner[] = [
   {
     name: "Bhargava Clinic",
     emoji: "🏥",
@@ -53,14 +83,16 @@ const partners = [
 ];
 
 // ── Single partner card ───────────────────────────────────────────────────────
-function PartnerCard({ partner, index, inView }) {
+function PartnerCard({ partner, index, inView }: PartnerCardProps) {
   const [hovered, setHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e) => {
-    const r = cardRef.current.getBoundingClientRect();
-    setMousePos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = cardRef.current;
+    if (!r) return;
+    const rect = r.getBoundingClientRect();
+    setMousePos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 });
   };
 
   return (
@@ -211,7 +243,7 @@ function PartnerCard({ partner, index, inView }) {
 }
 
 // ── Infinite marquee row ──────────────────────────────────────────────────────
-function MarqueeRow({ items, direction = 1, speed = 40 }) {
+function MarqueeRow({ items, direction = 1, speed = 40 }: MarqueeRowProps) {
   const doubled = [...items, ...items];
   return (
     <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(90deg,transparent,black 10%,black 90%,transparent)" }}>
@@ -244,7 +276,7 @@ function MarqueeRow({ items, direction = 1, speed = 40 }) {
 }
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
-function Orb({ style, color, size, dur, delay }) {
+function Orb({ style, color, size, dur, delay }: OrbProps) {
   return (
     <motion.div
       className="absolute rounded-full blur-3xl pointer-events-none"

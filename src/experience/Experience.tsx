@@ -1,12 +1,97 @@
-import { useRef, useState } from "react";
+import { useRef, useState, CSSProperties } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion, useInView } from "framer-motion";
 import {
-  Briefcase, GraduationCap, Award, Calendar, MapPin, ExternalLink, Check, Star
+  Briefcase, GraduationCap, Award, Calendar, MapPin, ExternalLink, Check, Star, LucideIcon
 } from "lucide-react";
 
+// ── Type definitions ──────────────────────────────────────────────────────────
+interface Experience {
+  title: string;
+  company: string;
+  location: string;
+  period: string;
+  status: string;
+  description: string;
+  achievements: string[];
+  technologies: string[];
+  accent: string;
+  gradient: string;
+  emoji: string;
+}
+
+interface Education {
+  title: string;
+  field: string;
+  institution: string;
+  location: string;
+  period: string;
+  description: string;
+  achievements: string[];
+  accent: string;
+  gradient: string;
+  emoji: string;
+}
+
+interface Certification {
+  title: string;
+  issuer: string;
+  date: string;
+  id: string;
+  emoji: string;
+  accent: string;
+  gradient: string;
+}
+
+interface Badge {
+  title: string;
+  issuer: string;
+  verifyLink: string;
+  image: string;
+  accent: string;
+}
+
+interface OrbProps {
+  style?: CSSProperties;
+  color: string;
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+interface SectionTitleProps {
+  icon: LucideIcon;
+  iconColor: string;
+  text: string;
+}
+
+interface ExpItemProps {
+  exp: Experience;
+  index: number;
+  inView: boolean;
+  isLast: boolean;
+}
+
+interface EduItemProps {
+  edu: Education;
+  index: number;
+  inView: boolean;
+}
+
+interface CertCardProps {
+  cert: Certification;
+  index: number;
+  inView: boolean;
+}
+
+interface BadgeCardProps {
+  badge: Badge;
+  index: number;
+  inView: boolean;
+}
+
 // ── Data ──────────────────────────────────────────────────────────────────────
-const experiences = [
+const experiences: Experience[] = [
   {
     title: "Software Engineer",
     company: "Profilics Systems Pvt. Ltd.",
@@ -57,7 +142,7 @@ const experiences = [
   },
 ];
 
-const education = [
+const education: Education[] = [
   {
     title: "Bachelor of Technology",
     field: "Electronics & Computer Science Engineering",
@@ -75,21 +160,21 @@ const education = [
   },
 ];
 
-const certifications = [
+const certifications: Certification[] = [
   { title: "AWS Certified Solutions Architect",   issuer: "Amazon Web Services",                date: "March 2023",    id: "AWS-CSA-2023-001",  emoji: "☁️", accent: "#fb923c", gradient: "linear-gradient(135deg,#f97316,#ef4444)" },
   { title: "Google Cloud Professional Developer", issuer: "Google Cloud",                       date: "January 2023",  id: "GCP-PD-2023-001",   emoji: "🌐", accent: "#38bdf8", gradient: "linear-gradient(135deg,#3b82f6,#06b6d4)" },
   { title: "Certified Kubernetes Administrator",  issuer: "Cloud Native Computing Foundation",  date: "November 2022", id: "CKA-2022-001",       emoji: "⚙️", accent: "#818cf8", gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
   { title: "MongoDB Certified Developer",         issuer: "MongoDB Inc.",                       date: "September 2022",id: "MDB-DEV-2022-001",   emoji: "🍃", accent: "#4ade80", gradient: "linear-gradient(135deg,#10b981,#22c55e)" },
 ];
 
-const badges = [
+const badges: Badge[] = [
   { title: "Data Science for Business - Level 1", issuer: "IBM", verifyLink: "https://www.credly.com/badges/a3af8295-9513-4d5d-bc7a-b1d61080a439/public_url", image: "https://images.credly.com/size/340x340/images/547b89ab-8749-4dfa-8ace-edf4fc6af3be/blob", accent: "#fbbf24" },
   { title: "IBM Blockchain Essentials V2",        issuer: "IBM", verifyLink: "https://www.credly.com/badges/8225afdb-e459-4149-bf09-14ed9199fcfe/public_url", image: "https://images.credly.com/size/340x340/images/2f9eee24-6834-4595-b2b6-e8e585190a0d/IBM-Blockchain-Essentials-V2.png", accent: "#818cf8" },
   { title: "Deep Learning using TensorFlow",      issuer: "IBM", verifyLink: "https://www.credly.com/badges/09064042-1c44-42a7-8d69-ecca98568a27/public_url", image: "https://images.credly.com/size/340x340/images/ba85e07d-8263-4f30-b39b-d79883ee558c/blob", accent: "#38bdf8" },
 ];
 
 // ── Shared utilities ──────────────────────────────────────────────────────────
-function Orb({ style, color, size, dur, delay }) {
+function Orb({ style, color, size, dur, delay }: OrbProps) {
   return (
     <motion.div className="absolute rounded-full blur-3xl pointer-events-none"
       style={{ width: size, height: size, background: color, ...style }}
@@ -99,7 +184,7 @@ function Orb({ style, color, size, dur, delay }) {
   );
 }
 
-function SectionTitle({ icon: Icon, iconColor, text }) {
+function SectionTitle({ icon: Icon, iconColor, text }: SectionTitleProps) {
   return (
     <div className="flex items-center gap-3 mb-12">
       <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${iconColor}18`, border: `1px solid ${iconColor}30` }}>
@@ -112,14 +197,16 @@ function SectionTitle({ icon: Icon, iconColor, text }) {
 }
 
 // ── Experience timeline item ───────────────────────────────────────────────────
-function ExpItem({ exp, index, inView, isLast }) {
+function ExpItem({ exp, index, inView, isLast }: ExpItemProps) {
   const [hovered, setHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e) => {
-    const r = ref.current.getBoundingClientRect();
-    setMousePos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = ref.current;
+    if (!r) return;
+    const rect = r.getBoundingClientRect();
+    setMousePos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 });
   };
 
   return (
@@ -149,11 +236,10 @@ function ExpItem({ exp, index, inView, isLast }) {
         {!isLast && (
           <motion.div
             className="flex-1 w-px mt-2"
-            style={{ background: `linear-gradient(180deg,${exp.accent}60,rgba(255,255,255,0.05))` }}
+            style={{ background: `linear-gradient(180deg,${exp.accent}60,rgba(255,255,255,0.05))`, transformOrigin: "top", width: 1 }}
             initial={{ scaleY: 0 }}
             animate={inView ? { scaleY: 1 } : {}}
             transition={{ delay: index * 0.15 + 0.4, duration: 0.6 }}
-            style={{ transformOrigin: "top", background: `linear-gradient(180deg,${exp.accent}50,rgba(255,255,255,0.04))`, width: 1 }}
           />
         )}
       </div>
@@ -219,7 +305,7 @@ function ExpItem({ exp, index, inView, isLast }) {
               <div>
                 <div className="text-xs font-black uppercase tracking-widest mb-3" style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.3)" }}>Key Achievements</div>
                 <div className="flex flex-col gap-2">
-                  {exp.achievements.map((a) => (
+                  {exp.achievements.map((a: string) => (
                     <div key={a} className="flex items-start gap-2.5">
                       <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${exp.accent}18`, border: `1px solid ${exp.accent}30` }}>
                         <Check className="w-2.5 h-2.5" style={{ color: exp.accent }} strokeWidth={2.5} />
@@ -233,7 +319,7 @@ function ExpItem({ exp, index, inView, isLast }) {
               <div>
                 <div className="text-xs font-black uppercase tracking-widest mb-3" style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.3)" }}>Technologies</div>
                 <div className="flex flex-wrap gap-2">
-                  {exp.technologies.map((t) => (
+                  {exp.technologies.map((t: string) => (
                     <span key={t} className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ fontFamily: "'Space Mono', monospace", background: `${exp.accent}12`, border: `1px solid ${exp.accent}25`, color: exp.accent, fontSize: "0.65rem", letterSpacing: "0.03em" }}>{t}</span>
                   ))}
                 </div>
@@ -247,7 +333,7 @@ function ExpItem({ exp, index, inView, isLast }) {
 }
 
 // ── Education item ─────────────────────────────────────────────────────────────
-function EduItem({ edu, index, inView }) {
+function EduItem({ edu, index, inView }: EduItemProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -291,7 +377,7 @@ function EduItem({ edu, index, inView }) {
 
           <div className="text-xs font-black uppercase tracking-widest mb-3" style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.3)" }}>Achievements</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {edu.achievements.map((a) => (
+            {edu.achievements.map((a: string) => (
               <div key={a} className="flex items-start gap-2.5">
                 <div className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${edu.accent}18`, border: `1px solid ${edu.accent}30` }}>
                   <Star className="w-2.5 h-2.5" style={{ color: edu.accent }} strokeWidth={2.5} />
@@ -307,7 +393,7 @@ function EduItem({ edu, index, inView }) {
 }
 
 // ── Cert card ─────────────────────────────────────────────────────────────────
-function CertCard({ cert, index, inView }) {
+function CertCard({ cert, index, inView }: CertCardProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -346,7 +432,7 @@ function CertCard({ cert, index, inView }) {
 }
 
 // ── Badge card ────────────────────────────────────────────────────────────────
-function BadgeCard({ badge, index, inView }) {
+function BadgeCard({ badge, index, inView }: BadgeCardProps) {
   const [hovered, setHovered] = useState(false);
 
   return (

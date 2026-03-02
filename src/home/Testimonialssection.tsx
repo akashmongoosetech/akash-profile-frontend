@@ -1,8 +1,41 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, CSSProperties } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
-const testimonials = [
+// ── Type definitions ──────────────────────────────────────────────────────────
+interface Testimonial {
+  name: string;
+  position: string;
+  image: string;
+  text: string;
+  rating: number;
+  accent: string;
+  gradient: string;
+  company: string;
+  metric: string;
+}
+
+interface StarRatingProps {
+  rating: number;
+  inView: boolean;
+  delay: number;
+}
+
+interface TestimonialSlideProps {
+  t: Testimonial;
+  inView: boolean;
+  direction: number;
+}
+
+interface OrbProps {
+  style?: CSSProperties;
+  color: string;
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+const testimonials: Testimonial[] = [
   {
     name: "Dr. Shashank Bhargava",
     position: "Director, Bhargava Clinic",
@@ -39,7 +72,7 @@ const testimonials = [
 ];
 
 // ── Star rating ───────────────────────────────────────────────────────────────
-function StarRating({ rating, accent, inView, delay }) {
+function StarRating({ rating, inView, delay }: StarRatingProps) {
   return (
     <div className="flex gap-1">
       {Array.from({ length: rating }).map((_, i) => (
@@ -61,7 +94,7 @@ function StarRating({ rating, accent, inView, delay }) {
 }
 
 // ── Main testimonial display ──────────────────────────────────────────────────
-function TestimonialSlide({ t, inView, direction }) {
+function TestimonialSlide({ t, inView, direction }: TestimonialSlideProps) {
   return (
     <motion.div
       key={t.name}
@@ -139,7 +172,7 @@ function TestimonialSlide({ t, inView, direction }) {
         </div>
 
         {/* Stars */}
-        <StarRating rating={t.rating} accent={t.accent} inView={inView} delay={0.2} />
+        <StarRating rating={t.rating} inView={inView} delay={0.2} />
       </div>
 
       {/* Right: quote */}
@@ -204,7 +237,7 @@ function TestimonialSlide({ t, inView, direction }) {
 }
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
-function Orb({ style, color, size, dur, delay }) {
+function Orb({ style, color, size, dur, delay }: OrbProps) {
   return (
     <motion.div
       className="absolute rounded-full blur-3xl pointer-events-none"
@@ -222,7 +255,7 @@ export default function TestimonialsSection() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  const navigate = (next) => {
+  const navigate = (next: number) => {
     setDirection(next > current ? 1 : -1);
     setCurrent(next);
   };

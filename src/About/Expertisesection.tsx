@@ -1,8 +1,32 @@
-import { useRef, useState } from "react";
+import { useRef, useState, CSSProperties } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Code, Globe, Shield, Gauge, Terminal, Heart, Check } from "lucide-react";
+import { Code, Globe, Shield, Gauge, Terminal, Heart, Check, LucideIcon } from "lucide-react";
 
-const expertiseSections = [
+interface ExpertiseSection {
+  title: string;
+  icon: LucideIcon;
+  accent: string;
+  gradient: string;
+  glow: string;
+  tag: string;
+  items: string[];
+}
+
+interface ExpertiseCardProps {
+  section: ExpertiseSection;
+  index: number;
+  inView: boolean;
+}
+
+interface OrbProps {
+  style?: CSSProperties;
+  color: string;
+  size: number;
+  dur: number;
+  delay: number;
+}
+
+const expertiseSections: ExpertiseSection[] = [
   {
     title: "Core Technical Expertise",
     icon: Code,
@@ -94,21 +118,22 @@ const expertiseSections = [
 ];
 
 // ── Single expertise card ─────────────────────────────────────────────────────
-function ExpertiseCard({ section, index, inView }) {
+function ExpertiseCard({ section, index, inView }: ExpertiseCardProps) {
   const [hovered, setHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [expanded, setExpanded] = useState(false);
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const Icon = section.icon;
   const isOpen = hovered || expanded;
 
-  const handleMouseMove = (e) => {
-    const r = cardRef.current.getBoundingClientRect();
-    setMousePos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = cardRef.current;
+    if (!r) return;
+    const rect = r.getBoundingClientRect();
+    setMousePos({ x: ((e.clientX - rect.left) / rect.width) * 100, y: ((e.clientY - rect.top) / rect.height) * 100 });
   };
 
   // Show 2 items collapsed, all on hover
-  const visibleItems = isOpen ? section.items : section.items.slice(0, 2);
 
   return (
     <motion.div
@@ -245,7 +270,7 @@ function ExpertiseCard({ section, index, inView }) {
           {/* Items list */}
           <div className="flex flex-col gap-2 flex-1">
             <AnimatePresence initial={false}>
-              {section.items.map((item, i) => {
+              {section.items.map((item: string, i: number) => {
                 const show = isOpen || i < 2;
                 return show ? (
                   <motion.div
@@ -307,7 +332,7 @@ function ExpertiseCard({ section, index, inView }) {
 }
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
-function Orb({ style, color, size, dur, delay }) {
+function Orb({ style, color, size, dur, delay }: OrbProps) {
   return (
     <motion.div
       className="absolute rounded-full blur-3xl pointer-events-none"

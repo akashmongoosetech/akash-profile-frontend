@@ -270,11 +270,9 @@ const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  const heroRef = useRef(null);
   const formRef = useRef(null);
   const infoRef = useRef(null);
 
-  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
   const formInView = useInView(formRef, { once: true, margin: "-80px" });
   const infoInView = useInView(infoRef, { once: true, margin: "-80px" });
 
@@ -401,9 +399,7 @@ const Contact: React.FC = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
           {/* Hero */}
-          <div ref={heroRef}>
-            <Hero inView={heroInView} />
-          </div>
+          <Hero />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
