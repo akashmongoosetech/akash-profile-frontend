@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, CSSProperties } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowRight, BookOpen, Search, Loader2, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, BookOpen, Search, Eye, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from '../utils/api';
 
@@ -39,13 +39,499 @@ interface BlogResponse {
   };
 }
 
+// ── Animated Orb Component ───────────────────────────────────────────────────
+function Orb({ style, color, size, dur, delay }: { style?: CSSProperties; color: string; size: number; dur: number; delay: number }) {
+  return (
+    <motion.div
+      className="absolute rounded-full blur-3xl pointer-events-none"
+      style={{ width: size, height: size, background: color, ...style }}
+      animate={{ scale: [1, 1.28, 1], opacity: [0.08, 0.18, 0.08] }}
+      transition={{ duration: dur, delay, repeat: Infinity, ease: "easeInOut" }}
+    />
+  );
+}
+
+// ── Section Label Component ───────────────────────────────────────────────────
+function SectionLabel({ text }: { text: string }) {
+  return (
+    <div className="inline-flex items-center gap-3 mb-4">
+      <div className="h-px w-8 bg-gradient-to-r from-transparent to-indigo-500" />
+      <span className="text-xs font-bold tracking-widest uppercase text-indigo-400" style={{ fontFamily: "'Space Mono', monospace" }}>{text}</span>
+      <div className="h-px w-8 bg-gradient-to-l from-transparent to-indigo-500" />
+    </div>
+  );
+}
+
+// ── Blog Card Component ─────────────────────────────────────────────────────
+interface BlogCardProps {
+  post: BlogPost;
+  index: number;
+  expanded: boolean;
+  onToggle: () => void;
+  authorImageError: boolean;
+  setAuthorImageError: (postId: string) => void;
+}
+
+function BlogCard({ post, index, expanded, onToggle, authorImageError, setAuthorImageError }: BlogCardProps) {
+  const [hovered, setHovered] = React.useState(false);
+
+  const shouldTruncate = post.excerpt.length > 150;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+    >
+      <Link
+        to={`/blog/${post.slug}`}
+        className="group block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <motion.article
+          className="relative rounded-2xl overflow-hidden h-full"
+          style={{ 
+            background: "rgb(11,12,24)", 
+            border: "1px solid rgba(255,255,255,0.06)",
+            transform: hovered ? "translateY(-4px)" : "translateY(0)",
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 26 }}
+        >
+          {/* Glow effect */}
+          <motion.div
+            className="absolute -inset-px rounded-2xl pointer-events-none"
+            style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}
+            animate={{ opacity: hovered ? 0.4 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+
+          {/* Image */}
+          <div className="relative h-48 overflow-hidden">
+            <motion.img
+              src={normalizeImageUrl(post.image)}
+              alt={post.title}
+              className="w-full h-full object-cover"
+              animate={{ scale: hovered ? 1.05 : 1 }}
+              transition={{ duration: 0.3 }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            
+            {/* Category Badge */}
+            <motion.div
+              className="absolute top-4 left-4"
+              animate={{ scale: hovered ? 1.05 : 1 }}
+            >
+              <span 
+                className="px-3 py-1.5 text-xs font-bold rounded-full"
+                style={{ 
+                  fontFamily: "'Space Mono', monospace",
+                  background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+                  color: "#fff",
+                  letterSpacing: "0.05em"
+                }}
+              >
+                {post.category}
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Content */}
+          <div className="p-5">
+            <h3 
+              className="font-bold text-white mb-3 line-clamp-2"
+              style={{ 
+                fontFamily: "'Sora', sans-serif", 
+                fontSize: "1.1rem",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              {post.title}
+            </h3>
+
+            <div className="text-sm mb-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}>
+              <p className="whitespace-pre-wrap">
+                {expanded || !shouldTruncate
+                  ? stripHtmlTags(post.excerpt)
+                  : stripHtmlTags(post.excerpt).substring(0, 150) + '...'
+                }
+              </p>
+              {shouldTruncate && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onToggle();
+                  }}
+                  className="inline-flex items-center gap-1 mt-2 text-xs font-medium"
+                  style={{ color: "#818cf8" }}
+                >
+                  {expanded ? (
+                    <>Show less <ChevronUp className="w-3 h-3" /></>
+                  ) : (
+                    <>Read more <ChevronDown className="w-3 h-3" /></>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Meta */}
+            <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center gap-3">
+                {isValidImageUrl(post.authorProfilePic) && !authorImageError ? (
+                  <img
+                    src={normalizeImageUrl(post.authorProfilePic)}
+                    alt={post.author}
+                    className="w-8 h-8 rounded-full object-cover border border-white/20"
+                    onError={() => setAuthorImageError(post._id)}
+                  />
+                ) : (
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}
+                  >
+                    <span className="text-white text-xs font-bold">{post.author.charAt(0)}</span>
+                  </div>
+                )}
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'DM Sans', sans-serif" }}>{post.author}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Space Mono', monospace" }}>
+                  <Calendar className="w-3 h-3" />
+                  {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                <motion.span
+                  animate={{ x: hovered ? 4 : 0 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <ArrowRight className="w-4 h-4" style={{ color: "#818cf8" }} />
+                </motion.span>
+              </div>
+            </div>
+          </div>
+        </motion.article>
+      </Link>
+    </motion.div>
+  );
+}
+
+// ── Featured Blog Card ─────────────────────────────────────────────────────
+interface FeaturedBlogCardProps {
+  post: BlogPost;
+  index: number;
+  expanded: boolean;
+  onToggle: () => void;
+  authorImageError: boolean;
+  setAuthorImageError: (postId: string) => void;
+}
+
+function FeaturedBlogCard({ post, index, expanded, onToggle, authorImageError, setAuthorImageError }: FeaturedBlogCardProps) {
+  const [hovered, setHovered] = React.useState(false);
+
+  const shouldTruncate = post.excerpt.length > 200;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.15, duration: 0.5 }}
+    >
+      <Link
+        to={`/blog/${post.slug}`}
+        className="group block"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <motion.article
+          className="relative rounded-2xl overflow-hidden h-full"
+          style={{ 
+            background: "rgb(11,12,24)", 
+            border: "1px solid rgba(255,255,255,0.06)",
+          }}
+        >
+          {/* Glow */}
+          <motion.div
+            className="absolute -inset-px rounded-2xl pointer-events-none"
+            style={{ background: "linear-gradient(135deg,#8b5cf6,#ec4899)" }}
+            animate={{ opacity: hovered ? 0.5 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+
+          <div className="flex flex-col md:flex-row">
+            {/* Image */}
+            <div className="relative h-64 md:h-auto md:w-2/5 overflow-hidden">
+              <motion.img
+                src={normalizeImageUrl(post.image)}
+                alt={post.title}
+                className="w-full h-full object-cover"
+                animate={{ scale: hovered ? 1.05 : 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:bg-gradient-to-r" />
+              
+              {/* Badges */}
+              <div className="absolute top-4 left-4 flex gap-2">
+                <span 
+                  className="px-3 py-1.5 text-xs font-bold rounded-full"
+                  style={{ 
+                    fontFamily: "'Space Mono', monospace",
+                    background: "linear-gradient(135deg,#8b5cf6,#ec4899)",
+                    color: "#fff",
+                    letterSpacing: "0.05em"
+                  }}
+                >
+                  {post.category}
+                </span>
+                <span 
+                  className="px-3 py-1.5 text-xs font-bold rounded-full"
+                  style={{ 
+                    fontFamily: "'Space Mono', monospace",
+                    background: "linear-gradient(135deg,#fbbf24,#f59e0b)",
+                    color: "#000",
+                    letterSpacing: "0.05em"
+                  }}
+                >
+                  Featured
+                </span>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 md:p-8 md:w-3/5 flex flex-col justify-center">
+              <h3 
+                className="font-bold text-white mb-4"
+                style={{ 
+                  fontFamily: "'Sora', sans-serif", 
+                  fontSize: "1.35rem",
+                  letterSpacing: "-0.02em"
+                }}
+              >
+                {post.title}
+              </h3>
+
+              <div className="text-sm mb-5 leading-relaxed" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}>
+                <p className="whitespace-pre-wrap">
+                  {expanded || !shouldTruncate
+                    ? stripHtmlTags(post.excerpt)
+                    : stripHtmlTags(post.excerpt).substring(0, 200) + '...'
+                  }
+                </p>
+                {shouldTruncate && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onToggle();
+                    }}
+                    className="inline-flex items-center gap-1 mt-2 text-xs font-medium"
+                    style={{ color: "#c084fc" }}
+                  >
+                    {expanded ? (
+                      <>Show less <ChevronUp className="w-3 h-3" /></>
+                    ) : (
+                      <>Read more <ChevronDown className="w-3 h-3" /></>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Meta */}
+              <div className="flex items-center justify-between pt-4 mt-auto" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="flex items-center gap-3">
+                  {isValidImageUrl(post.authorProfilePic) && !authorImageError ? (
+                    <img
+                      src={normalizeImageUrl(post.authorProfilePic)}
+                      alt={post.author}
+                      className="w-9 h-9 rounded-full object-cover border border-white/20"
+                      onError={() => setAuthorImageError(post._id)}
+                    />
+                  ) : (
+                    <div 
+                      className="w-9 h-9 rounded-full flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg,#8b5cf6,#ec4899)" }}
+                    >
+                      <span className="text-white text-sm font-bold">{post.author.charAt(0)}</span>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-white">{post.author}</p>
+                    {post.authorProfile && (
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{post.authorProfile}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Space Mono', monospace" }}>
+                    <Calendar className="w-3 h-3" />
+                    {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Space Mono', monospace" }}>
+                    <Clock className="w-3 h-3" />
+                    {post.readTime}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.article>
+      </Link>
+    </motion.div>
+  );
+}
+
+// ── Hero Component ───────────────────────────────────────────────────────────
+function Hero() {
+  const particles = Array.from({ length: 15 }, (_, i) => ({
+    x: Math.random() * 100, y: Math.random() * 100,
+    size: 2 + Math.random() * 4,
+    accent: ["#38bdf8","#c084fc","#4ade80","#fb923c","#f472b6","#818cf8"][i % 6],
+    delay: i * 0.3, dur: 3 + Math.random() * 3,
+  }));
+
+  return (
+    <div className="relative text-center py-20 overflow-hidden">
+      {particles.map((p, i) => (
+        <motion.div key={i} className="absolute rounded-full pointer-events-none"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size, background: p.accent }}
+          animate={{ y: [0, -24, 0], opacity: [0, 0.55, 0], scale: [0.5, 1.3, 0.5] }}
+          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ))}
+
+      <motion.div initial={{ opacity: 0, y: 36 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
+        <SectionLabel text="Insights & Tutorials" />
+        <h1
+          className="font-black leading-none mb-5"
+          style={{
+            fontFamily: "'Sora', sans-serif",
+            fontSize: "clamp(3rem,7vw,5rem)",
+            letterSpacing: "-0.06em",
+            background: "linear-gradient(135deg,#fff 20%,rgba(255,255,255,0.4) 100%)",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+          }}
+        >
+          Blog
+        </h1>
+        <p className="text-xl max-w-2xl mx-auto mb-8" style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.38)", fontWeight: 300, lineHeight: 1.8 }}>
+          Sharing insights, tutorials, and thoughts on software development, technology trends, and best practices.
+        </p>
+
+        {/* Stat pills */}
+        <div className="flex flex-wrap justify-center gap-3">
+          {[
+            { label: "Latest Articles", accent: "#38bdf8" },
+            { label: "Expert Insights", accent: "#c084fc" },
+            { label: "Tutorials", accent: "#4ade80" },
+          ].map(({ label, accent }) => (
+            <div key={label} className="px-4 py-2 rounded-full flex items-center gap-2" style={{ background: `${accent}0D`, border: `1px solid ${accent}25` }}>
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />
+              <span className="text-xs font-bold" style={{ fontFamily: "'Space Mono', monospace", color: accent, letterSpacing: "0.04em" }}>{label}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── Search & Filter Component ────────────────────────────────────────────────
+function SearchFilter({ 
+  searchTerm, 
+  setSearchTerm, 
+  selectedCategory, 
+  handleCategoryChange, 
+  categories,
+  handleSearch 
+}: { 
+  searchTerm: string; 
+  setSearchTerm: (s: string) => void;
+  selectedCategory: string;
+  handleCategoryChange: (c: string) => void;
+  categories: {_id: string; count: number}[];
+  handleSearch: (e: React.FormEvent) => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mb-12"
+    >
+      <div 
+        className="rounded-2xl overflow-hidden p-1"
+        style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div className="p-5">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+            {/* Search */}
+            <form onSubmit={handleSearch} className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: "rgba(255,255,255,0.3)" }} />
+                <input
+                  type="text"
+                  placeholder="Search articles..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl text-white"
+                  style={{ 
+                    fontFamily: "'DM Sans', sans-serif",
+                    background: "rgba(255,255,255,0.03)", 
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </form>
+
+            {/* Categories */}
+            <div className="flex flex-wrap gap-2">
+              <motion.button
+                onClick={() => handleCategoryChange('')}
+                className="px-4 py-2 rounded-xl text-xs font-bold"
+                style={{ 
+                  fontFamily: "'Space Mono', monospace",
+                  background: selectedCategory === '' ? "linear-gradient(135deg,#3b82f6,#8b5cf6)" : "rgba(255,255,255,0.03)",
+                  border: "1px solid",
+                  borderColor: selectedCategory === '' ? "transparent" : "rgba(255,255,255,0.1)",
+                  color: selectedCategory === '' ? "#fff" : "rgba(255,255,255,0.5)",
+                  letterSpacing: "0.05em"
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                All
+              </motion.button>
+              {categories.map((category) => (
+                <motion.button
+                  key={category._id}
+                  onClick={() => handleCategoryChange(category._id)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold"
+                  style={{ 
+                    fontFamily: "'Space Mono', monospace",
+                    background: selectedCategory === category._id ? "linear-gradient(135deg,#3b82f6,#8b5cf6)" : "rgba(255,255,255,0.03)",
+                    border: "1px solid",
+                    borderColor: selectedCategory === category._id ? "transparent" : "rgba(255,255,255,0.1)",
+                    color: selectedCategory === category._id ? "#fff" : "rgba(255,255,255,0.5)",
+                    letterSpacing: "0.05em"
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {category._id} ({category.count})
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────
 const Blog: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  // Blog state
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [featuredBlogs, setFeaturedBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,17 +541,16 @@ const Blog: React.FC = () => {
   const [pagination, setPagination] = useState<BlogResponse['pagination']>();
   const [categories, setCategories] = useState<{_id: string; count: number}[]>([]);
   
-  // Expanded content state
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const [expandedFeaturedPosts, setExpandedFeaturedPosts] = useState<Set<string>>(new Set());
   const [authorImageErrors, setAuthorImageErrors] = useState<Set<string>>(new Set());
 
-  // Fetch blogs from API
+  const heroRef = useRef(null);
+
   const fetchBlogs = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
       if (searchTerm) params.append('search', searchTerm);
       if (selectedCategory) params.append('category', selectedCategory);
       params.append('page', currentPage.toString());
@@ -85,7 +570,6 @@ const Blog: React.FC = () => {
     }
   }, [searchTerm, selectedCategory, currentPage]);
 
-  // Fetch featured blogs
   const fetchFeaturedBlogs = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/featured`);
@@ -99,7 +583,6 @@ const Blog: React.FC = () => {
     }
   };
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/categories`);
@@ -113,60 +596,6 @@ const Blog: React.FC = () => {
     }
   };
 
-  // Handle search
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCurrentPage(1);
-    fetchBlogs();
-  };
-
-  // Handle category filter
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-  };
-
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // Handle expand/collapse for regular posts
-  const togglePostExpansion = (postId: string) => {
-    setExpandedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  };
-
-  // Handle expand/collapse for featured posts
-  const toggleFeaturedPostExpansion = (postId: string) => {
-    setExpandedFeaturedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  };
-
-  // Check if content should be truncated (more than 150 characters)
-  const shouldTruncate = (text: string) => text.length > 150;
-
-  // Get truncated text
-  const getTruncatedText = (text: string, limit: number = 150) => {
-    if (text.length <= limit) return text;
-    return text.substring(0, limit) + '...';
-  };
-
-  // useEffect hooks
   useEffect(() => {
     fetchFeaturedBlogs();
     fetchCategories();
@@ -185,63 +614,50 @@ const Blog: React.FC = () => {
         fetchBlogs();
       }
     }, 500);
-
     return () => clearTimeout(timeoutId);
   }, [searchTerm, fetchBlogs, blogs.length]);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    setCurrentPage(1);
+    fetchBlogs();
+  };
 
-    setIsSubscribing(true);
-    setSubscriptionStatus('idle');
-    setErrorMessage('');
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
 
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim() }),
-      });
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubscriptionStatus('success');
-        setEmail('');
-        setTimeout(() => setSubscriptionStatus('idle'), 5000);
+  const togglePostExpansion = (postId: string) => {
+    setExpandedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
       } else {
-        setSubscriptionStatus('error');
-        setErrorMessage(data.message || 'Failed to subscribe. Please try again.');
+        newSet.add(postId);
       }
-    } catch {
-      setSubscriptionStatus('error');
-      setErrorMessage('Network error. Please check your connection and try again.');
-    } finally {
-      setIsSubscribing(false);
-    }
+      return newSet;
+    });
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+  const toggleFeaturedPostExpansion = (postId: string) => {
+    setExpandedFeaturedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
       }
-    }
+      return newSet;
+    });
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 }
-    }
+  const setAuthorImageError = (postId: string) => {
+    setAuthorImageErrors(prev => new Set(prev).add(postId));
   };
 
   return (
@@ -249,384 +665,141 @@ const Blog: React.FC = () => {
       <Helmet>
         <title>Blog — Akash Raikwar</title>
         <meta name="title" content="Blog — Akash Raikwar" />
-        <meta name="description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+        <meta name="description" content="Read articles on web development, programming, React, Node.js, and more." />
         <meta property="og:title" content="Blog — Akash Raikwar" />
-        <meta property="og:description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+        <meta property="og:description" content="Read articles on web development and technology." />
         <meta property="twitter:title" content="Blog — Akash Raikwar" />
-        <meta property="twitter:description" content="Read articles on web development, programming, React, Node.js, and more. Insights and tutorials from a full-stack developer." />
+        <meta property="twitter:description" content="Read articles on web development and technology." />
       </Helmet>
-      <div className="min-h-screen pt-20 pb-16">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-      >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-            Blog & Articles
-          </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Sharing insights, tutorials, and thoughts on software development, technology trends, and best practices.
-          </p>
-        </motion.div>
 
-        {/* Search and Filter Section */}
-        <motion.div variants={itemVariants} className="mb-12">
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
-              {/* Search */}
-              <form onSubmit={handleSearch} className="flex-1 w-full lg:w-auto">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search articles..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 backdrop-blur-lg"
-                  />
+      <div className="min-h-screen pt-20 pb-16 relative overflow-hidden" style={{ background: "#020209" }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;700;800;900&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
+        `}</style>
+
+        {/* Background Orbs */}
+        <Orb style={{ top: "5%", left: "-5%" }} color="radial-gradient(circle,rgba(59,130,246,0.25),transparent 70%)" size={500} dur={10} delay={0} />
+        <Orb style={{ top: "40%", right: "-5%" }} color="radial-gradient(circle,rgba(139,92,246,0.2),transparent 70%)" size={440} dur={13} delay={2} />
+        <Orb style={{ bottom: "5%", left: "30%" }} color="radial-gradient(circle,rgba(16,185,129,0.12),transparent 70%)" size={360} dur={14} delay={1} />
+
+        {/* Grid */}
+        <div className="fixed inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(99,102,241,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.03) 1px,transparent 1px)", backgroundSize: "64px 64px", zIndex: 0 }} />
+
+        {/* Scan line */}
+        <motion.div 
+          className="fixed left-0 right-0 h-px pointer-events-none" 
+          style={{ background: "linear-gradient(90deg,transparent,rgba(99,102,241,0.3),transparent)", zIndex: 1 }} 
+          animate={{ top: ["0%", "100%"] }} 
+          transition={{ duration: 14, repeat: Infinity, ease: "linear" }} 
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+          {/* Hero */}
+          <div ref={heroRef}>
+            <Hero />
+          </div>
+
+          {/* Search & Filter */}
+          <SearchFilter 
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedCategory={selectedCategory}
+            handleCategoryChange={handleCategoryChange}
+            categories={categories}
+            handleSearch={handleSearch}
+          />
+
+          {/* Featured Posts */}
+          {featuredBlogs.length > 0 && (
+            <motion.div className="mb-16">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#8b5cf6,#ec4899)" }}>
+                  <Sparkles className="w-5 h-5 text-white" strokeWidth={1.8} />
                 </div>
-              </form>
-
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleCategoryChange('')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    selectedCategory === ''
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                  }`}
-                >
-                  All
-                </button>
-                {categories.map((category) => (
-                  <button
-                    key={category._id}
-                    onClick={() => handleCategoryChange(category._id)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      selectedCategory === category._id
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                    }`}
-                  >
-                    {category._id} ({category.count})
-                  </button>
+                <h2 className="font-black text-white" style={{ fontFamily: "'Sora', sans-serif", fontSize: "1.5rem", letterSpacing: "-0.03em" }}>Featured Articles</h2>
+              </div>
+              <div className="grid grid-cols-1 gap-6">
+                {featuredBlogs.map((post, index) => (
+                  <FeaturedBlogCard
+                    key={post._id}
+                    post={post}
+                    index={index}
+                    expanded={expandedFeaturedPosts.has(post._id)}
+                    onToggle={() => toggleFeaturedPostExpansion(post._id)}
+                    authorImageError={authorImageErrors.has(post._id)}
+                    setAuthorImageError={setAuthorImageError}
+                  />
                 ))}
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          )}
 
-        {/* Featured Posts */}
-        {featuredBlogs.length > 0 && (
-          <motion.div variants={itemVariants} className="mb-16">
-            <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-blue-400" />
-              Featured Articles
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {featuredBlogs.map((post: BlogPost) => (
-                <Link
-                  key={post._id}
-                  to={`/blog/${post.slug}`}
-                  className="group block"
-                >
-                  <motion.article
-                    whileHover={{ y: -5 }}
-                    className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300"
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={normalizeImageUrl(post.image)}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className="inline-block px-3 py-1 bg-blue-500/80 text-white text-xs font-semibold rounded-full mb-2">
-                          {post.category}
-                        </span>
-                        <span className="inline-block px-3 py-1 bg-yellow-500/80 text-white text-xs font-semibold rounded-full mb-2 ml-2">
-                          Featured
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                        {post.title}
-                      </h3>
-                      <div className="text-gray-400 mb-4 text-sm leading-relaxed">
-                        <p className="whitespace-pre-wrap">
-                          {expandedFeaturedPosts.has(post._id) || !shouldTruncate(stripHtmlTags(post.excerpt))
-                            ? stripHtmlTags(post.excerpt)
-                            : getTruncatedText(stripHtmlTags(post.excerpt))
-                          }
-                        </p>
-                        {shouldTruncate(post.excerpt) && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              toggleFeaturedPostExpansion(post._id);
-                            }}
-                            className="inline-flex items-center gap-1 mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
-                          >
-                            {expandedFeaturedPosts.has(post._id) ? (
-                              <>
-                                Show less <ChevronUp className="w-3 h-3" />
-                              </>
-                            ) : (
-                              <>
-                                Read more <ChevronDown className="w-3 h-3" />
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {post.readTime}
-                          </span>
-                        </div>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                      
-                      {/* Author Information */}
-                      <div className="flex items-center gap-2 pt-3 border-t border-white/10">
-                        {isValidImageUrl(post.authorProfilePic) && !authorImageErrors.has(post._id) ? (
-                          <img
-                            src={normalizeImageUrl(post.authorProfilePic)}
-                            alt={post.author}
-                            className="w-8 h-8 rounded-full object-cover border border-white/20"
-                            onError={() => setAuthorImageErrors(prev => new Set(prev).add(post._id))}
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold">
-                              {post.author.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-white text-xs font-medium">{post.author}</p>
-                          {post.authorProfile && (
-                            <p className="text-gray-500 text-xs">{post.authorProfile}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.article>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Regular Posts */}
-        {loading ? (
-          <motion.div variants={itemVariants} className="mb-16 text-center">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-400" />
-            <p className="text-gray-400 mt-4">Loading articles...</p>
-          </motion.div>
-        ) : (
-          <motion.div variants={itemVariants} className="mb-16">
+          {/* Regular Posts */}
+          <motion.div className="mb-16">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-white">Latest Articles</h2>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}>
+                  <BookOpen className="w-5 h-5 text-white" strokeWidth={1.8} />
+                </div>
+                <h2 className="font-black text-white" style={{ fontFamily: "'Sora', sans-serif", fontSize: "1.5rem", letterSpacing: "-0.03em" }}>Latest Articles</h2>
+              </div>
+              <div className="flex items-center gap-2 text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Space Mono', monospace" }}>
                 <Eye className="w-4 h-4" />
                 <span>{pagination?.totalBlogs || 0} articles</span>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogs.map((post: BlogPost) => (
-                <Link
-                  key={post._id}
-                  to={`/blog/${post.slug}`}
-                  className="group block"
-                >
-                  <motion.article
-                    whileHover={{ y: -5 }}
-                    className="bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300"
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={normalizeImageUrl(post.image)}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className="inline-block px-3 py-1 bg-blue-500/80 text-white text-xs font-semibold rounded-full">
-                          {post.category}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                        {post.title}
-                      </h3>
-                      <div className="text-gray-400 mb-4 text-sm leading-relaxed">
-                        <p className="whitespace-pre-wrap">
-                          {expandedPosts.has(post._id) || !shouldTruncate(stripHtmlTags(post.excerpt))
-                            ? stripHtmlTags(post.excerpt)
-                            : getTruncatedText(stripHtmlTags(post.excerpt))
-                          }
-                        </p>
-                        {shouldTruncate(post.excerpt) && (
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              togglePostExpansion(post._id);
-                            }}
-                            className="inline-flex items-center gap-1 mt-2 text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors"
-                          >
-                            {expandedPosts.has(post._id) ? (
-                              <>
-                                Show less <ChevronUp className="w-3 h-3" />
-                              </>
-                            ) : (
-                              <>
-                                Read more <ChevronDown className="w-3 h-3" />
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {post.readTime}
-                          </span>
-                        </div>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                      
-                      {/* Author Information */}
-                      <div className="flex items-center gap-2 pt-3 border-t border-white/10">
-                        {post.authorProfilePic && !authorImageErrors.has(post._id) ? (
-                          <img
-                            src={post.authorProfilePic}
-                            alt={post.author}
-                            className="w-8 h-8 rounded-full object-cover border border-white/20"
-                            onError={() => setAuthorImageErrors(prev => new Set(prev).add(post._id))}
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-semibold">
-                              {post.author.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-white text-xs font-medium">{post.author}</p>
-                          {post.authorProfile && (
-                            <p className="text-gray-500 text-xs ">{post.authorProfile}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.article>
-                </Link>
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-12">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={!pagination.hasPrev}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200"
-                >
-                  Previous
-                </button>
-                
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`w-10 h-10 rounded-lg transition-all duration-200 ${
-                        page === currentPage
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white/10 hover:bg-white/20 text-gray-300'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-                
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={!pagination.hasNext}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200"
-                >
-                  Next
-                </button>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <motion.div 
+                  className="w-12 h-12 rounded-full"
+                  style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {blogs.map((post, index) => (
+                  <BlogCard
+                    key={post._id}
+                    post={post}
+                    index={index}
+                    expanded={expandedPosts.has(post._id)}
+                    onToggle={() => togglePostExpansion(post._id)}
+                    authorImageError={authorImageErrors.has(post._id)}
+                    setAuthorImageError={setAuthorImageError}
+                  />
+                ))}
               </div>
             )}
           </motion.div>
-        )}
 
-        {/* Newsletter Signup */}
-        <motion.div variants={itemVariants} className="mt-16">
-          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/10 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-            <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
-              Subscribe to my newsletter to get the latest articles, tutorials, and insights delivered straight to your inbox.
-            </p>
-            
-            {subscriptionStatus === 'success' ? (
-              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 max-w-md mx-auto">
-                <p className="text-green-400 text-sm">Successfully subscribed! Welcome to the newsletter.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 backdrop-blur-lg"
-                  required
-                />
-                <button 
-                  type="submit"
-                  disabled={isSubscribing}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 text-white rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex justify-center gap-2 mb-12">
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                <motion.button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className="w-10 h-10 rounded-xl text-xs font-bold"
+                  style={{ 
+                    fontFamily: "'Space Mono', monospace",
+                    background: currentPage === page ? "linear-gradient(135deg,#3b82f6,#8b5cf6)" : "rgba(255,255,255,0.03)",
+                    border: "1px solid",
+                    borderColor: currentPage === page ? "transparent" : "rgba(255,255,255,0.1)",
+                    color: currentPage === page ? "#fff" : "rgba(255,255,255,0.5)",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {isSubscribing ? 'Subscribing...' : 'Subscribe'}
-                </button>
-              </form>
-            )}
-            
-            {subscriptionStatus === 'error' && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 max-w-md mx-auto mt-4">
-                <p className="text-red-400 text-sm">{errorMessage}</p>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </motion.div>
-    </div>
+                  {page}
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 };
