@@ -172,6 +172,17 @@ const EventManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate character limits
+    if (formData.shortDescription.length > 500) {
+      setError('Short description cannot exceed 500 characters');
+      return;
+    }
+    if (formData.description.length > 2000) {
+      setError('Description cannot exceed 2000 characters');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -189,6 +200,7 @@ const EventManagement: React.FC = () => {
         price: formData.price,
         currency: formData.currency,
         maxAttendees: formData.maxAttendees,
+        isFree: formData.price === 0 || formData.price === '0',
         published: formData.published,
         featured: formData.featured
       };
@@ -204,6 +216,12 @@ const EventManagement: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData)
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server error:', response.status, errorText);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
 
       const data = await response.json();
 
@@ -612,8 +630,10 @@ const EventManagement: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
                     required
                     rows={2}
+                    maxLength={500}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  <p className="text-xs text-gray-400 mt-1">{formData.shortDescription.length}/500 characters</p>
                 </div>
 
                 <div>
@@ -622,8 +642,10 @@ const EventManagement: React.FC = () => {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
+                    maxLength={2000}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                  <p className="text-xs text-gray-400 mt-1">{formData.description.length}/2000 characters</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

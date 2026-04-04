@@ -381,9 +381,8 @@ function BottomCTA({ inView }: { inView: boolean }) {
     >
       <motion.div
         className="absolute -inset-px rounded-3xl pointer-events-none"
-        animate={{ background: ["linear-gradient(135deg,#3b82f6,#8b5cf6,#06b6d4)", "linear-gradient(225deg,#8b5cf6,#06b6d4,#3b82f6)", "linear-gradient(315deg,#06b6d4,#3b82f6,#8b5cf6)"] }}
+        animate={{ background: ["linear-gradient(135deg,#3b82f6,#8b5cf6,#06b6d4)", "linear-gradient(225deg,#8b5cf6,#06b6d4,#3b82f6)", "linear-gradient(315deg,#06b6d4,#3b82f6,#8b5cf6)"], opacity: 0.55 }}
         transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-        style={{ opacity: 0.55 }}
       />
       <div className="relative rounded-3xl overflow-hidden text-center px-8 py-14" style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.06)" }}>
         <motion.div className="absolute top-0 left-0 right-0 h-0.5" animate={{ background: ["linear-gradient(90deg,#3b82f6,#8b5cf6,#06b6d4)", "linear-gradient(90deg,#8b5cf6,#06b6d4,#3b82f6)"] }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} />

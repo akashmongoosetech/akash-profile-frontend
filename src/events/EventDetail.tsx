@@ -359,7 +359,7 @@ const EventDetail: React.FC = () => {
                     About This Event
                   </h2>
                   <div 
-                    className="prose dark:prose-invert max-w-none"
+                    className="prose dark:prose-invert max-w-none text-white"
                     dangerouslySetInnerHTML={{ __html: event.description }}
                   />
                 </div>
