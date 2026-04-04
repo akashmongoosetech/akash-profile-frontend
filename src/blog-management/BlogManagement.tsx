@@ -127,7 +127,7 @@ const BlogManagement: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        setBlogs(data.blogs);
+        setBlogs(data.blogs || []);
         setTotalPages(data.pagination?.totalPages || 1);
       }
     } catch (error) {
@@ -146,18 +146,18 @@ const BlogManagement: React.FC = () => {
     if (blog) {
       setEditingBlog(blog);
       setFormData({
-        title: blog.title,
-        slug: blog.slug,
-        excerpt: blog.excerpt,
-        content: blog.content,
+        title: blog.title || '',
+        slug: blog.slug || '',
+        excerpt: blog.excerpt || '',
+        content: blog.content || '',
         contentSections: blog.contentSections || [],
-        image: blog.image,
-        author: blog.author,
+        image: blog.image || '',
+        author: blog.author || '',
         authorProfile: blog.authorProfile || 'Full Stack Developer & Software Engineer passionate about creating innovative web solutions.',
         authorProfilePic: blog.authorProfilePic || '',
-        category: blog.category,
-        tags: blog.tags,
-        readTime: blog.readTime,
+        category: blog.category || '',
+        tags: blog.tags || [],
+        readTime: blog.readTime || '',
         featured: blog.featured,
         published: blog.published,
         seoTitle: blog.seoTitle || '',
@@ -221,25 +221,25 @@ const BlogManagement: React.FC = () => {
 
     try {
       // Validate required fields
-      if (!formData.title.trim()) {
+      if (!formData.title?.trim()) {
         alert('Title is required');
         setIsSubmitting(false);
         return;
       }
 
-      if (!formData.excerpt.trim()) {
+      if (!formData.excerpt?.trim()) {
         alert('Excerpt is required');
         setIsSubmitting(false);
         return;
       }
 
-      if (!formData.content.trim()) {
+      if (!formData.content?.trim()) {
         alert('Content is required');
         setIsSubmitting(false);
         return;
       }
 
-      if (!formData.image.trim()) {
+      if (!formData.image?.trim()) {
         alert('Image URL is required');
         setIsSubmitting(false);
         return;
@@ -249,23 +249,23 @@ const BlogManagement: React.FC = () => {
       const cleanedFormData = {
         ...formData,
         // Remove empty URL fields to avoid validation errors
-        authorProfilePic: formData.authorProfilePic.trim() || undefined,
+        authorProfilePic: formData.authorProfilePic?.trim() || undefined,
         contentSections: formData.contentSections.map(section => ({
           ...section,
-          image: section.image.trim() || undefined
+          image: section.image?.trim() || undefined
         })).filter(section =>
-          section.title.trim() || section.content.trim() || section.image || section.code.trim()
+          section.title?.trim() || section.content?.trim() || section.image || section.code?.trim()
         ),
         // Ensure tags are properly formatted
-        tags: formData.tags.filter(tag => tag.trim().length > 0)
+        tags: formData.tags.filter(tag => tag?.trim().length > 0)
       };
 
       console.log('Form data being sent:', cleanedFormData);
       console.log('Tags being sent:', cleanedFormData.tags);
 
       const url = editingBlog
-        ? `/api/blog/${editingBlog._id}`
-        : `/api/blog`;
+        ? `/api/blog/admin/${editingBlog._id}`
+        : `/api/blog/admin`;
 
       const method = editingBlog ? 'PUT' : 'POST';
 
@@ -321,7 +321,7 @@ const BlogManagement: React.FC = () => {
     if (!blogToDelete) return;
 
     try {
-      const response = await authenticatedFetch(`/api/blog/${blogToDelete._id}`, {
+      const response = await authenticatedFetch(`/api/blog/admin/${blogToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -411,7 +411,7 @@ const BlogManagement: React.FC = () => {
               </div>
 
               {/* Category Filter */}
-              <div className="flex flex-wrap gap-2 justify-center order-2 w-full lg:w-auto">
+              <div className="flex flex-wrap gap-1 md:gap-2 justify-center order-2 w-full lg:w-auto">
                 <button
                   onClick={() => setSelectedCategory('')}
                   className={`px-3 py-2 rounded-xl text-xs md:text-sm font-medium transition-all duration-300 border ${selectedCategory === ''
@@ -454,7 +454,7 @@ const BlogManagement: React.FC = () => {
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full transition-opacity group-hover:opacity-100 opacity-50 pointer-events-none" />
                   <div className="flex flex-col sm:flex-row items-start gap-6 relative z-10">
-                    <div className="w-full sm:w-48 h-32 flex-shrink-0 overflow-hidden rounded-xl border border-slate-700/50">
+                    <div className="w-full sm:w-48 min-h-32 flex-shrink-0 overflow-hidden rounded-xl border border-slate-700/50 aspect-[16/9]">
                       <img
                         src={normalizeImageUrl(blog.image)}
                         alt={blog.title}
@@ -567,9 +567,9 @@ const BlogManagement: React.FC = () => {
           <div className="bg-[#0A0F1C] rounded-2xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
             <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0A0F1C]/80 backdrop-blur-xl z-10">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                {editingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
-              </h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                    {editingBlog ? 'Edit Blog Post' : 'Create New Blog Post'}
+                  </h2>
               <button
                 onClick={closeModal}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"

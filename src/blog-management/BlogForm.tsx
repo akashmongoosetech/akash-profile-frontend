@@ -286,7 +286,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
                 Add Custom Category
               </button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={customCategory}
@@ -701,7 +701,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
       </div>
 
       {/* Checkboxes */}
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -725,7 +725,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
       </div>
 
       {/* Submit Buttons */}
-      <div className="flex items-center justify-end gap-4 pt-6 border-t border-white/10">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-4 pt-6 border-t border-white/10">
         <button
           type="button"
           onClick={onCancel}
