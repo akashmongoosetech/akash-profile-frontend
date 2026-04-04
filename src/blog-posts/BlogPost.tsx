@@ -170,6 +170,7 @@ const BlogPost: React.FC = () => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [authorImageError, setAuthorImageError] = useState(false);
+  const [showAuthorImageModal, setShowAuthorImageModal] = useState(false);
 
   // Fetch blog post by slug
   const fetchBlogPost = useCallback(async () => {
@@ -282,6 +283,25 @@ const BlogPost: React.FC = () => {
     setAuthorImageError(false);
     fetchBlogPost();
   }, [slug, fetchBlogPost]);
+
+  // Close modal on escape key press
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowAuthorImageModal(false);
+      }
+    };
+    
+    if (showAuthorImageModal) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showAuthorImageModal]);
 
   // Update SEO meta tags when blog loads
   useEffect(() => {
@@ -543,12 +563,14 @@ const BlogPost: React.FC = () => {
             {/* Author */}
             <div className="flex items-center gap-3">
               {isValidImageUrl(blog.authorProfilePic) && !authorImageError ? (
-                <img
+                <motion.img
                   src={normalizeImageUrl(blog.authorProfilePic)}
                   alt={blog.author}
-                  className="w-10 h-10 rounded-full object-cover border-2"
+                  className="w-10 h-10 rounded-full object-cover border-2 cursor-pointer"
                   style={{ borderColor: "rgba(139,92,246,0.5)" }}
                   onError={() => setAuthorImageError(true)}
+                  onClick={() => setShowAuthorImageModal(true)}
+                  whileHover={{ scale: 1.1 }}
                 />
               ) : (
                 <div 
@@ -623,7 +645,7 @@ const BlogPost: React.FC = () => {
               style={{ background: "linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1))", border: "1px solid rgba(139,92,246,0.2)" }}
             >
               <p className="text-lg leading-relaxed" style={{ color: "rgba(255,255,255,0.8)", fontFamily: "'DM Sans', sans-serif" }}>
-                {blog.excerpt}
+                <div dangerouslySetInnerHTML={{ __html: blog.excerpt }} />
               </p>
             </div>
 
@@ -891,6 +913,37 @@ const BlogPost: React.FC = () => {
           </motion.section>
         )}
       </div>
+
+      {/* Author Image Modal */}
+      {showAuthorImageModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setShowAuthorImageModal(false)}
+          style={{ background: "rgba(0,0,0,0.9)" }}
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-12 right-0 md:-right-12 p-2 rounded-full transition-colors hover:bg-white/10"
+              onClick={() => setShowAuthorImageModal(false)}
+              style={{ color: "#fff" }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <img
+              src={normalizeImageUrl(blog.authorProfilePic)}
+              alt={blog.author}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              style={{ boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)" }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
