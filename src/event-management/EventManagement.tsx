@@ -19,6 +19,9 @@ import {
   Users
 } from 'lucide-react';
 import { authenticatedFetch, normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import CKEditorComponent from '../blog-management/CKEditorComponent';
+import type { EventInfo } from '@ckeditor/ckeditor5-utils';
+import type Editor from '@ckeditor/ckeditor5-core/src/editor/editor';
 
 interface Event {
   _id: string;
@@ -90,6 +93,24 @@ const EventManagement: React.FC = () => {
     published: false,
     featured: false
   });
+
+  // CKEditor configuration for description
+  const ckeditorDescriptionConfig = {
+    toolbar: [
+      'heading', '|',
+      'bold', 'italic', 'underline', '|',
+      'bulletedList', 'numberedList', '|',
+      'link', 'blockquote', '|',
+      'imageUpload', 'image', '|',
+      'undo', 'redo'
+    ],
+    placeholder: "Describe your event in detail...",
+    contentsCss: [
+      'body { background-color: #1e293b; color: #f1f5f9; }',
+      'a { color: #60a5fa; }',
+      '.ck-placeholder { color: #94a3b8; }'
+    ]
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -638,14 +659,17 @@ const EventManagement: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Full Description</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={4}
-                    maxLength={2000}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  <CKEditorComponent
+                    config={ckeditorDescriptionConfig}
+                    data={formData.description}
+                    onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
+                      const data = editor.getData();
+                      if (data.replace(/<[^>]*>/g, '').length <= 2000) {
+                        setFormData({ ...formData, description: data });
+                      }
+                    }}
                   />
-                  <p className="text-xs text-gray-400 mt-1">{formData.description.length}/2000 characters</p>
+                  <p className="text-xs text-gray-400 mt-1">{formData.description.replace(/<[^>]*>/g, '').length}/2000 characters</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

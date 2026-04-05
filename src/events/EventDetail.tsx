@@ -358,8 +358,8 @@ const EventDetail: React.FC = () => {
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                     About This Event
                   </h2>
-                  <div 
-                    className="prose dark:prose-invert max-w-none text-white"
+                  <div
+                    className="blog-content"
                     dangerouslySetInnerHTML={{ __html: event.description }}
                   />
                 </div>

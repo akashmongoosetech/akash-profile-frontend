@@ -52,22 +52,24 @@ const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
   const [ClassicEditor, setClassicEditor] = useState<unknown>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     // Dynamically import CKEditor to avoid duplication
     Promise.all([
       import('@ckeditor/ckeditor5-react'),
       import('@ckeditor/ckeditor5-build-classic')
     ]).then(([{ CKEditor: CK }, CE]) => {
+      if (!isMounted) {
+        return;
+      }
+
       setCKEditor(() => CK);
       setClassicEditor(() => CE.default);
     });
 
     return () => {
-      // Cleanup editor instance on unmount
-      if (editorRef.current) {
-        editorRef.current.destroy().catch(() => {
-          // Ignore cleanup errors
-        });
-      }
+      isMounted = false;
+      editorRef.current = null;
     };
   }, []);
 
@@ -98,6 +100,9 @@ const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
         if (onReady) {
           onReady(editor);
         }
+      }}
+      onAfterDestroy={() => {
+        editorRef.current = null;
       }}
       onChange={onChange}
       config={modifiedConfig}
