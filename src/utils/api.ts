@@ -1,20 +1,65 @@
 // API utility functions for authenticated requests
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
+
+const getApiOrigin = (): string => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return API_BASE_URL;
+  }
+};
+
+const shouldRewriteToApiOrigin = (url: URL): boolean => {
+  return url.pathname.startsWith('/uploads/');
+};
+
+const isUploadPath = (value: string): boolean => {
+  return value.startsWith('/uploads/') || value.startsWith('uploads/');
+};
 
 // Normalize image URL to ensure it's an absolute URL
 export const normalizeImageUrl = (imageUrl: string | undefined | null): string => {
   if (!imageUrl || imageUrl.trim() === '') {
     return '';
   }
+
+  const trimmedUrl = imageUrl.trim();
   
   // If it's already an absolute URL (starts with http:// or https://), return as-is
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-    return imageUrl;
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+    try {
+      const parsedUrl = new URL(trimmedUrl);
+      if (shouldRewriteToApiOrigin(parsedUrl)) {
+        return `${getApiOrigin()}${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+      }
+    } catch {
+      return trimmedUrl;
+    }
+
+    return trimmedUrl;
   }
   
   // If it's a relative URL, prepend the API base URL
-  return `${API_BASE_URL}${imageUrl}`;
+  if (trimmedUrl.startsWith('/')) {
+    return `${API_BASE_URL}${trimmedUrl}`;
+  }
+
+  return `${API_BASE_URL}/${trimmedUrl}`;
+};
+
+export const normalizeHtmlImageSources = (html: string | undefined | null): string => {
+  if (!html || html.trim() === '') {
+    return '';
+  }
+
+  return html.replace(/(<img[^>]*\ssrc=["'])([^"']+)(["'][^>]*>)/gi, (_match, prefix, src, suffix) => {
+    const normalizedSrc = isUploadPath(src) || src.includes('/uploads/')
+      ? normalizeImageUrl(src)
+      : src;
+
+    return `${prefix}${normalizedSrc}${suffix}`;
+  });
 };
 
 // Check if image URL is valid (for display purposes)
@@ -101,14 +146,37 @@ export const authenticatedFetch = async (
   return response;
 };
 
+// Upload image file
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const token = getAuthToken();
+
+  const response = await fetch(`${API_BASE_URL}/api/blog/upload-image`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to upload image');
+  }
+
+  const data = await response.json();
+  return normalizeImageUrl(data.imageUrl);
+};
+
 // Strip HTML tags from text (useful for excerpts displayed in lists)
 export const stripHtmlTags = (html: string | undefined | null): string => {
   if (!html) return '';
-  
+
   // Create a temporary DOM element to strip HTML tags
   const temp = document.createElement('div');
   temp.innerHTML = html;
-  
+
   // Get text content and clean up extra whitespace
   const text = temp.textContent || temp.innerText || '';
   return text.replace(/\s+/g, ' ').trim();

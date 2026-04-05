@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import React, { useRef, useState } from 'react';
+import CKEditorComponent from './CKEditorComponent';
+import type { Editor } from '@ckeditor/ckeditor5-core';
+import type { EventInfo } from '@ckeditor/ckeditor5-utils';
+import { normalizeImageUrl, uploadImage } from '../utils/api';
 import {
   Plus,
   Trash2,
@@ -9,7 +11,9 @@ import {
   BarChart3,
   Code,
   Move,
-  Save
+  Save,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface ContentSection {
@@ -70,29 +74,15 @@ const BlogForm: React.FC<BlogFormProps> = ({
   onCancel
 }) => {
   // Refs for CKEditor instances
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const contentEditorRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const excerptEditorRef = useRef<any>(null);
+  const contentEditorRef = useRef<Editor | null>(null);
+  const excerptEditorRef = useRef<Editor | null>(null);
 
-  // Set CKEditor data when editingBlog changes (initial load only)
-  useEffect(() => {
-    const setEditorData = () => {
-      if (editingBlog) {
-        if (contentEditorRef.current && formData.content) {
-          contentEditorRef.current.setData(formData.content);
-        }
-        if (excerptEditorRef.current && formData.excerpt) {
-          excerptEditorRef.current.setData(formData.excerpt);
-        }
-      }
-    };
-    
-    // Small delay to ensure CKEditor is fully ready
-    if (editingBlog) {
-      setTimeout(setEditorData, 100);
-    }
-  }, [editingBlog]);
+  // State for image upload loading
+  const [uploadingImages, setUploadingImages] = useState<{ [key: number]: boolean }>({});
+  const [uploadingMainImage, setUploadingMainImage] = useState(false);
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+
+
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -193,10 +183,57 @@ const BlogForm: React.FC<BlogFormProps> = ({
     });
   };
 
+  // Handle main image upload
+  const handleMainImageUpload = async (file: File) => {
+    setUploadingMainImage(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      setFormData(prev => ({ ...prev, image: imageUrl }));
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingMainImage(false);
+    }
+  };
+
+  // Handle profile picture upload
+  const handleProfilePicUpload = async (file: File) => {
+    setUploadingProfilePic(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      setFormData(prev => ({ ...prev, authorProfilePic: imageUrl }));
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingProfilePic(false);
+    }
+  };
+
+  // Handle image upload for content sections
+  const handleImageUpload = async (index: number, file: File) => {
+    setUploadingImages(prev => ({ ...prev, [index]: true }));
+    try {
+      const imageUrl = await uploadImage(file);
+      handleContentSectionChange(index, 'image', imageUrl);
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingImages(prev => ({ ...prev, [index]: false }));
+    }
+  };
+
 
   // CKEditor dark theme configuration
   const ckeditorDarkConfig = {
-    toolbar: ['bold', 'italic', 'underline', '|', 'bulletedList', 'numberedList', '|', 'link', '|', 'undo', 'redo'],
+    toolbar: [
+      'bold', 'italic', 'underline', '|',
+      'bulletedList', 'numberedList', '|',
+      'link', 'imageUpload', 'image', '|',
+      'undo', 'redo'
+    ],
     placeholder: "Brief description of the blog post...",
     contentsCss: [
       'body { background-color: #1e293b; color: #f1f5f9; }',
@@ -211,7 +248,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
       'bold', 'italic', 'underline', 'strikethrough', '|',
       'bulletedList', 'numberedList', '|',
       'link', 'blockquote', '|',
-      'insertTable', '|',
+      'insertTable', 'imageUpload', 'image', '|',
       'undo', 'redo'
     ],
     placeholder: "Write your blog post content here...",
@@ -347,15 +384,51 @@ const BlogForm: React.FC<BlogFormProps> = ({
         <label className="block text-sm font-medium text-gray-300 mb-2">
           Image URL *
         </label>
-        <input
-          type="url"
-          name="image"
-          value={formData.image}
-          onChange={handleInputChange}
-          required
-          placeholder="https://example.com/image.jpg"
-          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
-        />
+        <div className="space-y-3">
+          <input
+            type="url"
+            name="image"
+            value={formData.image}
+            onChange={handleInputChange}
+            required
+            placeholder="https://example.com/image.jpg"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+          />
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleMainImageUpload(file);
+                }
+              }}
+              className="hidden"
+              id="main-image-upload"
+              disabled={uploadingMainImage}
+            />
+            <label
+              htmlFor="main-image-upload"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Upload className="w-4 h-4" />
+              {uploadingMainImage ? 'Uploading...' : 'Upload Image'}
+            </label>
+          </div>
+          {formData.image && (
+            <div className="mt-2">
+              <img
+                src={normalizeImageUrl(formData.image)}
+                alt="Blog preview"
+                className="max-w-full h-48 object-cover rounded-lg border border-white/20"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Excerpt */}
@@ -364,22 +437,18 @@ const BlogForm: React.FC<BlogFormProps> = ({
           Excerpt *
           <span className="text-gray-500 text-xs ml-2">(Max 1000 characters)</span>
         </label>
-        <CKEditor
-          editor={ClassicEditor as /* eslint-disable @typescript-eslint/no-explicit-any */ any}
-          onReady={(editor: any) => {
+        <CKEditorComponent
+          config={ckeditorDarkConfig}
+          data={formData.excerpt}
+          onReady={(editor: Editor) => {
             excerptEditorRef.current = editor;
-            // Set initial data when editing
-            if (formData.excerpt) {
-              editor.setData(formData.excerpt);
-            }
           }}
-          onChange={(_event: any, editor: any) => {
+          onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
             const data = editor.getData();
             if (data.length <= 1000) {
               setFormData(prev => ({ ...prev, excerpt: data }));
             }
           }}
-          config={ckeditorDarkConfig}
         />
         <div className="text-xs text-gray-500 mt-1">
           {formData.excerpt.replace(/<[^>]*>/g, '').length}/1000 characters
@@ -391,22 +460,16 @@ const BlogForm: React.FC<BlogFormProps> = ({
         <label className="block text-sm font-medium text-gray-300 mb-2">
           Content *
         </label>
-        <CKEditor
-          editor={ClassicEditor as /* eslint-disable @typescript-eslint/no-explicit-any */ any}
-          onReady={(editor: any) => {
+        <CKEditorComponent
+          config={ckeditorContentConfig}
+          data={formData.content}
+          onReady={(editor: Editor) => {
             contentEditorRef.current = editor;
-            // Set initial data when editing - use setTimeout to ensure data is available
-            if (formData.content) {
-              setTimeout(() => {
-                editor.setData(formData.content);
-              }, 0);
-            }
           }}
-          onChange={(_event: any, editor: any) => {
+          onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
             const data = editor.getData();
             setFormData(prev => ({ ...prev, content: data }));
           }}
-          config={ckeditorContentConfig}
         />
       </div>
 
@@ -496,14 +559,50 @@ const BlogForm: React.FC<BlogFormProps> = ({
         <label className="block text-sm font-medium text-gray-300 mb-2">
           Author Profile Picture URL
         </label>
-        <input
-          type="url"
-          name="authorProfilePic"
-          value={formData.authorProfilePic}
-          onChange={handleInputChange}
-          placeholder="https://example.com/profile-pic.jpg"
-          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
-        />
+        <div className="space-y-3">
+          <input
+            type="url"
+            name="authorProfilePic"
+            value={formData.authorProfilePic}
+            onChange={handleInputChange}
+            placeholder="https://example.com/profile-pic.jpg"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+          />
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleProfilePicUpload(file);
+                }
+              }}
+              className="hidden"
+              id="profile-pic-upload"
+              disabled={uploadingProfilePic}
+            />
+            <label
+              htmlFor="profile-pic-upload"
+              className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Upload className="w-4 h-4" />
+              {uploadingProfilePic ? 'Uploading...' : 'Upload Image'}
+            </label>
+          </div>
+          {formData.authorProfilePic && (
+            <div className="mt-2">
+              <img
+                src={normalizeImageUrl(formData.authorProfilePic)}
+                alt="Author profile preview"
+                className="w-16 h-16 object-cover rounded-full border border-white/20"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content Sections */}
@@ -578,30 +677,66 @@ const BlogForm: React.FC<BlogFormProps> = ({
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Content
                     </label>
-                    <CKEditor
+                    <CKEditorComponent
                       key={`section-${index}-${editingBlog?._id || 'new'}`}
-                      editor={ClassicEditor as /* eslint-disable @typescript-eslint/no-explicit-any */ any}
+                      config={ckeditorDarkConfig}
                       data={section.content}
-                      onChange={(_event: any, editor: any) => {
+                      onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
                         const data = editor.getData();
                         handleContentSectionChange(index, 'content', data);
                       }}
-                      config={ckeditorDarkConfig}
                     />
                   </div>
 
                   {/* Section Image */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Image URL
+                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-1">
+                      <ImageIcon className="w-4 h-4" />
+                      Image
                     </label>
-                    <input
-                      type="url"
-                      value={section.image}
-                      onChange={(e) => handleContentSectionChange(index, 'image', e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 text-sm"
-                    />
+                    <div className="space-y-3">
+                      <input
+                        type="url"
+                        value={section.image}
+                        onChange={(e) => handleContentSectionChange(index, 'image', e.target.value)}
+                        placeholder="https://example.com/image.jpg"
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 text-sm"
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleImageUpload(index, file);
+                            }
+                          }}
+                          className="hidden"
+                          id={`image-upload-${index}`}
+                          disabled={uploadingImages[index]}
+                        />
+                        <label
+                          htmlFor={`image-upload-${index}`}
+                          className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {uploadingImages[index] ? 'Uploading...' : 'Upload Image'}
+                        </label>
+                      </div>
+                      {section.image && (
+                        <div className="mt-2">
+                          <img
+                            src={normalizeImageUrl(section.image)}
+                            alt="Section preview"
+                            className="max-w-full h-32 object-cover rounded-lg border border-white/20"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Section Code */}

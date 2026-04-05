@@ -14,7 +14,7 @@ import {
   Sparkles,
   Loader2
 } from 'lucide-react';
-import { normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import { normalizeHtmlImageSources, normalizeImageUrl, isValidImageUrl } from '../utils/api';
 
 interface ContentSection {
   title: string;
@@ -362,7 +362,7 @@ const BlogPost: React.FC = () => {
 
       updateOGTag('og:title', blog.seoTitle || blog.title);
       updateOGTag('og:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
-      updateOGTag('og:image', blog.image);
+      updateOGTag('og:image', normalizeImageUrl(blog.image));
       updateOGTag('og:type', 'article');
       updateOGTag('og:url', window.location.href);
       updateOGTag('og:site_name', 'Akash Raikwar - Portfolio');
@@ -383,7 +383,7 @@ const BlogPost: React.FC = () => {
       updateTwitterTag('twitter:card', 'summary_large_image');
       updateTwitterTag('twitter:title', blog.seoTitle || blog.title);
       updateTwitterTag('twitter:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
-      updateTwitterTag('twitter:image', blog.image);
+      updateTwitterTag('twitter:image', normalizeImageUrl(blog.image));
       updateTwitterTag('twitter:creator', '@akashraikwar');
       updateTwitterTag('twitter:site', '@akashraikwar');
 
@@ -402,7 +402,7 @@ const BlogPost: React.FC = () => {
         '@type': 'Article',
         headline: blog.title,
         description: blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '',
-        image: blog.image,
+        image: normalizeImageUrl(blog.image),
         datePublished: blog.publishedAt,
         dateModified: blog.publishedAt,
         author: {
@@ -449,6 +449,9 @@ const BlogPost: React.FC = () => {
   if (error || !blog) {
     return <ErrorState error={error || 'Blog post not found'} onBack={() => navigate('/blog')} />;
   }
+
+  const normalizedExcerpt = normalizeHtmlImageSources(blog.excerpt);
+  const normalizedContent = normalizeHtmlImageSources(blog.content);
 
   return (
     <div className="min-h-screen pt-20 pb-16 relative overflow-hidden" style={{ background: "#020209" }}>
@@ -645,14 +648,14 @@ const BlogPost: React.FC = () => {
               style={{ background: "linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1))", border: "1px solid rgba(139,92,246,0.2)" }}
             >
               <p className="text-lg leading-relaxed" style={{ color: "rgba(255,255,255,0.8)", fontFamily: "'DM Sans', sans-serif" }}>
-                <div dangerouslySetInnerHTML={{ __html: blog.excerpt }} />
+                <div dangerouslySetInnerHTML={{ __html: normalizedExcerpt }} />
               </p>
             </div>
 
             {/* Content */}
             <div 
               className="blog-content"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: normalizedContent }}
             />
 
             {/* Content Sections */}
@@ -683,7 +686,7 @@ const BlogPost: React.FC = () => {
                       )}
                       
                       {section.content && (
-                        <div className="blog-content" dangerouslySetInnerHTML={{ __html: section.content }} />
+                        <div className="blog-content" dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(section.content) }} />
                       )}
                       
                       {section.image && (
