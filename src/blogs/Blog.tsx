@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Eye, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from '../utils/api';
+import Loader from '../components/Loader';
 
 interface BlogPost {
   _id: string;
@@ -751,12 +752,7 @@ const Blog: React.FC = () => {
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <motion.div 
-                  className="w-12 h-12 rounded-full"
-                  style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
+                <Loader />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

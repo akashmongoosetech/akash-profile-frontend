@@ -11,10 +11,10 @@ import {
   Share2, 
   ChevronRight,
   BookOpen,
-  Sparkles,
-  Loader2
+  Sparkles
 } from 'lucide-react';
 import { normalizeHtmlImageSources, normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import Loader from '../components/Loader';
 
 interface ContentSection {
   title: string;
@@ -83,41 +83,7 @@ function Orb({ style, color, size, dur, delay }: { style?: CSSProperties; color:
   );
 }
 
-// Loading Component
-function LoadingState() {
-  return (
-    <div className="min-h-screen pt-20 flex items-center justify-center" style={{ background: "#020209" }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center"
-      >
-        <motion.div
-          className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        >
-          <Loader2 className="w-8 h-8 text-white" />
-        </motion.div>
-        <motion.p
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="text-lg"
-          style={{ fontFamily: "'Sora', sans-serif", color: "rgba(255,255,255,0.7)" }}
-        >
-          Loading Article...
-        </motion.p>
-        <motion.div
-          className="h-1 mx-auto mt-4 rounded-full"
-          style={{ background: "linear-gradient(90deg,#3b82f6,#8b5cf6,#06b6d4)", width: "120px" }}
-          animate={{ scaleX: [0, 1, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
-      </motion.div>
-    </div>
-  );
-}
+
 
 // Error Component
 function ErrorState({ error, onBack }: { error: string; onBack: () => void }) {
@@ -442,7 +408,11 @@ const BlogPost: React.FC = () => {
 
   // Loading state
   if (loading) {
-    return <LoadingState />;
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ background: "#020209" }}>
+        <Loader />
+      </div>
+    );
   }
 
   // Error state

@@ -13,8 +13,9 @@
  */
 
 import React, { useState } from 'react';
+import Loader from './Loader';
 import { motion } from 'framer-motion';
-import { Copy, Check, Loader2, Lightbulb, AlertCircle, Code, Rocket, Sparkles } from 'lucide-react';
+import { Copy, Check, Lightbulb, AlertCircle, Code, Rocket, Sparkles } from 'lucide-react';
 import { generateProjectIdeas } from '../utils/aiApi';
 
 interface Project {
@@ -267,10 +268,7 @@ ${project.bonusFeature}`;
                 className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Generating Ideas...
-                  </>
+                  <Loader />
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
@@ -303,8 +301,8 @@ ${project.bonusFeature}`;
               {/* Loading State */}
               {isLoading && (
                 <div className="flex flex-col items-center justify-center h-[400px]">
-                  <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <Loader />
+                  <p className="text-gray-500 dark:text-gray-400 mt-4">
                     Generating creative project ideas...
                   </p>
                 </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Trash2, CheckCircle, XCircle, Mail, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteModal from '../components/DeleteModal';
+import Loader from '../components/Loader';
 
 interface Subscriber {
   _id: string;
@@ -198,10 +199,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   if (loading) {
     return (
       <div className={`flex items-center justify-center p-8 ${className}`}>
-        <div className="flex items-center gap-2">
-          <RefreshCw className="w-5 h-5 animate-spin text-blue-400" />
-          <span className="text-gray-400">Loading subscribers...</span>
-        </div>
+        <Loader />
       </div>
     );
   }

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { streamChat, ChatMessage } from '../utils/aiApi';
 import DeleteModal from './DeleteModal';
+import Loader from './Loader';
 
 interface Message {
   id: string;
@@ -725,7 +726,7 @@ const AIChat: React.FC = () => {
               className="flex-shrink-0 p-2.5 sm:p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl transition-colors"
             >
               {isLoading ? (
-                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <Loader />
               ) : (
                 <Send className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               )}

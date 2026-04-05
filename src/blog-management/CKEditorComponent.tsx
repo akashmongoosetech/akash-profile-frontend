@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import type Editor from '@ckeditor/ckeditor5-core/src/editor/editor';
 import type EventInfo from '@ckeditor/ckeditor5-utils/src/eventinfo';
 import { uploadImage } from '../utils/api'; // Import your existing upload function
+import Loader from '../components/Loader';
 
 interface CKEditorComponentProps {
   config: Record<string, unknown>;
@@ -75,7 +76,7 @@ const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
 
   if (!CKEditor || !ClassicEditor) {
     return <div className="min-h-[200px] bg-white/5 border border-white/20 rounded-lg flex items-center justify-center">
-      <div className="text-gray-400">Loading editor...</div>
+      <Loader />
     </div>;
   }
 

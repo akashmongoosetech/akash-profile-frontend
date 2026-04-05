@@ -19,6 +19,7 @@ import {
   Users
 } from 'lucide-react';
 import { authenticatedFetch, normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import Loader from '../components/Loader';
 import CKEditorComponent from '../blog-management/CKEditorComponent';
 import type { EventInfo } from '@ckeditor/ckeditor5-utils';
 import type Editor from '@ckeditor/ckeditor5-core/src/editor/editor';
@@ -456,7 +457,7 @@ const EventManagement: React.FC = () => {
       <div className="bg-gray-800 rounded-xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+            <Loader />
           </div>
         ) : filteredEvents.length === 0 ? (
           <div className="text-center py-20">
@@ -920,7 +921,7 @@ const EventManagement: React.FC = () => {
               <div className="p-6 overflow-y-auto max-h-[70vh]">
                 {loadingRegistrations ? (
                   <div className="flex items-center justify-center py-10">
-                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+                    <Loader />
                   </div>
                 ) : registrations.length === 0 ? (
                   <div className="text-center py-10">

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from "../utils/api";
+import Loader from './Loader';
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
 function Orb({ style, color, size, dur, delay }) {
@@ -28,35 +29,9 @@ function Particle({ x, y, size, accent, delay, dur }) {
   );
 }
 
-// ── Loading skeleton ──────────────────────────────────────────────────────────
-function Skeleton({ w = "100%", h = 16, radius = 8, className = "" }) {
-  return (
-    <motion.div
-      className={className}
-      style={{ width: w, height: h, borderRadius: radius, background: "rgba(255,255,255,0.06)" }}
-      animate={{ opacity: [0.5, 1, 0.5] }}
-      transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-    />
-  );
-}
 
-function LoadingState() {
-  return (
-    <div className="space-y-5">
-      <Skeleton h={200} radius={16} />
-      <div className="space-y-2">
-        <Skeleton w="80%" h={22} />
-        <Skeleton w="60%" h={16} />
-      </div>
-      <div className="space-y-2">
-        <Skeleton h={12} />
-        <Skeleton h={12} />
-        <Skeleton w="70%" h={12} />
-      </div>
-      <Skeleton h={52} radius={14} />
-    </div>
-  );
-}
+
+
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
 function AuthorAvatar({ author, profilePic }) {
@@ -212,7 +187,9 @@ export default function BlogPopup({ isOpen, onClose }) {
                 {/* ── Body ── */}
                 <div className="relative z-10 px-7 py-6 overflow-y-auto" style={{ maxHeight: "calc(90vh - 120px)" }}>
                   {loading ? (
-                    <LoadingState />
+                    <div className="flex justify-center py-12">
+                      <Loader />
+                    </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
                       <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.2)" }}>

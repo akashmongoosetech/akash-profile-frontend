@@ -16,8 +16,6 @@ import {
   Share2,
   Globe,
   User,
-  Loader2,
-  X,
   Mail,
   Phone,
   Building,
@@ -27,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
+import Loader from '../components/Loader';
 
 interface Event {
   _id: string;
@@ -223,7 +222,7 @@ const EventDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+        <Loader />
       </div>
     );
   }

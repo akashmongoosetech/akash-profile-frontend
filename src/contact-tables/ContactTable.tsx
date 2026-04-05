@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import StatsCard from '../components/StatsCard';
 import DeleteModal from '../components/DeleteModal';
+import Loader from '../components/Loader';
 
 interface Contact {
   _id: string;
@@ -405,10 +406,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   if (loading) {
     return (
       <div className={`flex items-center justify-center p-8 ${className}`}>
-        <div className="flex items-center gap-2">
-          <RefreshCw className="w-5 h-5 animate-spin text-blue-400" />
-          <span className="text-gray-400">Loading contacts...</span>
-        </div>
+        <Loader />
       </div>
     );
   }

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Loader from '../components/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Eye,
   EyeOff,
   AlertCircle,
-  Loader2,
   ArrowLeft,
   Terminal,
   Cpu,
@@ -448,10 +448,7 @@ const AdminLogin: React.FC = () => {
 
                       <span className="relative flex items-center justify-center gap-2 text-white">
                         {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Authenticating…
-                          </>
+                          <Loader />
                         ) : (
                           'Sign In'
                         )}

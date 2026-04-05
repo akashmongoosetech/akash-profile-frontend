@@ -3,6 +3,7 @@ import CKEditorComponent from './CKEditorComponent';
 import type { Editor } from '@ckeditor/ckeditor5-core';
 import type { EventInfo } from '@ckeditor/ckeditor5-utils';
 import { normalizeImageUrl, uploadImage } from '../utils/api';
+import Loader from '../components/Loader';
 import {
   Plus,
   Trash2,
@@ -413,7 +414,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
               className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-4 h-4" />
-              {uploadingMainImage ? 'Uploading...' : 'Upload Image'}
+              {uploadingMainImage ? <Loader /> : 'Upload Image'}
             </label>
           </div>
           {formData.image && (
@@ -587,7 +588,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
               className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-4 h-4" />
-              {uploadingProfilePic ? 'Uploading...' : 'Upload Image'}
+              {uploadingProfilePic ? <Loader /> : 'Upload Image'}
             </label>
           </div>
           {formData.authorProfilePic && (
@@ -721,7 +722,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
                           className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Upload className="w-4 h-4" />
-                          {uploadingImages[index] ? 'Uploading...' : 'Upload Image'}
+                          {uploadingImages[index] ? <Loader /> : 'Upload Image'}
                         </label>
                       </div>
                       {section.image && (

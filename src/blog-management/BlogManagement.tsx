@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authenticatedFetch, normalizeImageUrl, stripHtmlTags } from '../utils/api';
 import BlogForm from './BlogForm';
+import Loader from '../components/Loader';
 import {
   Plus,
   Edit,
@@ -19,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  StarOff
 } from 'lucide-react';
 
 interface ContentSection {
@@ -249,6 +251,31 @@ const BlogManagement: React.FC = () => {
     }
   };
 
+  // ─── Toggle Featured ──────────────────────────────────────────────────────
+  const toggleFeatured = async (id: string) => {
+    const blog = blogs.find(b => b._id === id);
+    if (!blog) return;
+
+    const newFeaturedStatus = !blog.featured;
+
+    try {
+      const response = await authenticatedFetch(`/api/blog/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...blog, featured: newFeaturedStatus })
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchBlogs();
+        setSuccessMessage(newFeaturedStatus ? 'Blog featured successfully!' : 'Blog unfeatured successfully!');
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 3000);
+      }
+    } catch (err) {
+      console.error('Error toggling featured status:', err);
+    }
+  };
+
   // ─── Delete ────────────────────────────────────────────────────────────────
   const openDeleteModal = (blog: BlogPost) => {
     setBlogToDelete(blog);
@@ -373,8 +400,7 @@ const BlogManagement: React.FC = () => {
         <motion.div variants={itemVariants} className="mb-6">
           {loading ? (
             <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mb-4" />
-              <p className="text-slate-400 text-sm">Loading blog posts…</p>
+              <Loader />
             </div>
           ) : blogs.length === 0 ? (
             <div className="text-center py-16 bg-slate-800/30 rounded-2xl border border-slate-700/40">
@@ -390,6 +416,7 @@ const BlogManagement: React.FC = () => {
                   blog={blog}
                   onEdit={() => openModal(blog)}
                   onDelete={() => openDeleteModal(blog)}
+                  onToggleFeatured={toggleFeatured}
                 />
               ))}
             </div>
@@ -616,9 +643,10 @@ interface BlogCardProps {
   blog: BlogPost;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleFeatured: (id: string) => void;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete }) => (
+const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete, onToggleFeatured }) => (
   <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-slate-700/60 hover:border-slate-500/50 transition-all duration-300 shadow-xl hover:shadow-2xl group overflow-hidden relative">
     {/* Ambient glow */}
     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -705,6 +733,17 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onEdit, onDelete }) => (
           </div>
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button
+              onClick={() => onToggleFeatured(blog._id)}
+              className={`p-2 rounded-lg transition-colors ${
+                blog.featured
+                  ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                  : 'bg-gray-600/20 text-gray-400 hover:bg-gray-600/30'
+              }`}
+              aria-label={blog.featured ? 'Unfeature blog post' : 'Feature blog post'}
+            >
+              {blog.featured ? <Star className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <StarOff className="w-3.5 h-3.5 md:w-4 md:h-4" />}
+            </button>
             <button
               onClick={onEdit}
               className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
+import Loader from '../components/Loader';
 
 interface Event {
   _id: string;
@@ -283,7 +284,7 @@ const Events: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
+            <Loader />
           </div>
         ) : error ? (
           <div className="text-center py-20">

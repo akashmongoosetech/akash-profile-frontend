@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Loader from './Loader';
 
 interface StatsCardProps {
   icon: React.ReactNode;
@@ -30,7 +31,7 @@ const StatsCard: React.FC<StatsCardProps> = ({ icon, label, value, colorClass = 
           <p className="text-slate-400 text-xs md:text-sm font-medium tracking-wide uppercase group-hover:text-slate-300 transition-colors truncate">{label}</p>
           {loading ? (
             <div className="flex items-center gap-2 mt-1 md:mt-2">
-              <div className="w-16 md:w-20 h-6 md:h-8 bg-slate-700/50 rounded-lg animate-pulse" />
+              <Loader />
             </div>
           ) : (
             <motion.p 
