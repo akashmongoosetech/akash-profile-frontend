@@ -162,7 +162,16 @@ export const uploadImage = async (file: File): Promise<string> => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to upload image');
+    let errorMessage = 'Failed to upload image';
+
+    try {
+      const data = await response.json();
+      errorMessage = data?.error || data?.message || errorMessage;
+    } catch {
+      // Ignore JSON parsing errors and keep the fallback message.
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
