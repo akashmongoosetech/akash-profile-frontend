@@ -42,6 +42,7 @@ interface Event {
     name: string;
     title: string;
     image: string;
+    shortDescription: string;
   };
   date: string;
   endDate?: string;
@@ -698,6 +699,11 @@ const EventDetail: React.FC = () => {
                         {event.host.title && (
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             {event.host.title}
+                          </p>
+                        )}
+                        {event.host.shortDescription && (
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                            {event.host.shortDescription}
                           </p>
                         )}
                       </div>

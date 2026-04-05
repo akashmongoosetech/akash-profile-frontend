@@ -42,6 +42,12 @@ interface Event {
   isFree: boolean;
   published: boolean;
   featured: boolean;
+  host: {
+    name: string;
+    title: string;
+    image: string;
+    shortDescription: string;
+  };
 }
 
 interface Registration {
@@ -91,7 +97,13 @@ const EventManagement: React.FC = () => {
     currency: 'USD',
     maxAttendees: 0,
     published: false,
-    featured: false
+    featured: false,
+    host: {
+      name: '',
+      title: '',
+      image: '',
+      shortDescription: ''
+    }
   });
 
   // CKEditor configuration for description
@@ -161,7 +173,13 @@ const EventManagement: React.FC = () => {
         currency: event.currency,
         maxAttendees: event.maxAttendees,
         published: event.published,
-        featured: event.featured
+        featured: event.featured,
+        host: event.host || {
+          name: '',
+          title: '',
+          image: '',
+          shortDescription: ''
+        }
       });
     } else {
       setEditingEvent(null);
@@ -180,7 +198,13 @@ const EventManagement: React.FC = () => {
         currency: 'USD',
         maxAttendees: 0,
         published: false,
-        featured: false
+        featured: false,
+        host: {
+          name: '',
+          title: '',
+          image: '',
+          shortDescription: ''
+        }
       });
     }
     setShowModal(true);
@@ -223,7 +247,8 @@ const EventManagement: React.FC = () => {
         maxAttendees: formData.maxAttendees,
         isFree: formData.price === 0 || formData.price === '0',
         published: formData.published,
-        featured: formData.featured
+        featured: formData.featured,
+        host: formData.host
       };
 
       const url = editingEvent
@@ -713,6 +738,51 @@ const EventManagement: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
+                  </div>
+                </div>
+
+                {/* Host Information */}
+                <div className="border-t border-gray-700 pt-4">
+                  <h3 className="text-lg font-medium text-white mb-4">Host Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Host Name</label>
+                      <input
+                        type="text"
+                        value={formData.host.name}
+                        onChange={(e) => setFormData({ ...formData, host: { ...formData.host, name: e.target.value } })}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Host Title</label>
+                      <input
+                        type="text"
+                        value={formData.host.title}
+                        onChange={(e) => setFormData({ ...formData, host: { ...formData.host, title: e.target.value } })}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Host Image URL</label>
+                      <input
+                        type="url"
+                        value={formData.host.image}
+                        onChange={(e) => setFormData({ ...formData, host: { ...formData.host, image: e.target.value } })}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Host Short Description</label>
+                      <input
+                        type="text"
+                        value={formData.host.shortDescription}
+                        onChange={(e) => setFormData({ ...formData, host: { ...formData.host, shortDescription: e.target.value } })}
+                        className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
                   </div>
                 </div>
 

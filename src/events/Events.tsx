@@ -29,6 +29,7 @@ interface Event {
     name: string;
     title: string;
     image: string;
+    shortDescription: string;
   };
   date: string;
   endDate?: string;
@@ -391,6 +392,11 @@ const Events: React.FC = () => {
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <User className="w-4 h-4" />
                           <span>Hosted by {event.host.name}</span>
+                        </div>
+                      )}
+                      {event.host && event.host.shortDescription && (
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {event.host.shortDescription}
                         </div>
                       )}
                       {event.maxAttendees > 0 && (
