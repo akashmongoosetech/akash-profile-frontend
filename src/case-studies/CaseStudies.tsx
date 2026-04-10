@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL } from '../utils/api';
 import { 
   ArrowRight, 
   X, 
@@ -20,18 +21,18 @@ import {
 } from 'lucide-react';
 
 interface CaseStudy {
-  id: number;
+  _id: string;
   title: string;
   category: string;
   client: string;
   duration: string;
   thumbnail: string;
   color: string;
-  icon: React.ElementType;
+  icon: string;
   overview: string;
   challenge: string;
   solution: string;
-  results: { label: string; value: string; icon: React.ElementType }[];
+  results: { label: string; value: string; icon: string }[];
   technologies: string[];
   testimonial?: {
     text: string;
@@ -39,157 +40,66 @@ interface CaseStudy {
     position: string;
     avatar: string;
   };
+  published: boolean;
 }
 
 const CaseStudies: React.FC = () => {
   const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
   const [filter, setFilter] = useState('all');
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const caseStudies: CaseStudy[] = [
-    {
-      id: 1,
-      title: 'E-Commerce Platform for Fashion Brand',
-      category: 'Web Development',
-      client: 'StyleHub India',
-      duration: '3 months',
-      thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=500&fit=crop',
-      color: 'from-pink-500 to-rose-500',
-      icon: Code,
-      overview: 'A full-featured e-commerce platform with modern design, seamless checkout experience, and inventory management system.',
-      challenge: 'The client needed a scalable e-commerce solution that could handle thousands of products, provide fast loading times, and offer a smooth mobile shopping experience while maintaining brand aesthetics.',
-      solution: 'Built a Next.js-based e-commerce platform with optimized images, lazy loading, and a custom checkout flow. Implemented Redis caching for performance and integrated payment gateways including Razorpay.',
-      results: [
-        { label: 'Performance Boost', value: '85%', icon: TrendingUp },
-        { label: 'Mobile Traffic', value: '68%', icon: Smartphone },
-        { label: 'Conversion Rate', value: '3.2x', icon: Target },
-        { label: 'User Satisfaction', value: '4.8/5', icon: Star }
-      ],
-      technologies: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'MongoDB', 'Redis', 'Razorpay'],
-      // testimonial: {
-      //   text: "The team delivered an exceptional e-commerce platform that transformed our online business. Sales increased by 150% within the first quarter.",
-      //   author: 'Priya Sharma',
-      //   position: 'CEO, ModernHub India',
-      //   avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
-      // }
-    },
-    {
-      id: 2,
-      title: 'AI-Powered Healthcare Dashboard',
-      category: 'AI Solutions',
-      client: 'MediCare Plus',
-      duration: '4 months',
-      thumbnail: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop',
-      color: 'from-blue-500 to-cyan-500',
-      icon: Database,
-      overview: 'An intelligent healthcare management system with AI-driven patient analytics, appointment scheduling, and medical record management.',
-      challenge: 'Healthcare providers needed a centralized system to manage patient data, visualize health trends, and streamline appointment scheduling while ensuring HIPAA compliance.',
-      solution: 'Developed a comprehensive dashboard with React and Python backend. Implemented machine learning models for patient risk prediction and automated appointment reminders.',
-      results: [
-        { label: 'Time Saved', value: '40hrs/week', icon: Clock },
-        { label: 'Data Accuracy', value: '99.9%', icon: Target },
-        { label: 'Patient Engagement', value: '65%', icon: Users },
-        { label: 'ROI', value: '220%', icon: TrendingUp }
-      ],
-      technologies: ['React', 'Python', 'TensorFlow', 'PostgreSQL', 'FastAPI', 'Docker', 'AWS'],
-      // testimonial: {
-      //   text: "The AI-powered analytics helped us identify at-risk patients early and improve overall care quality. Truly revolutionary for our practice.",
-      //   author: 'Dr. Rajesh Kumar',
-      //   position: 'Medical Director, MediCare Plus',
-      //   avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100&h=100&fit=crop'
-      // }
-    },
-    {
-      id: 3,
-      title: 'Restaurant Management System',
-      category: 'Web Development',
-      client: 'Taste of India Restaurants',
-      duration: '2.5 months',
-      thumbnail: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop',
-      color: 'from-orange-500 to-amber-500',
-      icon: Palette,
-      overview: 'Complete restaurant management solution with online ordering, table reservation, inventory tracking, and staff management.',
-      challenge: 'Multiple restaurant locations needed a unified system to manage orders, track inventory in real-time, and provide customers with seamless dining experience.',
-      solution: 'Created a centralized dashboard with real-time synchronization across all locations. Built custom modules for kitchen display system and customer loyalty program.',
-      results: [
-        { label: 'Order Processing', value: '60% faster', icon: TrendingUp },
-        { label: 'Inventory Waste', value: '45% reduction', icon: Target },
-        { label: 'Customer Retention', value: '35% increase', icon: Users },
-        { label: 'Revenue Growth', value: '28%', icon: Star }
-      ],
-      technologies: ['React', 'Node.js', 'MongoDB', 'Socket.io', 'Redis', 'AWS S3'],
-      // testimonial: {
-      //   text: "This system revolutionized how we operate. From kitchen management to customer service, everything is streamlined and efficient.",
-      //   author: 'Amit Patel',
-      //   position: 'Owner, Taste of India',
-      //   avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
-      // }
-    },
-    {
-      id: 4,
-      title: 'Real Estate Property Portal',
-      category: 'Web Development',
-      client: 'EstatePro Realty',
-      duration: '3.5 months',
-      thumbnail: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=500&fit=crop',
-      color: 'from-green-500 to-emerald-500',
-      icon: Cloud,
-      overview: 'A feature-rich real estate platform with property listings, virtual tours, agent management, and lead generation system.',
-      challenge: 'The real estate agency needed a modern platform to showcase properties with virtual tours, manage agent profiles, and capture quality leads effectively.',
-      solution: 'Built a Next.js application with 360° virtual tour integration, advanced search filters, and automated lead nurturing system with CRM integration.',
-      results: [
-        { label: 'Lead Generation', value: '200% increase', icon: Users },
-        { label: 'Property Views', value: '5x growth', icon: TrendingUp },
-        { label: 'Conversion Rate', value: '4.5%', icon: Target },
-        { label: 'Page Load Time', value: '<1s', icon: Clock }
-      ],
-      technologies: ['Next.js', 'React', 'Three.js', 'PostgreSQL', 'Prisma', 'Vercel']
-    },
-    {
-      id: 5,
-      title: 'Fitness Tracking Mobile App',
-      category: 'Mobile App',
-      client: 'FitLife Gym Chain',
-      duration: '4 months',
-      thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=500&fit=crop',
-      color: 'from-purple-500 to-violet-500',
-      icon: Smartphone,
-      overview: 'A comprehensive fitness application with workout tracking, nutrition planning, progress analytics, and social features.',
-      challenge: 'A gym chain wanted to engage members with a mobile app that tracks workouts, provides personalized training plans, and builds community.',
-      solution: 'Developed a React Native app with wearable device integration, AI-powered workout recommendations, and in-app social features with challenges.',
-      results: [
-        { label: 'Active Users', value: '10,000+', icon: Users },
-        { label: 'User Retention', value: '78%', icon: Target },
-        { label: 'Daily Engagement', value: '45 min avg', icon: Clock },
-        { label: 'App Rating', value: '4.7/5', icon: Star }
-      ],
-      technologies: ['React Native', 'Firebase', 'Node.js', 'TensorFlow Lite', 'HealthKit', 'Google Fit']
-    },
-    {
-      id: 6,
-      title: 'SaaS Project Management Tool',
-      category: 'Web Development',
-      client: 'TaskFlow Solutions',
-      duration: '5 months',
-      thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop',
-      color: 'from-indigo-500 to-blue-500',
-      icon: Briefcase,
-      overview: 'A cloud-based project management platform with team collaboration, time tracking, reporting, and workflow automation.',
-      challenge: 'Remote teams needed a comprehensive tool to manage projects, track time, collaborate seamlessly, and generate insightful reports.',
-      solution: 'Built a full-featured SaaS application with real-time collaboration, Gantt charts, time tracking, and customizable workflows with automation rules.',
-      results: [
-        { label: 'Team Productivity', value: '40% boost', icon: TrendingUp },
-        { label: 'Time Saved', value: '15hrs/week', icon: Clock },
-        { label: 'Project Delivery', value: '30% faster', icon: Target },
-        { label: 'Customer NPS', value: '72', icon: Star }
-      ],
-      technologies: ['React', 'Node.js', 'PostgreSQL', 'Socket.io', 'AWS', 'Redis', 'Stripe']
-    }
-  ];
+  // Fetch case studies
+  useEffect(() => {
+    const fetchCaseStudies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/case-studies/public`);
+        const data = await response.json();
+        if (data.success) {
+          setCaseStudies(data.caseStudies || []);
+        }
+      } catch (error) {
+        console.error('Error fetching case studies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCaseStudies();
+  }, []);
+
+  // Map icon string to component
+  const getIconComponent = (iconName: string) => {
+    const iconMap: { [key: string]: React.ElementType } = {
+      Code,
+      Palette,
+      Database,
+      Cloud,
+      Smartphone,
+      TrendingUp,
+      Target,
+      Users,
+      Star,
+      Clock,
+    };
+    return iconMap[iconName] || Code;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-white text-xl">Loading case studies...</div>
+      </div>
+    );
+  }
+
+
 
   const categories = ['all', 'Web Development', 'Mobile App', 'AI Solutions'];
 
-  const filteredCaseStudies = filter === 'all' 
-    ? caseStudies 
+  const filteredCaseStudies = filter === 'all'
+    ? caseStudies
     : caseStudies.filter(c => c.category === filter);
 
   return (
@@ -277,7 +187,7 @@ const CaseStudies: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCaseStudies.map((study, index) => (
               <motion.div
-                key={study.id}
+                key={study._id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -332,12 +242,15 @@ const CaseStudies: React.FC = () => {
 
                     {/* Results Preview */}
                     <div className="flex gap-4 pt-4 border-t border-white/10">
-                      {study.results.slice(0, 2).map((result, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <result.icon className="w-4 h-4 text-blue-400" />
-                          <span className="text-white font-semibold">{result.value}</span>
-                        </div>
-                      ))}
+                      {study.results.slice(0, 2).map((result, i) => {
+                        const IconComponent = getIconComponent(result.icon);
+                        return (
+                          <div key={i} className="flex items-center gap-2">
+                            <IconComponent className="w-4 h-4 text-blue-400" />
+                            <span className="text-white font-semibold">{result.value}</span>
+                          </div>
+                        );
+                      })}
                     </div>
 
                     {/* View More */}
@@ -499,16 +412,19 @@ const CaseStudies: React.FC = () => {
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-white mb-4">Results & Impact</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {selectedCase.results.map((result, index) => (
-                      <div
-                        key={index}
-                        className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-white/10"
-                      >
-                        <result.icon className="w-6 h-6 text-blue-400 mb-2" />
-                        <div className="text-2xl font-bold text-white">{result.value}</div>
-                        <div className="text-sm text-gray-400">{result.label}</div>
-                      </div>
-                    ))}
+                    {selectedCase.results.map((result, index) => {
+                      const IconComponent = getIconComponent(result.icon);
+                      return (
+                        <div
+                          key={index}
+                          className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-white/10"
+                        >
+                          <IconComponent className="w-6 h-6 text-blue-400 mb-2" />
+                          <div className="text-2xl font-bold text-white">{result.value}</div>
+                          <div className="text-sm text-gray-400">{result.label}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 

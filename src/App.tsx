@@ -20,6 +20,7 @@ import ContactTable from './contact-tables/ContactTable';
 import SubscriberTable from './subscriber-tables/SubscriberTable';
 import BlogManagement from './blog-management/BlogManagement';
 import EventManagement from './event-management/EventManagement';
+import CaseStudiesManagement from './case-studies-management/CaseStudiesManagement';
 import WebsiteCostCalculator from './components/WebsiteCostCalculator';
 import EMICalculator from './components/EMICalculator';
 import SEOAuditMiniTool from './components/SEOAuditMiniTool';
@@ -104,6 +105,7 @@ function App() {
             <Route index element={<Admin />} />
             <Route path="blog-management" element={<BlogManagement />} />
             <Route path="event-management" element={<EventManagement />} />
+            <Route path="case-studies-management" element={<CaseStudiesManagement />} />
             <Route path="contact-table" element={<ContactTable />} />
             <Route path="subscriber-table" element={<SubscriberTable />} />
           </Route>

@@ -17,6 +17,7 @@ import {
   Calendar,
   Terminal,
   ChevronRight,
+  Briefcase,
 } from 'lucide-react';
 import { removeAuthToken, isTokenExpired } from '../utils/api';
 
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { to: '/admin',                  label: 'Dashboard',         icon: LayoutDashboard, end: true  },
   { to: '/admin/blog-management',  label: 'Blog Management',   icon: BookOpen,        end: false },
   { to: '/admin/event-management', label: 'Event Management',  icon: Calendar,        end: false },
+  { to: '/admin/case-studies-management', label: 'Case Studies', icon: Briefcase, end: false },
   { to: '/admin/contact-table',    label: 'Contact Table',     icon: Mail,            end: false },
   { to: '/admin/subscriber-table', label: 'Subscriber Table',  icon: Users,           end: false },
 ];
