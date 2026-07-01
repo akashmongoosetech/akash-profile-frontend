@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 const POPUP_STORAGE_KEY = 'blog_popup_last_shown';
 const POPUP_DELAY = 3000; // 3 seconds delay before showing popup
 const POPUP_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-const DEV_MODE = true; // Set to false in production - bypasses cooldown for testing
+const DEV_MODE = import.meta.env.DEV; // Auto-detects dev/prod
 
 // Check if there are any published blogs
 const checkBlogExists = async (): Promise<boolean> => {

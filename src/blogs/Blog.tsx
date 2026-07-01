@@ -754,6 +754,31 @@ const Blog: React.FC = () => {
               <div className="flex items-center justify-center py-20">
                 <Loader />
               </div>
+            ) : blogs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <BookOpen className="w-16 h-16 mb-6" style={{ color: "rgba(255,255,255,0.1)" }} />
+                <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
+                  No posts found
+                </h3>
+                <p className="text-sm max-w-md" style={{ fontFamily: "'DM Sans', sans-serif", color: "rgba(255,255,255,0.4)" }}>
+                  {searchTerm || selectedCategory
+                    ? "Try adjusting your search or filter to find what you're looking for."
+                    : "No blog posts have been published yet. Check back soon!"}
+                </p>
+                {(searchTerm || selectedCategory) && (
+                  <button
+                    onClick={() => { setSearchTerm(''); setSelectedCategory(''); setCurrentPage(1); }}
+                    className="mt-6 px-6 py-3 rounded-xl text-sm font-bold"
+                    style={{
+                      fontFamily: "'Space Mono', monospace",
+                      background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+                      color: "#fff",
+                    }}
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {blogs.map((post, index) => (

@@ -75,7 +75,7 @@ interface SidebarBlog {
 function Orb({ style, color, size, dur, delay }: { style?: CSSProperties; color: string; size: number; dur: number; delay: number }) {
   return (
     <motion.div
-      className="absolute rounded-full blur-3xl pointer-events-none"
+      className="fixed rounded-full blur-3xl pointer-events-none"
       style={{ width: size, height: size, background: color, ...style }}
       animate={{ scale: [1, 1.28, 1], opacity: [0.08, 0.18, 0.08] }}
       transition={{ duration: dur, delay, repeat: Infinity, ease: "easeInOut" }}
@@ -269,139 +269,95 @@ const BlogPost: React.FC = () => {
     };
   }, [showAuthorImageModal]);
 
-  // Update SEO meta tags when blog loads
+  // Update SEO meta tags when blog loads — with complete cleanup on unmount
   useEffect(() => {
-    if (blog) {
-      document.title = blog.seoTitle || blog.title || 'Blog Post';
-      
-      let metaDescription = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-      if (!metaDescription) {
-        metaDescription = document.createElement('meta') as HTMLMetaElement;
-        metaDescription.name = 'description';
-        document.head.appendChild(metaDescription);
+    if (!blog) return;
+
+    const createdElements: HTMLElement[] = [];
+    const pushCreated = (el: HTMLElement | null) => { if (el) createdElements.push(el); };
+
+    document.title = blog.seoTitle || blog.title || 'Blog Post';
+
+    const ensureMeta = (name: string, content: string, isProperty = false): HTMLMetaElement => {
+      const attr = isProperty ? 'property' : 'name';
+      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+        pushCreated(el);
       }
-      metaDescription.content = blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '';
-      
-      let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
-      if (blog.seoKeywords) {
-        if (!metaKeywords) {
-          metaKeywords = document.createElement('meta') as HTMLMetaElement;
-          metaKeywords.name = 'keywords';
-          document.head.appendChild(metaKeywords);
-        }
-        metaKeywords.content = blog.seoKeywords;
-      }
+      el.content = content;
+      return el;
+    };
 
-      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-      if (!canonicalLink) {
-        canonicalLink = document.createElement('link') as HTMLLinkElement;
-        canonicalLink.rel = 'canonical';
-        document.head.appendChild(canonicalLink);
-      }
-      canonicalLink.href = window.location.href;
+    ensureMeta('description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
+    if (blog.seoKeywords) ensureMeta('keywords', blog.seoKeywords);
+    ensureMeta('robots', 'index, follow');
+    ensureMeta('author', blog.author || 'Akash Raikwar');
 
-      let metaRobots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
-      if (!metaRobots) {
-        metaRobots = document.createElement('meta') as HTMLMetaElement;
-        metaRobots.name = 'robots';
-        document.head.appendChild(metaRobots);
-      }
-      metaRobots.content = 'index, follow';
+    const ogProperties = [
+      ['og:title', blog.seoTitle || blog.title],
+      ['og:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || ''],
+      ['og:image', normalizeImageUrl(blog.image)],
+      ['og:type', 'article'],
+      ['og:url', window.location.href],
+      ['og:site_name', 'Akash Raikwar - Portfolio'],
+      ['article:author', blog.author || 'Akash Raikwar'],
+      ['article:published_time', blog.publishedAt],
+      ['article:tag', blog.category],
+    ];
+    for (const [prop, val] of ogProperties) ensureMeta(prop, val, true);
 
-      let metaAuthor = document.querySelector('meta[name="author"]') as HTMLMetaElement | null;
-      if (!metaAuthor) {
-        metaAuthor = document.createElement('meta') as HTMLMetaElement;
-        metaAuthor.name = 'author';
-        document.head.appendChild(metaAuthor);
-      }
-      metaAuthor.content = blog.author || 'Akash Raikwar';
+    const twitterProperties = [
+      ['twitter:card', 'summary_large_image'],
+      ['twitter:title', blog.seoTitle || blog.title],
+      ['twitter:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || ''],
+      ['twitter:image', normalizeImageUrl(blog.image)],
+      ['twitter:creator', '@akashraikwar'],
+      ['twitter:site', '@akashraikwar'],
+    ];
+    for (const [name, val] of twitterProperties) ensureMeta(name, val);
 
-      const updateOGTag = (property: string, content: string) => {
-        let ogTag = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
-        if (!ogTag) {
-          ogTag = document.createElement('meta') as HTMLMetaElement;
-          ogTag.setAttribute('property', property);
-          document.head.appendChild(ogTag);
-        }
-        ogTag.content = content;
-      };
-
-      updateOGTag('og:title', blog.seoTitle || blog.title);
-      updateOGTag('og:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
-      updateOGTag('og:image', normalizeImageUrl(blog.image));
-      updateOGTag('og:type', 'article');
-      updateOGTag('og:url', window.location.href);
-      updateOGTag('og:site_name', 'Akash Raikwar - Portfolio');
-      updateOGTag('article:author', blog.author || 'Akash Raikwar');
-      updateOGTag('article:published_time', blog.publishedAt);
-      updateOGTag('article:tag', blog.category);
-
-      const updateTwitterTag = (name: string, content: string) => {
-        let twitterTag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
-        if (!twitterTag) {
-          twitterTag = document.createElement('meta') as HTMLMetaElement;
-          twitterTag.setAttribute('name', name);
-          document.head.appendChild(twitterTag);
-        }
-        twitterTag.content = content;
-      };
-
-      updateTwitterTag('twitter:card', 'summary_large_image');
-      updateTwitterTag('twitter:title', blog.seoTitle || blog.title);
-      updateTwitterTag('twitter:description', blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '');
-      updateTwitterTag('twitter:image', normalizeImageUrl(blog.image));
-      updateTwitterTag('twitter:creator', '@akashraikwar');
-      updateTwitterTag('twitter:site', '@akashraikwar');
-
-      const scriptId = 'blog-post-structured-data';
-      let structuredDataScript = document.getElementById(scriptId) as HTMLScriptElement | null;
-      
-      if (!structuredDataScript) {
-        structuredDataScript = document.createElement('script') as HTMLScriptElement;
-        structuredDataScript.id = scriptId;
-        structuredDataScript.type = 'application/ld+json';
-        document.head.appendChild(structuredDataScript);
-      }
-
-      const structuredData = {
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: blog.title,
-        description: blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '',
-        image: normalizeImageUrl(blog.image),
-        datePublished: blog.publishedAt,
-        dateModified: blog.publishedAt,
-        author: {
-          '@type': 'Person',
-          name: blog.author || 'Akash Raikwar',
-          url: 'https://akashraikwar.in'
-        },
-        publisher: {
-          '@type': 'Organization',
-          name: 'Akash Raikwar - Portfolio',
-          logo: {
-            '@type': 'ImageObject',
-            url: 'https://akashraikwar.in/logo.png'
-          }
-        },
-        mainEntityOfPage: {
-          '@type': 'WebPage',
-          '@id': window.location.href
-        },
-        keywords: blog.seoKeywords || blog.tags?.join(', ') || '',
-        articleSection: blog.category,
-        wordCount: blog.content?.split(/\s+/).length || 0
-      };
-
-      structuredDataScript.textContent = JSON.stringify(structuredData);
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+      pushCreated(canonicalLink);
     }
+    canonicalLink.href = window.location.href;
+
+    const scriptId = 'blog-post-structured-data';
+    let structuredDataScript = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!structuredDataScript) {
+      structuredDataScript = document.createElement('script');
+      structuredDataScript.id = scriptId;
+      structuredDataScript.type = 'application/ld+json';
+      document.head.appendChild(structuredDataScript);
+      pushCreated(structuredDataScript);
+    }
+
+    structuredDataScript.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: blog.title,
+      description: blog.seoDescription || blog.excerpt?.replace(/<[^>]*>/g, '') || '',
+      image: normalizeImageUrl(blog.image),
+      datePublished: blog.publishedAt,
+      dateModified: blog.publishedAt,
+      author: { '@type': 'Person', name: blog.author || 'Akash Raikwar', url: 'https://akashraikwar.in' },
+      publisher: { '@type': 'Organization', name: 'Akash Raikwar - Portfolio', logo: { '@type': 'ImageObject', url: 'https://akashraikwar.in/logo.png' } },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+      keywords: blog.seoKeywords || blog.tags?.join(', ') || '',
+      articleSection: blog.category,
+      wordCount: blog.content?.split(/\s+/).length || 0,
+    });
 
     return () => {
       document.title = 'Akash Raikwar - Portfolio';
-      
-      const structuredDataScript = document.getElementById('blog-post-structured-data');
-      if (structuredDataScript) {
-        structuredDataScript.remove();
+      for (const el of createdElements) {
+        el.remove();
       }
     };
   }, [blog]);
@@ -424,7 +380,7 @@ const BlogPost: React.FC = () => {
   const normalizedContent = normalizeHtmlImageSources(blog.content);
 
   return (
-    <div className="min-h-screen pt-20 pb-16 relative overflow-hidden" style={{ background: "#020209" }}>
+    <div className="min-h-screen pt-20 pb-16 relative" style={{ background: "#020209" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;700;800;900&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');
         .blog-content h1, .blog-content h2, .blog-content h3 { color: #fff; font-family: 'Sora', sans-serif; margin-top: 1.5rem; margin-bottom: 0.75rem; }
@@ -604,7 +560,7 @@ const BlogPost: React.FC = () => {
         </motion.div>
 
         {/* Main Content Grid */}
-        <div className="flex flex-col lg:flex-row gap-12">
+          <div className="flex flex-col lg:flex-row gap-12 lg:items-start">
           {/* Article Content */}
           <motion.article
             initial={{ opacity: 0, y: 20 }}
@@ -727,95 +683,97 @@ const BlogPost: React.FC = () => {
           </motion.article>
 
           {/* Sidebar */}
-          <motion.aside
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="lg:w-1/3"
-          >
-            {/* Other Blogs Widget */}
-            <div 
-              className="rounded-2xl overflow-hidden sticky top-24"
-              style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.06)" }}
+          <aside className="lg:w-1/3">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="sticky top-24"
             >
-              <div className="p-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}>
-                    <BookOpen className="w-5 h-5 text-white" strokeWidth={1.8} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white" style={{ fontFamily: "'Sora', sans-serif" }}>Other Blogs</h3>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'DM Sans', sans-serif" }}>Explore more articles</p>
+              {/* Other Blogs Widget */}
+              <div 
+                className="rounded-2xl overflow-hidden"
+                style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                <div className="p-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)" }}>
+                      <BookOpen className="w-5 h-5 text-white" strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white" style={{ fontFamily: "'Sora', sans-serif" }}>Other Blogs</h3>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'DM Sans', sans-serif" }}>Explore more articles</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                {sidebarBlogs.map((post) => (
+                
+                <div className="divide-y" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  {sidebarBlogs.map((post) => (
+                    <Link
+                      key={post._id}
+                      to={`/blog/${post.slug}`}
+                      className="block p-4 group"
+                    >
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-20 h-20 rounded-xl overflow-hidden">
+                            <img
+                              src={normalizeImageUrl(post.image)}
+                              alt={post.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span 
+                            className="inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-2"
+                            style={{ 
+                              fontFamily: "'Space Mono', monospace",
+                              background: "rgba(139,92,246,0.15)",
+                              color: "#a78bfa"
+                            }}
+                          >
+                            {post.category}
+                          </span>
+                          <h4 
+                            className="text-white font-semibold text-sm line-clamp-2 group-hover:text-blue-400 transition-colors"
+                            style={{ fontFamily: "'Sora', sans-serif" }}
+                          >
+                            {post.title}
+                          </h4>
+                          <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {post.readTime}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                
+                <div className="p-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                   <Link
-                    key={post._id}
-                    to={`/blog/${post.slug}`}
-                    className="block p-4 group"
+                    to="/blog"
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm group"
+                    style={{ 
+                      fontFamily: "'Sora', sans-serif",
+                      background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+                      color: "#fff"
+                    }}
                   >
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 rounded-xl overflow-hidden">
-                          <img
-                            src={normalizeImageUrl(post.image)}
-                            alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span 
-                          className="inline-block px-2 py-0.5 rounded-full text-xs font-bold mb-2"
-                          style={{ 
-                            fontFamily: "'Space Mono', monospace",
-                            background: "rgba(139,92,246,0.15)",
-                            color: "#a78bfa"
-                          }}
-                        >
-                          {post.category}
-                        </span>
-                        <h4 
-                          className="text-white font-semibold text-sm line-clamp-2 group-hover:text-blue-400 transition-colors"
-                          style={{ fontFamily: "'Sora', sans-serif" }}
-                        >
-                          {post.title}
-                        </h4>
-                        <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {post.readTime}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    View All Blogs
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                ))}
+                </div>
               </div>
-              
-              <div className="p-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                <Link
-                  to="/blog"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-sm group"
-                  style={{ 
-                    fontFamily: "'Sora', sans-serif",
-                    background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
-                    color: "#fff"
-                  }}
-                >
-                  View All Blogs
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
-          </motion.aside>
+            </motion.div>
+          </aside>
         </div>
 
         {/* Related Posts */}

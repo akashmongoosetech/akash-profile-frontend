@@ -83,6 +83,13 @@ const BlogForm: React.FC<BlogFormProps> = ({
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
 
+  // Tags: separate raw input from committed tags
+  const [tagsInput, setTagsInput] = useState(() => formData.tags.join(', '));
+  const commitTags = (raw: string) => {
+    const tags = raw.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    setFormData(prev => ({ ...prev, tags }));
+  };
+
 
 
   // Generate slug from title
@@ -106,18 +113,6 @@ const BlogForm: React.FC<BlogFormProps> = ({
     }
   };
 
-  // Handle tags input with better comma separation
-  const handleTagsInput = (value: string) => {
-    const tags = value.split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
-    
-    setFormData(prev => ({ 
-      ...prev, 
-      tags: tags
-    }));
-  };
-
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -126,7 +121,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (name === 'tags') {
-      handleTagsInput(value);
+      setTagsInput(value);
     } else {
       setFormData(prev => ({ 
         ...prev, 
@@ -446,7 +441,8 @@ const BlogForm: React.FC<BlogFormProps> = ({
           }}
           onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
             const data = editor.getData();
-            if (data.length <= 1000) {
+            const textLength = data.replace(/<[^>]*>/g, '').length;
+            if (textLength <= 1000) {
               setFormData(prev => ({ ...prev, excerpt: data }));
             }
           }}
@@ -478,14 +474,21 @@ const BlogForm: React.FC<BlogFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
           Tags
-          <span className="text-gray-500 text-xs ml-2">(Separate with commas)</span>
+          <span className="text-gray-500 text-xs ml-2">(Press Enter or Tab to commit each tag)</span>
         </label>
         <div className="space-y-3">
           <input
             type="text"
             name="tags"
-            value={formData.tags.join(', ')}
+            value={tagsInput}
             onChange={handleInputChange}
+            onBlur={() => commitTags(tagsInput)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                commitTags(tagsInput);
+              }
+            }}
             placeholder="react, javascript, tutorial, web development, nodejs, express"
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
           />
@@ -505,6 +508,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
                     onClick={() => {
                       const newTags = formData.tags.filter((_, i) => i !== index);
                       setFormData(prev => ({ ...prev, tags: newTags }));
+                      setTagsInput(newTags.join(', '));
                     }}
                     className="ml-1 hover:text-red-300 transition-colors"
                   >
@@ -516,7 +520,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
           )}
           
           <p className="text-xs text-gray-500">
-            💡 Tip: Type unlimited tags separated by commas. Each tag will appear as a badge above. You can click × to remove individual tags.
+            💡 Tip: Type tags separated by commas. Press Enter, Tab, or click away to commit. Click × to remove individual tags.
           </p>
         </div>
       </div>
