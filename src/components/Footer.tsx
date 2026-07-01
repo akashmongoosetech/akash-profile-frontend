@@ -159,7 +159,7 @@ const Footer: React.FC = () => {
     { icon: Github, href: 'https://github.com/akash007123', label: 'GitHub', gradient: "linear-gradient(135deg,#6b7280,#374151)" },
     { icon: Linkedin, href: 'https://www.linkedin.com/in/akash-raikwar-4a67bb171/', label: 'LinkedIn', gradient: "linear-gradient(135deg,#0077b5,#0a66c2)" },
     { icon: Twitter, href: 'https://x.com/AkashRa28283838', label: 'Twitter', gradient: "linear-gradient(135deg,#1da1f2,#0d8ecf)" },
-    { icon: Mail, href: 'mailto:akashraikwar763@gmail.com', label: 'Email', gradient: "linear-gradient(135deg,#3b82f6,#06b6d4)" },
+    { icon: Mail, href: 'mailto:info@akashraikwar.in', label: 'Email', gradient: "linear-gradient(135deg,#3b82f6,#06b6d4)" },
     { icon: Instagram, href: 'https://www.instagram.com/akashraikwar_007', label: 'Instagram', gradient: "linear-gradient(135deg,#e1306c,#fd594a)" },
     { icon: Facebook, href: 'https://www.facebook.com/akashraikwar007', label: 'Facebook', gradient: "linear-gradient(135deg,#1877f2,#0d65d9)" }
   ];
@@ -183,7 +183,7 @@ const Footer: React.FC = () => {
   ];
 
   const contactInfo = [
-    { icon: Mail, value: 'akashraikwar763@gmail.com', href: 'mailto:akashraikwar763@gmail.com', gradient: "linear-gradient(135deg,#3b82f6,#06b6d4)" },
+    { icon: Mail, value: 'info@akashraikwar.in', href: 'mailto:info@akashraikwar.in', gradient: "linear-gradient(135deg,#3b82f6,#06b6d4)" },
     { icon: Phone, value: '+91 96855 33878', href: 'tel:+919685533878', gradient: "linear-gradient(135deg,#10b981,#22c55e)" },
     { icon: MapPin, value: 'Ujjain, India', href: 'https://maps.app.goo.gl/8FY1VYnqYTfWdfYFA', gradient: "linear-gradient(135deg,#f97316,#ef4444)" }
   ];

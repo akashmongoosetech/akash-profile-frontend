@@ -132,7 +132,7 @@ export default function HeroSection() {
     { icon: Linkedin, href: "https://www.linkedin.com/in/akash-raikwar-4a67bb171/", color: "#0ea5e9" },
     { icon: Instagram, href: "https://www.instagram.com/akashraikwar_007", color: "#ec4899" },
     { icon: Facebook, href: "https://www.facebook.com/akashraikwar007", color: "#60a5fa" },
-    { icon: Mail, href: "mailto:akashraikwar763@gmail.com", color: "#f87171" },
+    { icon: Mail, href: "mailto:info@akashraikwar.in", color: "#f87171" },
   ];
 
   const stats = [

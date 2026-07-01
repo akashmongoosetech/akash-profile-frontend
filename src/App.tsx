@@ -1,60 +1,63 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import Home from './Home';
-import About from './About';
-import Projects from './projects/Projects';
-import Skills from './skills/Skills';
-import Services from './services/Services';
-import Experience from './experience/Experience';
-import Testimonials from './testimonials/Testimonials';
-import Blog from './blogs/Blog';
-import BlogPost from './blog-posts/BlogPost';
-import Contact from './contacts/Contact';
-import Admin from './admins/Admin';
-import CaseStudies from './case-studies/CaseStudies';
-import AdminLogin from './admins/AdminLogin';
-import AdminLayout from './admins/AdminLayout';
-import ContactTable from './contact-tables/ContactTable';
-import SubscriberTable from './subscriber-tables/SubscriberTable';
-import BlogManagement from './blog-management/BlogManagement';
-import EventManagement from './event-management/EventManagement';
-import CaseStudiesManagement from './case-studies-management/CaseStudiesManagement';
-import WebsiteCostCalculator from './components/WebsiteCostCalculator';
-import EMICalculator from './components/EMICalculator';
-import SEOAuditMiniTool from './components/SEOAuditMiniTool';
-import InvoiceGenerator from './components/InvoiceGenerator';
-import QuotationGenerator from './components/QuotationGenerator';
-import ResumeBuilder from './components/ResumeBuilder';
-import MeetingAgendaGenerator from './components/MeetingAgendaGenerator';
-import ContractTemplateGenerator from './components/ContractTemplateGenerator';
-import FreelanceProposalGenerator from './components/FreelanceProposalGenerator';
-import AIEmailReplyGenerator from './components/AIEmailReplyGenerator';
-import LinkedInPostGenerator from './components/LinkedInPostGenerator';
-import ProjectIdeaGenerator from './components/ProjectIdeaGenerator';
-import AIBusinessIdeaValidator from './components/AIBusinessIdeaValidator';
-import AIStartupNameGenerator from './components/AIStartupNameGenerator';
-import AIBusinessPlanGenerator from './components/AIBusinessPlanGenerator';
-import AIMedicalNoteFormatter from './components/AIMedicalNoteFormatter';
-import AIPatientDischargeSummaryGenerator from './components/AIPatientDischargeSummaryGenerator';
-import AIClinicWebsiteContentGenerator from './components/AIClinicWebsiteContentGenerator';
-import AISQLQueryGenerator from './components/AISQLQueryGenerator';
-import AIProjectDescriptionGenerator from './components/AIProjectDescriptionGenerator';
-import AIInternshipCoverLetterGenerator from './components/AIInternshipCoverLetterGenerator';
-import AIPersonalStatementGenerator from './components/AIPersonalStatementGenerator';
-import AIPortfolioBioGenerator from './components/AIPortfolioBioGenerator';
-import AIMeetingSummaryGenerator from './components/AIMeetingSummaryGenerator';
-import Tools from './Tools';
-import AIChat from './components/AIChat';
-import Events from './events/Events';
-import EventDetail from './events/EventDetail';
+// Lazy load components
+const Home = lazy(() => import('./Home'));
+const About = lazy(() => import('./About'));
+const Projects = lazy(() => import('./projects/Projects'));
+const Skills = lazy(() => import('./skills/Skills'));
+const Services = lazy(() => import('./services/Services'));
+const Experience = lazy(() => import('./experience/Experience'));
+const Testimonials = lazy(() => import('./testimonials/Testimonials'));
+const Blog = lazy(() => import('./blogs/Blog'));
+const BlogPost = lazy(() => import('./blog-posts/BlogPost'));
+const Contact = lazy(() => import('./contacts/Contact'));
+const Admin = lazy(() => import('./admins/Admin'));
+const CaseStudies = lazy(() => import('./case-studies/CaseStudies'));
+const AdminLogin = lazy(() => import('./admins/AdminLogin'));
+const AdminLayout = lazy(() => import('./admins/AdminLayout'));
+const ContactTable = lazy(() => import('./contact-tables/ContactTable'));
+const SubscriberTable = lazy(() => import('./subscriber-tables/SubscriberTable'));
+const BlogManagement = lazy(() => import('./blog-management/BlogManagement'));
+const EventManagement = lazy(() => import('./event-management/EventManagement'));
+const CaseStudiesManagement = lazy(() => import('./case-studies-management/CaseStudiesManagement'));
+const WebsiteCostCalculator = lazy(() => import('./components/WebsiteCostCalculator'));
+const EMICalculator = lazy(() => import('./components/EMICalculator'));
+const SEOAuditMiniTool = lazy(() => import('./components/SEOAuditMiniTool'));
+const InvoiceGenerator = lazy(() => import('./components/InvoiceGenerator'));
+const QuotationGenerator = lazy(() => import('./components/QuotationGenerator'));
+const ResumeBuilder = lazy(() => import('./components/ResumeBuilder'));
+const MeetingAgendaGenerator = lazy(() => import('./components/MeetingAgendaGenerator'));
+const ContractTemplateGenerator = lazy(() => import('./components/ContractTemplateGenerator'));
+const FreelanceProposalGenerator = lazy(() => import('./components/FreelanceProposalGenerator'));
+const AIEmailReplyGenerator = lazy(() => import('./components/AIEmailReplyGenerator'));
+const LinkedInPostGenerator = lazy(() => import('./components/LinkedInPostGenerator'));
+const ProjectIdeaGenerator = lazy(() => import('./components/ProjectIdeaGenerator'));
+const AIBusinessIdeaValidator = lazy(() => import('./components/AIBusinessIdeaValidator'));
+const AIStartupNameGenerator = lazy(() => import('./components/AIStartupNameGenerator'));
+const AIBusinessPlanGenerator = lazy(() => import('./components/AIBusinessPlanGenerator'));
+const AIMedicalNoteFormatter = lazy(() => import('./components/AIMedicalNoteFormatter'));
+const AIPatientDischargeSummaryGenerator = lazy(() => import('./components/AIPatientDischargeSummaryGenerator'));
+const AIClinicWebsiteContentGenerator = lazy(() => import('./components/AIClinicWebsiteContentGenerator'));
+const AISQLQueryGenerator = lazy(() => import('./components/AISQLQueryGenerator'));
+const AIProjectDescriptionGenerator = lazy(() => import('./components/AIProjectDescriptionGenerator'));
+const AIInternshipCoverLetterGenerator = lazy(() => import('./components/AIInternshipCoverLetterGenerator'));
+const AIPersonalStatementGenerator = lazy(() => import('./components/AIPersonalStatementGenerator'));
+const AIPortfolioBioGenerator = lazy(() => import('./components/AIPortfolioBioGenerator'));
+const AIMeetingSummaryGenerator = lazy(() => import('./components/AIMeetingSummaryGenerator'));
+const Tools = lazy(() => import('./Tools'));
+const AIChat = lazy(() => import('./components/AIChat'));
+const Events = lazy(() => import('./events/Events'));
+const EventDetail = lazy(() => import('./events/EventDetail'));
 
 function App() {
   return (
     <ThemeProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-900"><div className="text-white text-xl">Loading...</div></div>}>
+          <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
@@ -109,7 +112,8 @@ function App() {
             <Route path="contact-table" element={<ContactTable />} />
             <Route path="subscriber-table" element={<SubscriberTable />} />
           </Route>
-        </Routes>
+          </Routes>
+        </Suspense>
       </Router>
     </ThemeProvider>
   );

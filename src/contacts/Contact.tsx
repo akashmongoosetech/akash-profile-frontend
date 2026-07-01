@@ -280,8 +280,8 @@ const Contact: React.FC = () => {
     {
       icon: Mail,
       label: 'Email',
-      value: 'akashraikwar763@gmail.com',
-      href: 'mailto:akashraikwar763@gmail.com',
+      value: 'info@akashraikwar.in',
+      href: 'mailto:info@akashraikwar.in',
       gradient: 'linear-gradient(135deg,#3b82f6,#06b6d4)',
       accent: '#38bdf8'
     },
