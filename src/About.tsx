@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion, useInView } from 'framer-motion';
 import { Calendar, MapPin, Code, Award, Users, GraduationCap, Briefcase, LucideIcon } from 'lucide-react';
 import ExpertiseSection from './About/Expertisesection';
+import ProfessionalExperience from './About/ProfessionalExperience';
 
 // ── Animated counter hook ──────────────────────────────────────────────────
 function useCounter(target: string, duration: number = 2000, inView: boolean = true) {
@@ -274,62 +275,27 @@ const About: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   const stats = [
-    { icon: Code, value: '2+', label: 'Years Exp.', sub: 'Building production apps', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)', accentColor: '#60a5fa' },
+    { icon: Code, value: '3+', label: 'Years Exp.', sub: 'Building production apps', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)', accentColor: '#60a5fa' },
     { icon: Award, value: '50+', label: 'Projects', sub: 'Shipped across industries', gradient: 'linear-gradient(135deg, #10b981, #059669)', accentColor: '#34d399' },
     { icon: Users, value: '20+', label: 'Clients', sub: 'Across 4+ countries', gradient: 'linear-gradient(135deg, #8b5cf6, #a855f7)', accentColor: '#c084fc' },
   ];
 
   const timeline = [
     {
-      type: 'experience' as const,
-      title: 'Software Engineer',
-      company: 'Profilics Systems Pvt. Ltd.',
-      location: 'Ujjain, India',
-      period: 'Feb 2025 - Present',
-      description: 'Developing scalable and responsive web applications using MERN Stack. Building reusable UI components and integrating RESTful APIs. Collaborating with cross-functional Agile teams to deliver reliable software solutions.',
+      type: 'education' as const,
+      title: 'M.Tech in Information Technology & AI',
+      company: 'Information Technology & Artificial Intelligence',
+      institution: 'Ujjain Engineering College, Ujjain',
+      period: '2023 - 2025',
+      description: 'Pursuing advanced studies in Information Technology with a specialization in Artificial Intelligence. Focusing on machine learning, deep learning, and intelligent systems.',
       achievements: [
-        'Developing scalable web applications using MERN Stack',
-        'Building reusable UI components for improved efficiency',
-        'Integrating RESTful APIs for seamless data flow',
-        'Optimizing application performance and user experience'
+        'Specializing in AI, Machine Learning & Deep Learning',
+        'Research in intelligent systems and automation',
+        'Hands-on experience with AI/ML frameworks and tools',
+        'Building projects integrating AI with web technologies'
       ],
-      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'REST APIs'],
       accent: '#38bdf8',
       gradient: 'linear-gradient(135deg,#3b82f6,#06b6d4)',
-    },
-    {
-      type: 'experience' as const,
-      title: 'Graduate Software Engineer',
-      company: 'Knocial India Limited',
-      location: 'Gurgaon, India',
-      period: 'June 2023 - Nov 2024',
-      description: 'Worked on full stack development following Agile and SDLC best practices. Implemented new features, resolved bugs, and improved application performance.',
-      achievements: [
-        'Implemented new features following Agile methodology',
-        'Resolved bugs and improved application performance',
-        'Participated in code reviews and team collaborations',
-        'Delivered scalable solutions aligned with business needs'
-      ],
-      technologies: ['MongoDB', 'Express.js', 'React', 'Node.js', 'JavaScript'],
-      accent: '#4ade80',
-      gradient: 'linear-gradient(135deg,#10b981,#22c55e)',
-    },
-    {
-      type: 'experience' as const,
-      title: 'Software Trainee Intern',
-      company: 'Allsoft Infotech & Multimedia',
-      location: 'Ujjain, India',
-      period: 'Oct 2022 - May 2023',
-      description: 'Assisted in developing user-friendly web interfaces using HTML, CSS, and JavaScript. Supported backend integration, testing, and deployment activities.',
-      achievements: [
-        'Assisted in developing user-friendly web interfaces',
-        'Supported backend integration and testing activities',
-        'Gained hands-on experience with live projects',
-        'Collaborated with senior developers on implementation'
-      ],
-      technologies: ['HTML', 'CSS', 'JavaScript', 'Backend Integration', 'Testing'],
-      accent: '#c084fc',
-      gradient: 'linear-gradient(135deg,#8b5cf6,#a855f7)',
     },
     {
       type: 'education' as const,
@@ -545,7 +511,10 @@ const About: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Timeline Section */}
+          {/* Professional Experience Section */}
+          <ProfessionalExperience />
+
+          {/* Education Timeline Section */}
           <motion.div
             className="mb-20"
             initial={{ opacity: 0, y: 30 }}
@@ -564,7 +533,7 @@ const About: React.FC = () => {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Experience & Education
+                Education
               </h2>
             </div>
             
@@ -574,11 +543,9 @@ const About: React.FC = () => {
                   key={`${item.type}-${index}`}
                   title={item.title}
                   company={item.company}
-                  location={item.location}
                   period={item.period}
                   description={item.description}
                   achievements={item.achievements}
-                  technologies={item.technologies}
                   accent={item.accent}
                   gradient={item.gradient}
                   type={item.type}
