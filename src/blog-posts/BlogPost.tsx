@@ -641,6 +641,39 @@ const BlogPost: React.FC = () => {
               </div>
             )}
 
+            {/* Tags */}
+            {blog.tags && blog.tags.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.5 }}
+                className="mt-10"
+              >
+                <h4 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Space Mono', monospace" }}>
+                  Tags
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {blog.tags.map((tag, i) => (
+                    <motion.span
+                      key={tag}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4 + i * 0.05 }}
+                      className="px-3 py-1.5 rounded-full text-xs font-medium"
+                      style={{
+                        fontFamily: "'Space Mono', monospace",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        color: "rgba(255,255,255,0.5)"
+                      }}
+                    >
+                      #{tag}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Actions */}
             <motion.div
               className="flex flex-wrap items-center gap-4 mt-10 pt-8"
