@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { normalizeHtmlImageSources, normalizeImageUrl, isValidImageUrl } from '../utils/api';
 import Loader from '../components/Loader';
+import BlogContactForm from './BlogContactForm';
 
 interface ContentSection {
   title: string;
@@ -804,6 +805,11 @@ const BlogPost: React.FC = () => {
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
+              </div>
+
+              {/* Contact Form */}
+              <div className="mt-6">
+                <BlogContactForm />
               </div>
             </motion.div>
           </aside>
