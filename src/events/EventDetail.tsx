@@ -645,7 +645,7 @@ const EventDetail: React.FC = () => {
                               >
                                 {registering ? (
                                   <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     Registering...
                                   </>
                                 ) : (
