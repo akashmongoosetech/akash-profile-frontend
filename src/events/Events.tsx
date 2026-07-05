@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import {
@@ -6,15 +6,14 @@ import {
   Clock,
   MapPin,
   Users,
-  Video,
-  GraduationCap,
-  Award,
   Search,
-  User
+  X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
-import Loader from '../components/Loader';
+import { formatDate, formatTime, formatDuration } from '../utils/format';
+import { eventTypeConfig } from '../constants/eventConfig';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface Event {
   _id: string;
@@ -59,36 +58,23 @@ interface Event {
   isSoldOut: boolean;
 }
 
-const eventTypeConfig = {
-  webinar: {
-    icon: Video,
-    label: 'Webinar',
-    color: 'from-blue-500 to-cyan-500',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-500/30'
-  },
-  workshop: {
-    icon: GraduationCap,
-    label: 'Workshop',
-    color: 'from-green-500 to-emerald-500',
-    bgColor: 'bg-green-500/10',
-    borderColor: 'border-green-500/30'
-  },
-  'office-hours': {
-    icon: Users,
-    label: 'Office Hours',
-    color: 'from-purple-500 to-violet-500',
-    bgColor: 'bg-purple-500/10',
-    borderColor: 'border-purple-500/30'
-  },
-  conference: {
-    icon: Award,
-    label: 'Conference',
-    color: 'from-orange-500 to-red-500',
-    bgColor: 'bg-orange-500/10',
-    borderColor: 'border-orange-500/30'
-  }
-};
+function EventCardSkeleton() {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 animate-pulse">
+      <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+      <div className="p-6 space-y-4">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4" />
+        </div>
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-xl w-full" />
+      </div>
+    </div>
+  );
+}
 
 const Events: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -97,27 +83,26 @@ const Events: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showPastEvents, setShowPastEvents] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 9;
 
-  useEffect(() => {
-    fetchEvents();
-  }, [selectedType, showPastEvents]);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const fetchEvents = async () => {
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const fetchEvents = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setLoading(true);
       setError(null);
 
-      let url = `${import.meta.env.VITE_API_BASE_URL}/api/events?limit=50`;
-      if (selectedType) {
-        url += `&eventType=${selectedType}`;
-      }
-      if (showPastEvents) {
-        url += '&past=true';
-      } else {
-        url += '&upcoming=true';
-      }
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/events?limit=50${selectedType ? `&eventType=${selectedType}` : ''}`;
 
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
       const data = await response.json();
 
       if (data.success) {
@@ -125,44 +110,41 @@ const Events: React.FC = () => {
       } else {
         setError(data.message || 'Failed to fetch events');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       setError('Failed to connect to server');
       console.error('Error fetching events:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedType]);
 
-  const filteredEvents = events.filter(event =>
-    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.shortDescription.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    fetchEvents();
+    return () => abortRef.current?.abort();
+  }, [fetchEvents]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const filteredEvents = useMemo(() => {
+    const now = new Date();
+    return events.filter(event => {
+      const matchesPast = showPastEvents
+        ? new Date(event.date) < now
+        : new Date(event.date) >= now;
+      if (!matchesPast) return false;
+
+      if (!debouncedSearch) return true;
+      const q = debouncedSearch.toLowerCase();
+      return (
+        event.title.toLowerCase().includes(q) ||
+        event.shortDescription.toLowerCase().includes(q)
+      );
     });
-  };
+  }, [events, showPastEvents, debouncedSearch]);
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZoneName: 'short'
-    });
-  };
+  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / pageSize));
+  const paginatedEvents = filteredEvents.slice((page - 1) * pageSize, page * pageSize);
 
-  const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-  };
+  useEffect(() => { setPage(1); }, [showPastEvents, debouncedSearch, selectedType]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -175,6 +157,17 @@ const Events: React.FC = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback ignored
+    }
   };
 
   return (
@@ -198,7 +191,7 @@ const Events: React.FC = () => {
               Events & Webinars
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Join our live sessions, workshops, and expert-led webinars. 
+              Join our live sessions, workshops, and expert-led webinars.
               Learn, connect, and grow with industry professionals.
             </p>
           </motion.div>
@@ -207,12 +200,14 @@ const Events: React.FC = () => {
 
       {/* Filters Section */}
       <section className="bg-white dark:bg-gray-800 shadow-md sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
             {/* Event Type Filter */}
-            <div className="flex flex-wrap gap-2">
+            <div className="relative overflow-hidden">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap snap-x snap-mandatory" role="group" aria-label="Event type filter" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <button
                 onClick={() => setSelectedType('')}
+                aria-pressed={selectedType === ''}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedType === ''
                     ? 'bg-blue-600 text-white'
@@ -227,6 +222,7 @@ const Events: React.FC = () => {
                   <button
                     key={type}
                     onClick={() => setSelectedType(type)}
+                    aria-pressed={selectedType === type}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                       selectedType === type
                         ? `bg-gradient-to-r ${config.color} text-white`
@@ -239,12 +235,14 @@ const Events: React.FC = () => {
                 );
               })}
             </div>
+            </div>
 
             {/* Past/Upcoming Toggle & Search */}
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-full p-1">
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-full p-1" role="group" aria-label="Event time filter">
                 <button
                   onClick={() => setShowPastEvents(false)}
+                  aria-pressed={!showPastEvents}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                     !showPastEvents
                       ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow'
@@ -255,6 +253,7 @@ const Events: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowPastEvents(true)}
+                  aria-pressed={showPastEvents}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                     showPastEvents
                       ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow'
@@ -272,9 +271,27 @@ const Events: React.FC = () => {
                   placeholder="Search events..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  aria-label="Search events"
+                  className="pl-10 pr-9 py-2 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
+
+              <button
+                onClick={handleShare}
+                className="px-3 py-2 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                aria-label="Copy link to clipboard"
+              >
+                {copied ? 'Copied!' : 'Share'}
+              </button>
             </div>
           </div>
         </div>
@@ -283,17 +300,35 @@ const Events: React.FC = () => {
       {/* Events Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
           </div>
         ) : error ? (
-          <div className="text-center py-20">
+          <div className="text-center py-20" role="alert">
             <p className="text-red-500 text-lg">{error}</p>
             <button
               onClick={fetchEvents}
               className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Try Again
+            </button>
+          </div>
+        ) : filteredEvents.length === 0 && debouncedSearch ? (
+          <div className="text-center py-20">
+            <Search className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+              No Matching Events
+            </h3>
+            <p className="text-gray-500 dark:text-gray-500 mb-4">
+              No events match "{debouncedSearch}". Try a different search term.
+            </p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Clear Search
             </button>
           </div>
         ) : filteredEvents.length === 0 ? (
@@ -303,21 +338,23 @@ const Events: React.FC = () => {
               No Events Found
             </h3>
             <p className="text-gray-500 dark:text-gray-500">
-              {showPastEvents 
-                ? 'No past events available. Check back later!' 
+              {showPastEvents
+                ? 'No past events available. Check back later!'
                 : 'No upcoming events scheduled. Stay tuned!'}
             </p>
           </div>
         ) : (
+          <>
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {filteredEvents.map((event) => {
+            {paginatedEvents.map((event) => {
               const config = eventTypeConfig[event.eventType];
               const Icon = config.icon;
+              const isPast = new Date(event.date) < new Date();
 
               return (
                 <motion.div
@@ -332,13 +369,14 @@ const Events: React.FC = () => {
                         src={normalizeImageUrl(event.image)}
                         alt={event.title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <div className={`w-full h-full bg-gradient-to-br ${config.color} flex items-center justify-center`}>
                         <Icon className="w-16 h-16 text-white/50" />
                       </div>
                     )}
-                    
+
                     {/* Event Type Badge */}
                     <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium text-white bg-gradient-to-r ${config.color}`}>
                       {config.label}
@@ -352,7 +390,7 @@ const Events: React.FC = () => {
                     )}
 
                     {/* Past Event Overlay */}
-                    {event.date && new Date(event.date) < new Date() && (
+                    {isPast && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white font-medium">
                           Event Ended
@@ -383,7 +421,7 @@ const Events: React.FC = () => {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <Clock className="w-4 h-4" />
-                        <span>{formatTime(event.date)} • {formatDuration(event.duration)}</span>
+                        <span>{formatTime(event.date)} &bull; {formatDuration(event.duration)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <MapPin className="w-4 h-4" />
@@ -391,13 +429,8 @@ const Events: React.FC = () => {
                       </div>
                       {event.host && (
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                          <User className="w-4 h-4" />
+                          <Users className="w-4 h-4" />
                           <span>Hosted by {event.host.name}</span>
-                        </div>
-                      )}
-                      {event.host && event.host.shortDescription && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          {event.host.shortDescription}
                         </div>
                       )}
                       {event.maxAttendees > 0 && (
@@ -427,11 +460,11 @@ const Events: React.FC = () => {
                       to={`/events/${event.slug}`}
                       className={`block w-full text-center py-3 rounded-xl font-medium transition-all bg-gradient-to-r ${config.color} text-white hover:opacity-90`}
                     >
-                      {event.date && new Date(event.date) < new Date() 
-                        ? 'View Recording' 
-                        : event.isSoldOut 
+                      {isPast
+                        ? 'View Recording'
+                        : event.isSoldOut
                           ? 'Join Waitlist'
-                          : event.registrationLink 
+                          : event.registrationLink
                             ? 'Register Now'
                             : 'Learn More'}
                     </Link>
@@ -440,6 +473,40 @@ const Events: React.FC = () => {
               );
             })}
           </motion.div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-30"
+                style={{
+                  background: page === 1 ? 'rgba(255,255,255,0.03)' : 'rgba(59,130,246,0.1)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: page === 1 ? 'rgba(255,255,255,0.3)' : '#60a5fa'
+                }}
+              >
+                Previous
+              </button>
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)', fontFamily: "'Space Mono', monospace" }}>
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-30"
+                style={{
+                  background: page === totalPages ? 'rgba(255,255,255,0.03)' : 'rgba(59,130,246,0.1)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: page === totalPages ? 'rgba(255,255,255,0.3)' : '#60a5fa'
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
+          </>
         )}
       </section>
 
