@@ -498,13 +498,25 @@ const Contact: React.FC = () => {
                       />
                       
                       <div>
-                        <label 
-                          htmlFor="message" 
-                          className="block text-xs font-bold mb-3"
-                          style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.5)", letterSpacing: "0.04em" }}
-                        >
-                          MESSAGE <span className="text-pink-400">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-3">
+                          <label
+                            htmlFor="message"
+                            className="block text-xs font-bold"
+                            style={{ fontFamily: "'Space Mono', monospace", color: "rgba(255,255,255,0.5)", letterSpacing: "0.04em" }}
+                          >
+                            MESSAGE <span className="text-pink-400">*</span>
+                          </label>
+                          <span
+                            className="text-xs font-bold"
+                            style={{
+                              fontFamily: "'Space Mono', monospace",
+                              color: formData.message.length >= 1000 ? "#f87171" : "rgba(255,255,255,0.4)",
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            {formData.message.length}/1000 characters allowed
+                          </span>
+                        </div>
                         <textarea
                           id="message"
                           name="message"
@@ -512,11 +524,12 @@ const Contact: React.FC = () => {
                           onChange={handleChange}
                           required
                           rows={5}
+                          maxLength={1000}
                           placeholder="Tell me about your project or idea..."
                           className="w-full px-5 py-4 rounded-xl text-white resize-none"
-                          style={{ 
+                          style={{
                             fontFamily: "'DM Sans', sans-serif",
-                            background: "rgb(11,12,24)", 
+                            background: "rgb(11,12,24)",
                             border: "1px solid rgba(255,255,255,0.06)",
                             outline: 'none',
                           }}
