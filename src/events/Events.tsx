@@ -7,7 +7,8 @@ import {
   MapPin,
   Users,
   Search,
-  X
+  X,
+  IndianRupee
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
@@ -446,7 +447,12 @@ const Events: React.FC = () => {
                       <span className={`text-lg font-bold ${
                         event.isFree ? 'text-green-500' : 'text-blue-600 dark:text-blue-400'
                       }`}>
-                        {event.isFree ? 'Free' : `${event.currency} ${event.price}`}
+                        {event.isFree ? 'Free' : (
+                          <span className="flex items-center gap-1">
+                            <IndianRupee className="w-4 h-4" />
+                            {event.price}
+                          </span>
+                        )}
                       </span>
                       {event.isSoldOut && (
                         <span className="text-sm font-medium text-red-500">

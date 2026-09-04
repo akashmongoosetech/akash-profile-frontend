@@ -16,7 +16,8 @@ import {
   Video,
   GraduationCap,
   Award,
-  Users
+  Users,
+  IndianRupee
 } from 'lucide-react';
 import { authenticatedFetch, normalizeImageUrl, isValidImageUrl } from '../utils/api';
 import Loader from '../components/Loader';
@@ -95,7 +96,7 @@ const EventManagement: React.FC = () => {
     duration: 60,
     location: 'Online',
     price: 0,
-    currency: 'USD',
+    currency: 'INR',
     maxAttendees: 0,
     published: false,
     featured: false,
@@ -518,7 +519,12 @@ const EventManagement: React.FC = () => {
                       </td>
                       <td className="px-4 py-4">
                         <span className={event.isFree ? 'text-green-400' : 'text-white'}>
-                          {event.isFree ? 'Free' : `${event.currency} ${event.price}`}
+                          {event.isFree ? 'Free' : (
+                            <span className="flex items-center gap-1">
+                              <IndianRupee className="w-4 h-4" />
+                              {event.price}
+                            </span>
+                          )}
                         </span>
                       </td>
                       <td className="px-4 py-4">

@@ -20,7 +20,8 @@ import {
   Briefcase,
   FileText,
   Check,
-  ChevronRight
+  ChevronRight,
+  IndianRupee
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
@@ -349,7 +350,12 @@ const EventDetail: React.FC = () => {
                     <span className={`text-3xl font-bold ${
                       event.isFree ? 'text-green-500' : 'text-blue-600 dark:text-blue-400'
                     }`}>
-                      {event.isFree ? 'Free' : `${event.currency} ${event.price}`}
+                      {event.isFree ? 'Free' : (
+                        <span className="flex items-center gap-1">
+                          <IndianRupee className="w-5 h-5" />
+                          {event.price}
+                        </span>
+                      )}
                     </span>
                     {/*{event.maxAttendees > 0 && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
@@ -726,7 +732,7 @@ const EventDetail: React.FC = () => {
                     About This Event
                   </h2>
                   <div
-                    className="prose dark:prose-invert max-w-none"
+                    className="prose text-white max-w-none"
                     dangerouslySetInnerHTML={{ __html: event.description }}
                   />
                 </div>
