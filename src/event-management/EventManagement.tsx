@@ -197,7 +197,7 @@ const EventManagement: React.FC = () => {
         duration: 60,
         location: 'Online',
         price: 0,
-        currency: 'USD',
+        currency: 'INR',
         maxAttendees: 0,
         published: false,
         featured: false,
