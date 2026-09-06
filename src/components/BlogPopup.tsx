@@ -126,8 +126,6 @@ export default function BlogPopup({ isOpen, onClose }) {
               style={{ borderRadius: "1.75rem" }}
               onClick={(e) => e.stopPropagation()}
             >
-              <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;700;800;900&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap');`}</style>
-
               {/* Animated glow border */}
               <motion.div
                 className="absolute -inset-px pointer-events-none"

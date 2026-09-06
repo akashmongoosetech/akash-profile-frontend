@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Code, Database, Cloud, Palette, Globe, Smartphone } from 'lucide-react';
+import { Code, Database, Cloud, Palette, Globe, Smartphone, Bot } from 'lucide-react';
 
 const Skills: React.FC = () => {
   const skillCategories = [
@@ -55,6 +55,33 @@ const Skills: React.FC = () => {
         { name: 'Android (Kotlin)', level: 70 },
         { name: 'Expo', level: 85 },
         { name: 'React Native CLI', level: 90 }
+      ]
+    },
+    {
+      title: 'AI & Automation',
+      icon: Bot,
+      color: 'from-violet-500 to-fuchsia-500',
+      skills: [
+        { name: 'AI Integration & API Development', level: 95 },
+        { name: 'LLM / Generative AI', level: 92 },
+        { name: 'AI Chatbots', level: 90 },
+        { name: 'RAG — Retrieval-Augmented Generation', level: 88 },
+        { name: 'Vector Databases', level: 85 },
+        { name: 'AI Agents & Agentic AI', level: 88 },
+        { name: 'AI Automation', level: 90 },
+        { name: 'n8n Skills & AI Agent', level: 85 },
+        { name: 'AI + Backend Development', level: 92 },
+        { name: 'AI + Database', level: 88 },
+        { name: 'AI Frameworks & Libraries', level: 85 },
+        { name: 'Machine Learning', level: 80 },
+        { name: 'NLP (Natural Language Processing)', level: 82 },
+        { name: 'Computer Vision / Multimodal AI', level: 78 },
+        { name: 'AI Voice Applications', level: 75 },
+        { name: 'AI Security', level: 80 },
+        { name: 'AI Testing & Evaluation', level: 82 },
+        { name: 'AI DevOps / MLOps', level: 78 },
+        { name: 'AI + Business Applications', level: 88 },
+        { name: 'AI Cloud Services', level: 85 }
       ]
     }
   ];

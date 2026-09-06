@@ -20,6 +20,7 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { removeAuthToken, isTokenExpired } from '../utils/api';
+import { AdminErrorBoundaryWrapper } from '../components/AdminErrorBoundary';
 
 /* ─── nav config ─────────────────────────────────────────────────────────── */
 const NAV_ITEMS = [
@@ -84,7 +85,6 @@ const AdminLayout: React.FC = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         .font-display { font-family: 'Syne', sans-serif; }
         .font-body    { font-family: 'DM Sans', sans-serif; }
         .nav-scrollbar::-webkit-scrollbar { width: 3px; }
@@ -383,7 +383,9 @@ const AdminLayout: React.FC = () => {
               transition={{ duration: 0.35, ease: 'easeOut' }}
               className="relative z-10 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto"
             >
-              <Outlet />
+              <AdminErrorBoundaryWrapper fallbackTitle="Admin Module Error" fallbackMessage="This section encountered an error. Other admin modules are unaffected.">
+                <Outlet />
+              </AdminErrorBoundaryWrapper>
             </motion.div>
           </main>
         </div>
