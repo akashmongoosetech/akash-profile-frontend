@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 // Lazy load components
 const Home = lazy(() => import('./Home'));
 const About = lazy(() => import('./About'));
@@ -55,7 +56,8 @@ const EventDetail = lazy(() => import('./events/EventDetail'));
 function App() {
   return (
     <ThemeProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <ErrorBoundary>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-900"><div className="text-white text-xl">Loading...</div></div>}>
           <Routes>
           <Route path="/" element={<Layout />}>
@@ -115,6 +117,7 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

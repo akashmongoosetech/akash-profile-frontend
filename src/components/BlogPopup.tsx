@@ -131,10 +131,9 @@ export default function BlogPopup({ isOpen, onClose }) {
               {/* Animated glow border */}
               <motion.div
                 className="absolute -inset-px pointer-events-none"
-                style={{ borderRadius: "1.75rem" }}
+                style={{ borderRadius: "1.75rem", opacity: 0.6 }}
                 animate={{ background: ["linear-gradient(135deg,#3b82f6,#8b5cf6,#06b6d4)", "linear-gradient(225deg,#8b5cf6,#06b6d4,#3b82f6)", "linear-gradient(315deg,#06b6d4,#3b82f6,#8b5cf6)"] }}
                 transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                style={{ opacity: 0.6 }}
               />
 
               {/* Outer glow */}
