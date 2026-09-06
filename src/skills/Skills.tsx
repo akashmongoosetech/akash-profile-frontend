@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { Code, Database, Cloud, Palette, Globe, Smartphone, Bot } from 'lucide-react';
+import { Code, Database, Cloud, Palette, Globe, Smartphone, Bot, TrendingUp } from 'lucide-react';
 
 const Skills: React.FC = () => {
   const skillCategories = [
@@ -82,6 +82,33 @@ const Skills: React.FC = () => {
         { name: 'AI DevOps / MLOps', level: 78 },
         { name: 'AI + Business Applications', level: 88 },
         { name: 'AI Cloud Services', level: 85 }
+      ]
+    },
+    {
+      title: 'Digital Marketing',
+      icon: TrendingUp,
+      color: 'from-amber-500 to-orange-500',
+      skills: [
+        { name: 'Digital Marketing Strategy', level: 95 },
+        { name: 'SEO — Search Engine Optimization', level: 92 },
+        { name: 'Local SEO', level: 88 },
+        { name: 'Content Marketing', level: 90 },
+        { name: 'Social Media Marketing', level: 88 },
+        { name: 'Paid Advertising / PPC', level: 90 },
+        { name: 'Social Media Advertising', level: 88 },
+        { name: 'Email Marketing', level: 85 },
+        { name: 'Marketing Automation', level: 85 },
+        { name: 'Conversion Rate Optimization — CRO', level: 82 },
+        { name: 'Analytics & Tracking', level: 90 },
+        { name: 'E-commerce Marketing', level: 85 },
+        { name: 'Affiliate & Influencer Marketing', level: 80 },
+        { name: 'Brand & Reputation Marketing', level: 82 },
+        { name: 'Video & YouTube Marketing', level: 85 },
+        { name: 'Mobile Marketing', level: 80 },
+        { name: 'WhatsApp & Conversational Marketing', level: 82 },
+        { name: 'B2B Marketing', level: 85 },
+        { name: 'Growth Marketing', level: 90 },
+        { name: 'AI-Powered Digital Marketing', level: 92 }
       ]
     }
   ];
