@@ -74,6 +74,13 @@ const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (editor && data !== undefined && editor.getData() !== data) {
+      editor.setData(data);
+    }
+  }, [data]);
+
   if (!CKEditor || !ClassicEditor) {
     return <div className="min-h-[200px] bg-white/5 border border-white/20 rounded-lg flex items-center justify-center">
       <Loader />
@@ -98,6 +105,9 @@ const CKEditorComponent: React.FC<CKEditorComponentProps> = ({
       data={data}
       onReady={(editor: Editor) => {
         editorRef.current = editor;
+        if (data && editor.getData() !== data) {
+          editor.setData(data);
+        }
         if (onReady) {
           onReady(editor);
         }

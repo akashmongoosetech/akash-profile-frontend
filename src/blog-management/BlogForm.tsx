@@ -85,6 +85,11 @@ const BlogForm: React.FC<BlogFormProps> = ({
 
   // Tags: separate raw input from committed tags
   const [tagsInput, setTagsInput] = useState(() => formData.tags.join(', '));
+  
+  React.useEffect(() => {
+    setTagsInput(formData.tags.join(', '));
+  }, [formData.tags]);
+
   const commitTags = (raw: string) => {
     const tags = raw.split(',').map(t => t.trim()).filter(t => t.length > 0);
     setFormData(prev => ({ ...prev, tags }));

@@ -547,16 +547,15 @@ const BlogPost: React.FC = () => {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="mb-12"
         >
-          <div className="relative rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="relative rounded-2xl overflow-hidden flex items-center justify-center bg-[#0a0a14]/60" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
             <motion.img
               src={normalizeImageUrl(blog.image)}
               alt={blog.title}
-              className="w-full h-64 md:h-96 object-cover"
+              className="w-full h-auto max-h-[500px] md:max-h-[650px] object-contain mx-auto"
               initial={{ scale: 1 }}
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
         </motion.div>
 

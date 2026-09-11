@@ -154,28 +154,76 @@ const BlogManagement: React.FC = () => {
   }, [searchTerm, selectedCategory]);
 
   // ─── Modal helpers ─────────────────────────────────────────────────────────
-  const openModal = (blog?: BlogPost) => {
+  const openModal = async (blog?: BlogPost) => {
     if (blog) {
       setEditingBlog(blog);
-      setFormData({
-        title: blog.title ?? '',
-        slug: blog.slug ?? '',
-        excerpt: blog.excerpt ?? '',
-        content: blog.content ?? '',
-        contentSections: blog.contentSections ?? [],
-        image: blog.image ?? '',
-        author: blog.author ?? '',
-        authorProfile: blog.authorProfile ?? DEFAULT_FORM_DATA.authorProfile,
-        authorProfilePic: blog.authorProfilePic ?? '',
-        category: blog.category ?? '',
-        tags: blog.tags ?? [],
-        readTime: blog.readTime ?? '',
-        featured: blog.featured,
-        published: blog.published,
-        seoTitle: blog.seoTitle ?? '',
-        seoDescription: blog.seoDescription ?? '',
-        seoKeywords: blog.seoKeywords ?? '',
-      });
+      try {
+        const response = await authenticatedFetch(`/api/blog/${blog._id}`);
+        const data = await response.json();
+        if (data.success && data.blog) {
+          const fullBlog = data.blog;
+          setFormData({
+            title: fullBlog.title ?? '',
+            slug: fullBlog.slug ?? '',
+            excerpt: fullBlog.excerpt ?? '',
+            content: fullBlog.content ?? '',
+            contentSections: fullBlog.contentSections ?? [],
+            image: fullBlog.image ?? '',
+            author: fullBlog.author ?? '',
+            authorProfile: fullBlog.authorProfile ?? DEFAULT_FORM_DATA.authorProfile,
+            authorProfilePic: fullBlog.authorProfilePic ?? '',
+            category: fullBlog.category ?? '',
+            tags: fullBlog.tags ?? [],
+            readTime: fullBlog.readTime ?? '',
+            featured: fullBlog.featured,
+            published: fullBlog.published,
+            seoTitle: fullBlog.seoTitle ?? '',
+            seoDescription: fullBlog.seoDescription ?? '',
+            seoKeywords: fullBlog.seoKeywords ?? '',
+          });
+        } else {
+          setFormData({
+            title: blog.title ?? '',
+            slug: blog.slug ?? '',
+            excerpt: blog.excerpt ?? '',
+            content: blog.content ?? '',
+            contentSections: blog.contentSections ?? [],
+            image: blog.image ?? '',
+            author: blog.author ?? '',
+            authorProfile: blog.authorProfile ?? DEFAULT_FORM_DATA.authorProfile,
+            authorProfilePic: blog.authorProfilePic ?? '',
+            category: blog.category ?? '',
+            tags: blog.tags ?? [],
+            readTime: blog.readTime ?? '',
+            featured: blog.featured,
+            published: blog.published,
+            seoTitle: blog.seoTitle ?? '',
+            seoDescription: blog.seoDescription ?? '',
+            seoKeywords: blog.seoKeywords ?? '',
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching blog details for edit:', err);
+        setFormData({
+          title: blog.title ?? '',
+          slug: blog.slug ?? '',
+          excerpt: blog.excerpt ?? '',
+          content: blog.content ?? '',
+          contentSections: blog.contentSections ?? [],
+          image: blog.image ?? '',
+          author: blog.author ?? '',
+          authorProfile: blog.authorProfile ?? DEFAULT_FORM_DATA.authorProfile,
+          authorProfilePic: blog.authorProfilePic ?? '',
+          category: blog.category ?? '',
+          tags: blog.tags ?? [],
+          readTime: blog.readTime ?? '',
+          featured: blog.featured,
+          published: blog.published,
+          seoTitle: blog.seoTitle ?? '',
+          seoDescription: blog.seoDescription ?? '',
+          seoKeywords: blog.seoKeywords ?? '',
+        });
+      }
     } else {
       setEditingBlog(null);
       setFormData(DEFAULT_FORM_DATA);
