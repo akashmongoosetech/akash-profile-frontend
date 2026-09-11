@@ -63,14 +63,11 @@ const AdminLayout: React.FC = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  /* token expiry check */
+  /* check token presence on mount */
   useEffect(() => {
-    const check = () => {
-      if (isTokenExpired()) { removeAuthToken(); navigate('/admin/login', { replace: true }); }
-    };
-    check();
-    const id = setInterval(check, 60_000);
-    return () => clearInterval(id);
+    if (!localStorage.getItem('adminToken')) {
+      navigate('/admin/login', { replace: true });
+    }
   }, [navigate]);
 
   /* scroll main back to top on route change */

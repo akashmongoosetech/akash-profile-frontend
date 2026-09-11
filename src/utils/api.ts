@@ -72,18 +72,14 @@ export const getAuthToken = (): string | null => {
   return localStorage.getItem('adminToken');
 };
 
-// Get token expiration time from localStorage
+// Get token expiration time from localStorage (deprecated, kept for backwards compatibility)
 export const getTokenExpiration = (): number | null => {
-  const expiration = localStorage.getItem('adminTokenExpiration');
-  return expiration ? parseInt(expiration, 10) : null;
+  return null;
 };
 
-// Set auth token in localStorage with expiration
+// Set auth token in localStorage (persistent login without inactivity expiration)
 export const setAuthToken = (token: string): void => {
   localStorage.setItem('adminToken', token);
-  // Store token expiration time (1 hour from now in milliseconds)
-  const expirationTime = Date.now() + 60 * 60 * 1000;
-  localStorage.setItem('adminTokenExpiration', expirationTime.toString());
 };
 
 // Remove auth token from localStorage
@@ -92,13 +88,9 @@ export const removeAuthToken = (): void => {
   localStorage.removeItem('adminTokenExpiration');
 };
 
-// Check if token is expired
+// Check if token is expired (always returns false unless token is completely missing)
 export const isTokenExpired = (): boolean => {
-  const expiration = getTokenExpiration();
-  if (!expiration) {
-    return true; // No expiration stored, treat as expired
-  }
-  return Date.now() >= expiration;
+  return !getAuthToken();
 };
 
 // Check if user is authenticated
