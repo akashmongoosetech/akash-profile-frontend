@@ -349,7 +349,7 @@ const CaseStudiesManagement: React.FC = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[700px]">
                 <thead className="bg-white/[0.02]">
                   <tr className="text-left">
                     <th className="px-6 py-4 text-white/60 font-medium">Title</th>

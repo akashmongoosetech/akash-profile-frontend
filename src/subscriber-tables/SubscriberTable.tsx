@@ -297,7 +297,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
 
         {/* Desktop Table View - hidden on small screens */}
         <div className="hidden md:block overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead className="bg-slate-900/50 border-b border-slate-700/50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Email</th>
