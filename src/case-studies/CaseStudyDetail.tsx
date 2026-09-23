@@ -121,7 +121,7 @@ const CaseStudyDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 pt-14 sm:pt-16">
         <div className="text-white text-xl">Loading case study...</div>
       </div>
     );
@@ -129,7 +129,7 @@ const CaseStudyDetail: React.FC = () => {
 
   if (error || !caseStudy) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4 pt-14 sm:pt-16">
         <h1 className="text-3xl font-bold text-white mb-4">Case study not found</h1>
         <p className="text-gray-400 mb-8">{error || 'This case study does not exist.'}</p>
         <Link
@@ -153,32 +153,32 @@ const CaseStudyDetail: React.FC = () => {
         <link rel="canonical" href={`${window.location.origin}/case-studies/${caseStudy.slug}`} />
       </Helmet>
 
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-gray-900 pt-14 sm:pt-16">
         {/* Hero */}
-        <div className="relative h-[50vh] min-h-[380px]">
-          <img
-            src={normalizeImageUrl(caseStudy.thumbnail)}
-            alt={caseStudy.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/475569?text=No+Image';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
-          <div className="absolute inset-0 flex items-end">
-            <div className="max-w-5xl mx-auto px-4 pb-10 w-full">
-              <Link
-                to="/case-studies"
-                className="inline-flex items-center text-gray-300 hover:text-white mb-4 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                All Case Studies
-              </Link>
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3">
+        <div className="max-w-5xl mx-auto px-4 pt-8">
+          <Link
+            to="/case-studies"
+            className="inline-flex items-center text-gray-300 hover:text-white mb-5 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            All Case Studies
+          </Link>
+          <div className="relative h-[320px] md:h-[420px] overflow-hidden rounded-3xl border border-white/10">
+            <img
+              src={normalizeImageUrl(caseStudy.thumbnail)}
+              alt={caseStudy.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/475569?text=No+Image';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
+            <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3 backdrop-blur">
                 {caseStudy.category}
               </span>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">{caseStudy.title}</h1>
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">{caseStudy.title}</h1>
               <div className="flex items-center gap-2 text-gray-300">
                 <span>{caseStudy.client}</span>
                 <span>•</span>
@@ -189,7 +189,7 @@ const CaseStudyDetail: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="max-w-5xl mx-auto px-4 py-12">
+        <div className="max-w-5xl mx-auto px-4 py-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="mb-10">
               <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
