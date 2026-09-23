@@ -160,6 +160,10 @@ const CaseStudyDetail: React.FC = () => {
             src={normalizeImageUrl(caseStudy.thumbnail)}
             alt={caseStudy.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/475569?text=No+Image';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
           <div className="absolute inset-0 flex items-end">
@@ -224,23 +228,53 @@ const CaseStudyDetail: React.FC = () => {
               </div>
             )}
 
-            {caseStudy.results && caseStudy.results.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-2xl font-bold text-white mb-4">Results & Impact</h2>
+            {caseStudy.results && caseStudy.results.filter((r) => r.value?.trim() || r.label?.trim()).length > 0 && (
+              <div className="mb-12">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-2xl font-bold text-white">Results & Impact</h2>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+                    {caseStudy.results.filter((r) => r.value?.trim() || r.label?.trim()).length} outcomes
+                  </span>
+                </div>
+                <div className="h-1 w-24 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-emerald-400 mb-6" />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {caseStudy.results.map((result, index) => {
-                    const IconComponent = getIconComponent(result.icon);
-                    return (
-                      <div
-                        key={index}
-                        className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-white/10"
-                      >
-                        <IconComponent className="w-6 h-6 text-blue-400 mb-2" />
-                        <div className="text-2xl font-bold text-white">{result.value}</div>
-                        <div className="text-sm text-gray-400">{result.label}</div>
-                      </div>
-                    );
-                  })}
+                  {caseStudy.results
+                    .filter((r) => r.value?.trim() || r.label?.trim())
+                    .map((result, index) => {
+                      const IconComponent = getIconComponent(result.icon);
+                      const accents = [
+                        { text: 'text-blue-400', tile: 'from-blue-500/25 to-blue-500/5 border-blue-500/30', glow: 'group-hover:shadow-blue-500/20', hairline: 'from-blue-500 to-transparent' },
+                        { text: 'text-purple-400', tile: 'from-purple-500/25 to-purple-500/5 border-purple-500/30', glow: 'group-hover:shadow-purple-500/20', hairline: 'from-purple-500 to-transparent' },
+                        { text: 'text-emerald-400', tile: 'from-emerald-500/25 to-emerald-500/5 border-emerald-500/30', glow: 'group-hover:shadow-emerald-500/20', hairline: 'from-emerald-500 to-transparent' },
+                        { text: 'text-amber-400', tile: 'from-amber-500/25 to-amber-500/5 border-amber-500/30', glow: 'group-hover:shadow-amber-500/20', hairline: 'from-amber-500 to-transparent' },
+                      ];
+                      const accent = accents[index % accents.length];
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 16 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: index * 0.08, duration: 0.4 }}
+                          className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-gray-900/60 p-5 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-xl ${accent.glow}`}
+                        >
+                          <div className={`absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r ${accent.hairline}`} />
+                          <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border bg-gradient-to-br ${accent.tile}`}>
+                            <IconComponent className={`h-5 w-5 ${accent.text}`} />
+                          </div>
+                          {result.value?.trim() && (
+                            <div className="break-words text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+                              {result.value}
+                            </div>
+                          )}
+                          {result.label?.trim() && (
+                            <div className="mt-1 break-words text-sm leading-snug text-gray-400">
+                              {result.label}
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -266,6 +300,10 @@ const CaseStudyDetail: React.FC = () => {
                       src={normalizeImageUrl(caseStudy.testimonial.avatar)}
                       alt={caseStudy.testimonial.author}
                       className="w-14 h-14 rounded-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://placehold.co/100x100/1e293b/475569?text=No+Image';
+                      }}
                     />
                   )}
                   <div>
@@ -294,6 +332,10 @@ const CaseStudyDetail: React.FC = () => {
                         src={normalizeImageUrl(item.thumbnail)}
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://placehold.co/600x300/1e293b/475569?text=No+Image';
+                        }}
                       />
                     </div>
                     <div className="p-5">
