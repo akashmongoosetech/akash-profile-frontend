@@ -1,0 +1,319 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { API_BASE_URL, normalizeHtmlImageSources, normalizeImageUrl, stripHtmlTags } from '../utils/api';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Code,
+  Palette,
+  Database,
+  Cloud,
+  Smartphone,
+  TrendingUp,
+  Target,
+  Users,
+  Star,
+  Clock,
+  Lightbulb,
+  Rocket,
+} from 'lucide-react';
+
+interface CaseStudy {
+  _id: string;
+  title: string;
+  slug: string;
+  category: string;
+  client: string;
+  duration: string;
+  thumbnail: string;
+  color: string;
+  icon: string;
+  overview: string;
+  challenge: string;
+  solution: string;
+  results: { label: string; value: string; icon: string }[];
+  technologies: string[];
+  testimonial?: {
+    text: string;
+    author: string;
+    position: string;
+    avatar: string;
+  };
+  published: boolean;
+}
+
+const CaseStudyDetail: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
+  const [related, setRelated] = useState<CaseStudy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const getIconComponent = (iconName: string) => {
+    const iconMap: { [key: string]: React.ElementType } = {
+      Code,
+      Palette,
+      Database,
+      Cloud,
+      Smartphone,
+      TrendingUp,
+      Target,
+      Users,
+      Star,
+      Clock,
+    };
+    return iconMap[iconName] || Code;
+  };
+
+  const fetchRelated = useCallback(async (category: string, excludeId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/case-studies/public`);
+      const data = await response.json();
+      if (data.success) {
+        const filtered = (data.caseStudies || [])
+          .filter((c: CaseStudy) => c._id !== excludeId && c.category === category)
+          .slice(0, 3);
+        setRelated(filtered);
+      }
+    } catch {
+      /* ignore related fetch errors */
+    }
+  }, []);
+
+  const fetchCaseStudy = useCallback(async (caseSlug: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`${API_BASE_URL}/api/case-studies/slug/${caseSlug}`, {
+        signal: controller.signal,
+      });
+      const data = await response.json();
+      if (data.success && data.caseStudy) {
+        setCaseStudy(data.caseStudy);
+        fetchRelated(data.caseStudy.category, data.caseStudy._id);
+      } else {
+        setError(data.message || 'Case study not found');
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      console.error('Error fetching case study:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchRelated]);
+
+  useEffect(() => {
+    if (slug) fetchCaseStudy(slug);
+    return () => abortRef.current?.abort();
+  }, [slug, fetchCaseStudy]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-white text-xl">Loading case study...</div>
+      </div>
+    );
+  }
+
+  if (error || !caseStudy) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4">
+        <h1 className="text-3xl font-bold text-white mb-4">Case study not found</h1>
+        <p className="text-gray-400 mb-8">{error || 'This case study does not exist.'}</p>
+        <Link
+          to="/case-studies"
+          className="inline-flex items-center px-6 py-3 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Case Studies
+        </Link>
+      </div>
+    );
+  }
+
+  const plainOverview = stripHtmlTags(caseStudy.overview);
+
+  return (
+    <>
+      <Helmet>
+        <title>{`${caseStudy.title} | Case Study`}</title>
+        <meta name="description" content={plainOverview.substring(0, 160)} />
+        <link rel="canonical" href={`${window.location.origin}/case-studies/${caseStudy.slug}`} />
+      </Helmet>
+
+      <div className="min-h-screen bg-gray-900">
+        {/* Hero */}
+        <div className="relative h-[50vh] min-h-[380px]">
+          <img
+            src={normalizeImageUrl(caseStudy.thumbnail)}
+            alt={caseStudy.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
+          <div className="absolute inset-0 flex items-end">
+            <div className="max-w-5xl mx-auto px-4 pb-10 w-full">
+              <Link
+                to="/case-studies"
+                className="inline-flex items-center text-gray-300 hover:text-white mb-4 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                All Case Studies
+              </Link>
+              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3">
+                {caseStudy.category}
+              </span>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">{caseStudy.title}</h1>
+              <div className="flex items-center gap-2 text-gray-300">
+                <span>{caseStudy.client}</span>
+                <span>•</span>
+                <span>{caseStudy.duration}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-5xl mx-auto px-4 py-12">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="mb-10">
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-yellow-400" />
+                Overview
+              </h2>
+              <div
+                className="blog-content text-gray-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(caseStudy.overview) }}
+              />
+            </div>
+
+            {caseStudy.challenge && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Target className="w-6 h-6 text-red-400" />
+                  The Challenge
+                </h2>
+                <div
+                  className="blog-content text-gray-300 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(caseStudy.challenge) }}
+                />
+              </div>
+            )}
+
+            {caseStudy.solution && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Rocket className="w-6 h-6 text-green-400" />
+                  The Solution
+                </h2>
+                <div
+                  className="blog-content text-gray-300 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(caseStudy.solution) }}
+                />
+              </div>
+            )}
+
+            {caseStudy.results && caseStudy.results.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold text-white mb-4">Results & Impact</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {caseStudy.results.map((result, index) => {
+                    const IconComponent = getIconComponent(result.icon);
+                    return (
+                      <div
+                        key={index}
+                        className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-white/10"
+                      >
+                        <IconComponent className="w-6 h-6 text-blue-400 mb-2" />
+                        <div className="text-2xl font-bold text-white">{result.value}</div>
+                        <div className="text-sm text-gray-400">{result.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {caseStudy.technologies && caseStudy.technologies.length > 0 && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold text-white mb-4">Technologies Used</h2>
+                <div className="flex flex-wrap gap-2">
+                  {caseStudy.technologies.map((tech, index) => (
+                    <span key={index} className="px-4 py-2 rounded-full bg-white/10 text-gray-300 text-sm">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {caseStudy.testimonial && caseStudy.testimonial.text && (
+              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-6 border border-white/10 mb-10">
+                <div className="flex items-start gap-4">
+                  {caseStudy.testimonial.avatar && (
+                    <img
+                      src={normalizeImageUrl(caseStudy.testimonial.avatar)}
+                      alt={caseStudy.testimonial.author}
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                  )}
+                  <div>
+                    <p className="text-gray-300 italic mb-3">"{caseStudy.testimonial.text}"</p>
+                    <div className="text-white font-semibold">{caseStudy.testimonial.author}</div>
+                    <div className="text-gray-400 text-sm">{caseStudy.testimonial.position}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Related */}
+          {related.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold text-white mb-6">Related Case Studies</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {related.map((item) => (
+                  <Link
+                    key={item._id}
+                    to={`/case-studies/${item.slug}`}
+                    className="group bg-gray-900/50 rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all"
+                  >
+                    <div className="h-40 overflow-hidden">
+                      <img
+                        src={normalizeImageUrl(item.thumbnail)}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-white font-bold group-hover:text-blue-400 transition-colors">
+                        {item.title}
+                      </h3>
+                      <div className="mt-3 flex items-center text-blue-400 text-sm font-medium">
+                        View Case Study
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default CaseStudyDetail;
