@@ -36,6 +36,7 @@ interface Testimonial {
 interface CaseStudy {
   _id: string;
   title: string;
+  slug: string;
   category: string;
   client: string;
   duration: string;
@@ -55,6 +56,7 @@ interface CaseStudy {
 
 interface CaseStudyFormData {
   title: string;
+  slug: string;
   category: string;
   client: string;
   duration: string;
@@ -72,6 +74,7 @@ interface CaseStudyFormData {
 
 const DEFAULT_FORM_DATA: CaseStudyFormData = {
   title: '',
+  slug: '',
   category: 'Web Development',
   client: '',
   duration: '',
@@ -112,6 +115,17 @@ const CaseStudiesManagement: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   const [formData, setFormData] = useState<CaseStudyFormData>(DEFAULT_FORM_DATA);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+
+  // Generate slug from title (same as blog management)
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
 
   // CKEditor dark theme configuration
   const ckeditorDarkConfig = {
@@ -167,8 +181,10 @@ const CaseStudiesManagement: React.FC = () => {
   const openModal = (caseStudy?: CaseStudy) => {
     if (caseStudy) {
       setEditingCaseStudy(caseStudy);
+      setIsSlugManuallyEdited(true);
       setFormData({
         title: caseStudy.title ?? '',
+        slug: caseStudy.slug ?? generateSlug(caseStudy.title ?? ''),
         category: caseStudy.category ?? '',
         client: caseStudy.client ?? '',
         duration: caseStudy.duration ?? '',
@@ -185,6 +201,7 @@ const CaseStudiesManagement: React.FC = () => {
       });
     } else {
       setEditingCaseStudy(null);
+      setIsSlugManuallyEdited(false);
       setFormData(DEFAULT_FORM_DATA);
     }
     setShowModal(true);
@@ -193,6 +210,7 @@ const CaseStudiesManagement: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
     setEditingCaseStudy(null);
+    setIsSlugManuallyEdited(false);
     setFormData(DEFAULT_FORM_DATA);
   };
 
@@ -203,6 +221,9 @@ const CaseStudiesManagement: React.FC = () => {
 
     try {
       if (!formData.title?.trim()) { alert('Title is required'); return; }
+      const normalizedSlug = generateSlug(formData.slug || formData.title);
+      if (!normalizedSlug) { alert('Slug is required'); return; }
+      if (!/^[a-z0-9-]+$/.test(normalizedSlug)) { alert('Slug can only contain lowercase letters, numbers, and hyphens'); return; }
       if (!formData.client?.trim()) { alert('Client is required'); return; }
       if (!formData.overview?.trim()) { alert('Overview is required'); return; }
 
@@ -228,6 +249,9 @@ const CaseStudiesManagement: React.FC = () => {
           }
         }
       });
+
+      // Always send the normalized slug (auto-generated from title when needed)
+      formDataToSend.set('slug', normalizedSlug);
 
       // If editing and no new file uploaded, don't send thumbnail
       if (editingCaseStudy && typeof formData.thumbnail === 'string') {
@@ -394,6 +418,7 @@ const CaseStudiesManagement: React.FC = () => {
                           />
                           <div>
                             <p className="text-white font-medium truncate max-w-xs">{caseStudy.title}</p>
+                            <p className="text-white/40 text-sm truncate max-w-xs">/{caseStudy.slug}</p>
                             <p className="text-white/40 text-sm">{caseStudy.duration}</p>
                           </div>
                         </div>
@@ -519,12 +544,37 @@ const CaseStudiesManagement: React.FC = () => {
                         type="text"
                         value={formData.title}
                         maxLength={100}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        onChange={(e) => {
+                          const nextTitle = e.target.value;
+                          setFormData((prev) => ({
+                            ...prev,
+                            title: nextTitle,
+                            ...(!isSlugManuallyEdited ? { slug: generateSlug(nextTitle) } : {}),
+                          }));
+                        }}
                         className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
                         placeholder="Case study title"
                         required
                       />
                       <div className="text-xs text-white/40 mt-1">{formData.title.length}/100 characters</div>
+                    </div>
+                    <div>
+                      <label className="block text-white/80 text-sm font-medium mb-2">
+                        Slug *
+                        <span className="text-white/40 text-xs ml-2">(auto-generated, editable)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.slug}
+                        onChange={(e) => {
+                          setIsSlugManuallyEdited(true);
+                          setFormData({ ...formData, slug: generateSlug(e.target.value) });
+                        }}
+                        className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                        placeholder="case-study-slug"
+                        required
+                      />
+                      <div className="text-xs text-white/40 mt-1">Lowercase letters, numbers, and hyphens only</div>
                     </div>
                     <div>
                       <label className="block text-white/80 text-sm font-medium mb-2">
