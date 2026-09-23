@@ -294,7 +294,7 @@ const CaseStudies: React.FC = () => {
             {[
               { icon: Briefcase, value: '50+', label: 'Projects Completed' },
               { icon: Users, value: '25+', label: 'Happy Clients' },
-              { icon: Clock, value: '2+', label: 'Years Experience' },
+              { icon: Clock, value: '4+', label: 'Years Experience' },
               { icon: Star, value: '4.9', label: 'Average Rating' }
             ].map((stat, index) => (
               <motion.div
