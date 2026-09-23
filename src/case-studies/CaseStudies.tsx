@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL, normalizeHtmlImageSources, normalizeImageUrl, stripHtmlTags } from '../utils/api';
-import { 
-  ArrowRight, 
-  X, 
-  Code, 
-  Palette, 
-  Database, 
-  Cloud, 
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { API_BASE_URL, normalizeImageUrl, stripHtmlTags } from '../utils/api';
+import {
+  ArrowRight,
+  Code,
+  Palette,
+  Database,
+  Cloud,
   Smartphone,
   TrendingUp,
+  Target,
   Users,
   Clock,
   Star,
   Briefcase,
-  Lightbulb,
-  Target,
-  Rocket
 } from 'lucide-react';
 
 interface CaseStudy {
   _id: string;
   title: string;
+  slug: string;
   category: string;
   client: string;
   duration: string;
@@ -44,7 +43,6 @@ interface CaseStudy {
 }
 
 const CaseStudies: React.FC = () => {
-  const [selectedCase, setSelectedCase] = useState<CaseStudy | null>(null);
   const [filter, setFilter] = useState('all');
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,9 +190,13 @@ const CaseStudies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group cursor-pointer"
-                onClick={() => setSelectedCase(study)}
+                className="group"
               >
+                <Link
+                  to={`/case-studies/${study.slug || study._id}`}
+                  className="block cursor-pointer"
+                  aria-label={`View ${study.title}`}
+                >
                 <div className="bg-gray-900/50 backdrop-blur-lg rounded-2xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10">
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
@@ -260,6 +262,7 @@ const CaseStudies: React.FC = () => {
                     </div>
                   </div>
                 </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -340,144 +343,6 @@ const CaseStudies: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal */}
-      <AnimatePresence>
-        {selectedCase && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-start justify-center p-4 pt-20 bg-black/80 backdrop-blur-sm overflow-y-auto"
-            onClick={() => setSelectedCase(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-gray-900 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto pt-20"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal Header */}
-              <div className="relative h-64">
-                <img
-                  src={normalizeImageUrl(selectedCase.thumbnail)}
-                  alt={selectedCase.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
-                <button
-                  onClick={() => setSelectedCase(null)}
-                  className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-                <div className="absolute bottom-6 left-6 right-6">
-                  <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3">
-                    {selectedCase.category}
-                  </span>
-                  <h2 className="text-3xl font-bold text-white">{selectedCase.title}</h2>
-                </div>
-              </div>
-
-              {/* Modal Content */}
-              <div className="p-6 md:p-8">
-                {/* Overview */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-yellow-400" />
-                    Overview
-                  </h3>
-                  <div
-                    className="blog-content text-gray-300 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.overview) }}
-                  />
-                </div>
-
-                {/* Challenge */}
-                {selectedCase.challenge && (
-                  <div className="mb-8">
-                    <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                      <Target className="w-5 h-5 text-red-400" />
-                      The Challenge
-                    </h3>
-                    <div
-                      className="blog-content text-gray-300 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.challenge) }}
-                    />
-                  </div>
-                )}
-
-                {/* Solution */}
-                {selectedCase.solution && (
-                  <div className="mb-8">
-                    <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                      <Rocket className="w-5 h-5 text-green-400" />
-                      The Solution
-                    </h3>
-                    <div
-                      className="blog-content text-gray-300 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.solution) }}
-                    />
-                  </div>
-                )}
-
-                {/* Results */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-4">Results & Impact</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {selectedCase.results.map((result, index) => {
-                      const IconComponent = getIconComponent(result.icon);
-                      return (
-                        <div
-                          key={index}
-                          className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-4 border border-white/10"
-                        >
-                          <IconComponent className="w-6 h-6 text-blue-400 mb-2" />
-                          <div className="text-2xl font-bold text-white">{result.value}</div>
-                          <div className="text-sm text-gray-400">{result.label}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Technologies */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-4">Technologies Used</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCase.technologies.map((tech, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 rounded-full bg-white/10 text-gray-300 text-sm"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial */}
-                {selectedCase.testimonial && (
-                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-6 border border-white/10">
-                    <div className="flex items-start gap-4">
-                      <img
-                        src={selectedCase.testimonial.avatar}
-                        alt={selectedCase.testimonial.author}
-                        className="w-14 h-14 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="text-gray-300 italic mb-3">"{selectedCase.testimonial.text}"</p>
-                        <div className="text-white font-semibold">{selectedCase.testimonial.author}</div>
-                        <div className="text-gray-400 text-sm">{selectedCase.testimonial.position}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

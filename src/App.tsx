@@ -17,6 +17,7 @@ const BlogPost = lazy(() => import('./blog-posts/BlogPost'));
 const Contact = lazy(() => import('./contacts/Contact'));
 const Admin = lazy(() => import('./admins/Admin'));
 const CaseStudies = lazy(() => import('./case-studies/CaseStudies'));
+const CaseStudyDetail = lazy(() => import('./case-studies/CaseStudyDetail'));
 const AdminLogin = lazy(() => import('./admins/AdminLogin'));
 const AdminLayout = lazy(() => import('./admins/AdminLayout'));
 const ContactTable = lazy(() => import('./contact-tables/ContactTable'));
@@ -74,6 +75,7 @@ function App() {
             <Route path="events/:slug" element={<EventDetail />} />
             <Route path="contact" element={<Contact />} />
             <Route path="case-studies" element={<CaseStudies />} />
+            <Route path="case-studies/:slug" element={<CaseStudyDetail />} />
             <Route path="website-cost-calculator" element={<WebsiteCostCalculator />} />
             <Route path="emi-calculator" element={<EMICalculator />} />
             <Route path="seo-audit-mini-tool" element={<SEOAuditMiniTool />} />
