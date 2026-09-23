@@ -163,11 +163,11 @@ const CaseStudyDetail: React.FC = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             All Case Studies
           </Link>
-          <div className="relative h-[320px] md:h-[420px] overflow-hidden rounded-3xl border border-white/10">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gray-950">
             <img
               src={normalizeImageUrl(caseStudy.thumbnail)}
               alt={caseStudy.title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-h-[75vh] object-contain"
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/475569?text=No+Image';

@@ -204,7 +204,11 @@ const CaseStudies: React.FC = () => {
                     <img
                       src={normalizeImageUrl(study.thumbnail)}
                       alt={study.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="relative w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://placehold.co/600x300/1e293b/475569?text=No+Image';
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
                     <div className="absolute top-4 left-4">
