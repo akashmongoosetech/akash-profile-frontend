@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL } from '../utils/api';
+import { API_BASE_URL, normalizeHtmlImageSources, normalizeImageUrl, stripHtmlTags } from '../utils/api';
 import { 
   ArrowRight, 
   X, 
@@ -200,7 +200,7 @@ const CaseStudies: React.FC = () => {
                   <div className="relative h-48 overflow-hidden">
                     <div className={`absolute inset-0 bg-gradient-to-br ${study.color} opacity-20`} />
                     <img
-                      src={study.thumbnail}
+                      src={normalizeImageUrl(study.thumbnail)}
                       alt={study.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -223,7 +223,7 @@ const CaseStudies: React.FC = () => {
                       {study.title}
                     </h3>
                     <p className="text-gray-400 text-sm line-clamp-2 mb-4">
-                      {study.overview}
+                      {stripHtmlTags(study.overview)}
                     </p>
                     
                     {/* Tech Tags */}
@@ -360,7 +360,7 @@ const CaseStudies: React.FC = () => {
               {/* Modal Header */}
               <div className="relative h-64">
                 <img
-                  src={selectedCase.thumbnail}
+                  src={normalizeImageUrl(selectedCase.thumbnail)}
                   alt={selectedCase.title}
                   className="w-full h-full object-cover"
                 />
@@ -387,26 +387,39 @@ const CaseStudies: React.FC = () => {
                     <Lightbulb className="w-5 h-5 text-yellow-400" />
                     Overview
                   </h3>
-                  <p className="text-gray-300 leading-relaxed">{selectedCase.overview}</p>
+                  <div
+                    className="blog-content text-gray-300 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.overview) }}
+                  />
                 </div>
 
                 {/* Challenge */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-red-400" />
-                    The Challenge
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">{selectedCase.challenge}</p>
-                </div>
+                {selectedCase.challenge && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                      <Target className="w-5 h-5 text-red-400" />
+                      The Challenge
+                    </h3>
+                    <div
+                      className="blog-content text-gray-300 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.challenge) }}
+                    />
+                  </div>
+                )}
 
                 {/* Solution */}
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-                    <Rocket className="w-5 h-5 text-green-400" />
-                    The Solution
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">{selectedCase.solution}</p>
-                </div>
+                {selectedCase.solution && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                      <Rocket className="w-5 h-5 text-green-400" />
+                      The Solution
+                    </h3>
+                    <div
+                      className="blog-content text-gray-300 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(selectedCase.solution) }}
+                    />
+                  </div>
+                )}
 
                 {/* Results */}
                 <div className="mb-8">

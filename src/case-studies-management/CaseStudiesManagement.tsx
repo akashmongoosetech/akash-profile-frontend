@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authenticatedFetch, normalizeImageUrl, API_BASE_URL } from '../utils/api';
+import CKEditorComponent from '../blog-management/CKEditorComponent';
+import type { Editor } from '@ckeditor/ckeditor5-core';
+import type { EventInfo } from '@ckeditor/ckeditor5-utils';
 import Loader from '../components/Loader';
 import {
   Plus,
@@ -109,6 +112,23 @@ const CaseStudiesManagement: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   const [formData, setFormData] = useState<CaseStudyFormData>(DEFAULT_FORM_DATA);
+
+  // CKEditor dark theme configuration
+  const ckeditorDarkConfig = {
+    toolbar: [
+      'heading', '|',
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'bulletedList', 'numberedList', '|',
+      'link', 'insertTable', 'imageUpload', 'image', '|',
+      'undo', 'redo'
+    ],
+    placeholder: "Enter details here...",
+    contentsCss: [
+      'body { background-color: #0d1526; color: #f1f5f9; }',
+      'a { color: #60a5fa; }',
+      '.ck-placeholder { color: #94a3b8; }'
+    ]
+  };
 
   // ─── Fetch case studies ───────────────────────────────────────────────────────────
   const fetchCaseStudies = useCallback(async () => {
@@ -491,26 +511,36 @@ const CaseStudiesManagement: React.FC = () => {
                   {/* Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Title *</label>
+                      <label className="block text-white/80 text-sm font-medium mb-2">
+                        Title *
+                        <span className="text-white/40 text-xs ml-2">(Max 100 characters)</span>
+                      </label>
                       <input
                         type="text"
                         value={formData.title}
+                        maxLength={100}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
                         placeholder="Case study title"
                         required
                       />
+                      <div className="text-xs text-white/40 mt-1">{formData.title.length}/100 characters</div>
                     </div>
                     <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Client *</label>
+                      <label className="block text-white/80 text-sm font-medium mb-2">
+                        Client *
+                        <span className="text-white/40 text-xs ml-2">(Max 100 characters)</span>
+                      </label>
                       <input
                         type="text"
                         value={formData.client}
+                        maxLength={100}
                         onChange={(e) => setFormData({ ...formData, client: e.target.value })}
                         className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
                         placeholder="Client name"
                         required
                       />
+                      <div className="text-xs text-white/40 mt-1">{formData.client.length}/100 characters</div>
                     </div>
                   </div>
 
@@ -528,14 +558,19 @@ const CaseStudiesManagement: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-white/80 text-sm font-medium mb-2">Duration</label>
+                      <label className="block text-white/80 text-sm font-medium mb-2">
+                        Duration
+                        <span className="text-white/40 text-xs ml-2">(Max 50 characters)</span>
+                      </label>
                       <input
                         type="text"
                         value={formData.duration}
+                        maxLength={50}
                         onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                         className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
                         placeholder="e.g., 3 months"
                       />
+                      <div className="text-xs text-white/40 mt-1">{formData.duration.length}/50 characters</div>
                     </div>
                   </div>
 
@@ -579,37 +614,72 @@ const CaseStudiesManagement: React.FC = () => {
 
                   {/* Content */}
                   <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Overview *</label>
-                    <textarea
-                      value={formData.overview}
-                      onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
-                      rows={3}
-                      placeholder="Brief overview of the project"
-                      required
-                    />
+                    <label className="block text-white/80 text-sm font-medium mb-2">
+                      Overview *
+                      <span className="text-white/40 text-xs ml-2">(Max 2000 characters)</span>
+                    </label>
+                    <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+                      <CKEditorComponent
+                        config={ckeditorDarkConfig}
+                        data={formData.overview}
+                        onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
+                          const data = editor.getData();
+                          const textLength = data.replace(/<[^>]*>/g, '').length;
+                          if (textLength <= 2000) {
+                            setFormData(prev => ({ ...prev, overview: data }));
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-white/40 mt-1">
+                      {formData.overview.replace(/<[^>]*>/g, '').length}/2000 characters
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Challenge</label>
-                    <textarea
-                      value={formData.challenge}
-                      onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
-                      rows={3}
-                      placeholder="The challenge faced"
-                    />
+                    <label className="block text-white/80 text-sm font-medium mb-2">
+                      Challenge
+                      <span className="text-white/40 text-xs ml-2">(Max 3000 characters)</span>
+                    </label>
+                    <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+                      <CKEditorComponent
+                        config={ckeditorDarkConfig}
+                        data={formData.challenge}
+                        onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
+                          const data = editor.getData();
+                          const textLength = data.replace(/<[^>]*>/g, '').length;
+                          if (textLength <= 3000) {
+                            setFormData(prev => ({ ...prev, challenge: data }));
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-white/40 mt-1">
+                      {formData.challenge.replace(/<[^>]*>/g, '').length}/3000 characters
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Solution</label>
-                    <textarea
-                      value={formData.solution}
-                      onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
-                      rows={3}
-                      placeholder="The solution implemented"
-                    />
+                    <label className="block text-white/80 text-sm font-medium mb-2">
+                      Solution
+                      <span className="text-white/40 text-xs ml-2">(Max 3000 characters)</span>
+                    </label>
+                    <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+                      <CKEditorComponent
+                        config={ckeditorDarkConfig}
+                        data={formData.solution}
+                        onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
+                          const data = editor.getData();
+                          const textLength = data.replace(/<[^>]*>/g, '').length;
+                          if (textLength <= 3000) {
+                            setFormData(prev => ({ ...prev, solution: data }));
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="text-xs text-white/40 mt-1">
+                      {formData.solution.replace(/<[^>]*>/g, '').length}/3000 characters
+                    </div>
                   </div>
 
                   {/* Results */}
