@@ -63,7 +63,7 @@ interface CaseStudyFormData {
   category: string;
   client: string;
   duration: string;
-  thumbnail: string | File;
+  thumbnail: string;
   color: string;
   icon: string;
   overview: string;
@@ -237,6 +237,9 @@ const CaseStudiesManagement: React.FC = () => {
       if (!normalizedSlug) { alert('Slug is required'); return; }
       if (!/^[a-z0-9-]+$/.test(normalizedSlug)) { alert('Slug can only contain lowercase letters, numbers, and hyphens'); return; }
       if (!formData.client?.trim()) { alert('Client is required'); return; }
+      const thumbnailValue = typeof formData.thumbnail === 'string' ? formData.thumbnail.trim() : '';
+      if (!thumbnailValue) { alert('Thumbnail image URL is required'); return; }
+      if (!/^(https?:\/\/|\/uploads\/).+/.test(thumbnailValue)) { alert('Thumbnail must be a valid image URL (http(s)://...)'); return; }
       if (!formData.overview?.trim()) { alert('Overview is required'); return; }
 
       const url = editingCaseStudy
@@ -246,7 +249,7 @@ const CaseStudiesManagement: React.FC = () => {
 
       const formDataToSend = new FormData();
 
-      // Add all form data
+      // Add all form data (thumbnail is a plain image URL string)
       Object.keys(formData).forEach(key => {
         const value = formData[key as keyof CaseStudyFormData];
         if (value !== undefined && value !== null) {
@@ -254,9 +257,7 @@ const CaseStudiesManagement: React.FC = () => {
             formDataToSend.append(key, JSON.stringify(value));
           } else if (key === 'testimonial' && value) {
             formDataToSend.append(key, JSON.stringify(value));
-          } else if (key === 'thumbnail' && value instanceof File) {
-            formDataToSend.append('thumbnail', value);
-          } else if (key !== 'thumbnail' || typeof value === 'string') {
+          } else {
             formDataToSend.append(key, String(value));
           }
         }
@@ -264,11 +265,7 @@ const CaseStudiesManagement: React.FC = () => {
 
       // Always send the normalized slug (auto-generated from title when needed)
       formDataToSend.set('slug', normalizedSlug);
-
-      // If editing and no new file uploaded, don't send thumbnail
-      if (editingCaseStudy && typeof formData.thumbnail === 'string') {
-        // Keep existing thumbnail
-      }
+      formDataToSend.set('thumbnail', thumbnailValue);
 
       const response = await fetch(`${API_BASE_URL}${url}`, {
         method,
@@ -662,15 +659,29 @@ const CaseStudiesManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">Thumbnail</label>
+                    <label className="block text-white/80 text-sm font-medium mb-2">
+                      Thumbnail Image URL *
+                    </label>
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setFormData({ ...formData, thumbnail: e.target.files?.[0] || '' })}
-                      className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-cyan-500 file:text-white hover:file:bg-cyan-600 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                      type="url"
+                      value={typeof formData.thumbnail === 'string' ? formData.thumbnail : ''}
+                      onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
+                      required
+                      className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
                     />
-                    {formData.thumbnail && typeof formData.thumbnail === 'string' && (
-                      <p className="text-white/60 text-sm mt-2">Current: {formData.thumbnail}</p>
+                    {formData.thumbnail && typeof formData.thumbnail === 'string' && formData.thumbnail.trim() !== '' && (
+                      <div className="mt-3">
+                        <p className="text-white/60 text-sm mb-2">Preview:</p>
+                        <img
+                          src={normalizeImageUrl(formData.thumbnail)}
+                          alt="Thumbnail preview"
+                          className="w-full max-h-48 object-cover rounded-xl border border-white/10"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x300?text=Invalid+Image+URL';
+                          }}
+                        />
+                      </div>
                     )}
                   </div>
 
