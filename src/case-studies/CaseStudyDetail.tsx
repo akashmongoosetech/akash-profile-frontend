@@ -41,6 +41,9 @@ interface CaseStudy {
     position: string;
     avatar: string;
   };
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
   published: boolean;
 }
 
@@ -119,6 +122,96 @@ const CaseStudyDetail: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // Dynamic SEO meta tags with cleanup on unmount/slug change (same as blog posts)
+  useEffect(() => {
+    if (!caseStudy) return;
+
+    const createdElements: HTMLElement[] = [];
+    const pushCreated = (el: HTMLElement | null) => { if (el) createdElements.push(el); };
+    const plainText = stripHtmlTags(caseStudy.overview);
+    const metaTitle = caseStudy.seoTitle || caseStudy.title;
+    const metaDescription = caseStudy.seoDescription || plainText.substring(0, 160);
+    const metaKeywords = caseStudy.seoKeywords || caseStudy.technologies.join(', ');
+    const metaImage = normalizeImageUrl(caseStudy.thumbnail);
+
+    document.title = `${metaTitle} | Case Study`;
+
+    const ensureMeta = (name: string, content: string, isProperty = false): HTMLMetaElement | null => {
+      if (!content) return null;
+      const attr = isProperty ? 'property' : 'name';
+      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+        pushCreated(el);
+      }
+      el.content = content;
+      return el;
+    };
+
+    ensureMeta('description', metaDescription);
+    if (metaKeywords) ensureMeta('keywords', metaKeywords);
+    ensureMeta('robots', 'index, follow');
+    ensureMeta('author', caseStudy.client || 'Akash Raikwar');
+
+    const ogProperties: [string, string][] = [
+      ['og:title', metaTitle],
+      ['og:description', metaDescription],
+      ['og:image', metaImage],
+      ['og:type', 'article'],
+      ['og:url', window.location.href],
+      ['og:site_name', 'Akash Raikwar - Portfolio'],
+    ];
+    for (const [prop, val] of ogProperties) ensureMeta(prop, val, true);
+
+    const twitterProperties: [string, string][] = [
+      ['twitter:card', 'summary_large_image'],
+      ['twitter:title', metaTitle],
+      ['twitter:description', metaDescription],
+      ['twitter:image', metaImage],
+    ];
+    for (const [name, val] of twitterProperties) ensureMeta(name, val);
+
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = 'canonical';
+      document.head.appendChild(canonicalLink);
+      pushCreated(canonicalLink);
+    }
+    canonicalLink.href = `${window.location.origin}/case-studies/${caseStudy.slug}`;
+
+    const scriptId = 'case-study-structured-data';
+    let structuredDataScript = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!structuredDataScript) {
+      structuredDataScript = document.createElement('script');
+      structuredDataScript.id = scriptId;
+      structuredDataScript.type = 'application/ld+json';
+      document.head.appendChild(structuredDataScript);
+      pushCreated(structuredDataScript);
+    }
+    structuredDataScript.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: caseStudy.title,
+      description: metaDescription,
+      image: metaImage,
+      author: { '@type': 'Person', name: caseStudy.client || 'Akash Raikwar' },
+      publisher: { '@type': 'Organization', name: 'Akash Raikwar - Portfolio' },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+      keywords: metaKeywords,
+      articleSection: caseStudy.category,
+    });
+
+    return () => {
+      document.title = 'Akash Raikwar - Portfolio';
+      for (const el of createdElements) {
+        el.remove();
+      }
+    };
+  }, [caseStudy]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 pt-14 sm:pt-16">
@@ -143,13 +236,15 @@ const CaseStudyDetail: React.FC = () => {
     );
   }
 
-  const plainOverview = stripHtmlTags(caseStudy.overview);
-
   return (
     <>
       <Helmet>
-        <title>{`${caseStudy.title} | Case Study`}</title>
-        <meta name="description" content={plainOverview.substring(0, 160)} />
+        <title>{`${caseStudy.seoTitle || caseStudy.title} | Case Study`}</title>
+        <meta
+          name="description"
+          content={caseStudy.seoDescription || stripHtmlTags(caseStudy.overview).substring(0, 160)}
+        />
+        {caseStudy.seoKeywords && <meta name="keywords" content={caseStudy.seoKeywords} />}
         <link rel="canonical" href={`${window.location.origin}/case-studies/${caseStudy.slug}`} />
       </Helmet>
 

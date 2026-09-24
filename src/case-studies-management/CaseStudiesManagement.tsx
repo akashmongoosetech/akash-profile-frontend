@@ -49,6 +49,9 @@ interface CaseStudy {
   results: CaseStudyResult[];
   technologies: string[];
   testimonial?: Testimonial;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
   published: boolean;
   createdAt: string;
   updatedAt: string;
@@ -69,6 +72,9 @@ interface CaseStudyFormData {
   results: CaseStudyResult[];
   technologies: string[];
   testimonial?: Testimonial;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
   published: boolean;
 }
 
@@ -91,6 +97,9 @@ const DEFAULT_FORM_DATA: CaseStudyFormData = {
     { label: '', value: '', icon: 'Star' },
   ],
   technologies: [],
+  seoTitle: '',
+  seoDescription: '',
+  seoKeywords: '',
   published: true,
 };
 
@@ -197,6 +206,9 @@ const CaseStudiesManagement: React.FC = () => {
         results: caseStudy.results ?? DEFAULT_FORM_DATA.results,
         technologies: caseStudy.technologies ?? [],
         testimonial: caseStudy.testimonial,
+        seoTitle: caseStudy.seoTitle ?? '',
+        seoDescription: caseStudy.seoDescription ?? '',
+        seoKeywords: caseStudy.seoKeywords ?? '',
         published: caseStudy.published,
       });
     } else {
@@ -859,6 +871,69 @@ const CaseStudiesManagement: React.FC = () => {
                       className="w-full px-3 py-2 mt-3 bg-white/[0.06] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors text-sm"
                       placeholder="Avatar URL"
                     />
+                  </div>
+
+                  {/* SEO Settings */}
+                  <div className="border-t border-white/10 pt-6">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-white mb-1">SEO Settings</h3>
+                      <p className="text-sm text-white/40">
+                        Optimize this case study for search engines and social media sharing
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">
+                          Meta Title
+                          <span className="text-white/40 text-xs ml-2">(Max 60 characters)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.seoTitle}
+                          maxLength={60}
+                          onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })}
+                          placeholder="SEO optimized title for search engines"
+                          className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                        />
+                        <div className="text-xs text-white/40 mt-1">
+                          {formData.seoTitle.length}/60 characters
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">
+                          Meta Description
+                          <span className="text-white/40 text-xs ml-2">(Max 160 characters)</span>
+                        </label>
+                        <textarea
+                          value={formData.seoDescription}
+                          maxLength={160}
+                          rows={3}
+                          onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })}
+                          placeholder="Brief description for search engine results..."
+                          className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
+                        />
+                        <div className="text-xs text-white/40 mt-1">
+                          {formData.seoDescription.length}/160 characters
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-white/80 text-sm font-medium mb-2">
+                          SEO Keywords
+                          <span className="text-white/40 text-xs ml-2">(Max 200 characters, comma-separated)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.seoKeywords}
+                          maxLength={200}
+                          onChange={(e) => setFormData({ ...formData, seoKeywords: e.target.value })}
+                          placeholder="crm, web development, ai automation"
+                          className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                        />
+                        <div className="text-xs text-white/40 mt-1">
+                          {formData.seoKeywords.length}/200 characters
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Published */}
