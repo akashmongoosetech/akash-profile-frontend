@@ -271,7 +271,7 @@ function Ticker() {
 const stats = [
   {
     icon: Award,
-    value: "2+",
+    value: "4+",
     label: "Years Exp.",
     sub: "Building production apps",
     gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)",
