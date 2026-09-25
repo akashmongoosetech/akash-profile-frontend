@@ -275,7 +275,7 @@ const About: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   const stats = [
-    { icon: Code, value: '3+', label: 'Years Exp.', sub: 'Building production apps', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)', accentColor: '#60a5fa' },
+    { icon: Code, value: '4+', label: 'Years Exp.', sub: 'Building production apps', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)', accentColor: '#60a5fa' },
     { icon: Award, value: '50+', label: 'Projects', sub: 'Shipped across industries', gradient: 'linear-gradient(135deg, #10b981, #059669)', accentColor: '#34d399' },
     { icon: Users, value: '20+', label: 'Clients', sub: 'Across 4+ countries', gradient: 'linear-gradient(135deg, #8b5cf6, #a855f7)', accentColor: '#c084fc' },
   ];

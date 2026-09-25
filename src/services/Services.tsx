@@ -5,7 +5,8 @@ import { LucideIcon } from "lucide-react";
 import {
   Code, Smartphone, Cloud, Palette, Database, Shield, Zap, ArrowRight,
   Code2, Search, Headphones, ClipboardList, Server,
-  TestTube, Rocket, Check, ChevronRight
+  TestTube, Rocket, Check, ChevronRight,
+  BrainCircuit, Workflow, Briefcase, UsersRound, Boxes, Sparkles, Bot, DatabaseZap
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -83,6 +84,69 @@ const services: ServiceData[] = [
     features: ["Security Audits", "Automated Testing", "Performance Testing", "Code Reviews"],
     accent: "#818cf8", gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)", glow: "rgba(129,140,248,0.18)",
     tag: "Security", price: "Starting at ₹3,500",
+  },
+  {
+    icon: BrainCircuit, title: "AI Development",
+    description: "Custom AI product engineering — from feature design to production deployment",
+    features: ["Custom AI Features", "LLM Integration", "Model Fine-tuning", "AI APIs"],
+    accent: "#a78bfa", gradient: "linear-gradient(135deg,#7c3aed,#a78bfa)", glow: "rgba(167,139,250,0.18)",
+    tag: "AI", price: "Custom Quote",
+  },
+  {
+    icon: Workflow, title: "AI Automations",
+    description: "Eliminate repetitive work with intelligent workflow automation",
+    features: ["Workflow Automation", "Scheduled AI Agents", "CRM Integrations", "Process Optimization"],
+    accent: "#22d3ee", gradient: "linear-gradient(135deg,#0891b2,#22d3ee)", glow: "rgba(34,211,238,0.18)",
+    tag: "Automation", price: "Custom Quote",
+  },
+  {
+    icon: Briefcase, title: "Business Solutions",
+    description: "Digital solutions mapped to real business goals and growth",
+    features: ["Requirement Mapping", "MVP Builds", "Digital Transformation", "Tech Consulting"],
+    accent: "#fbbf24", gradient: "linear-gradient(135deg,#d97706,#fbbf24)", glow: "rgba(251,191,36,0.18)",
+    tag: "Business", price: "Custom Quote",
+  },
+  {
+    icon: UsersRound, title: "Custom CRM Development",
+    description: "Tailor-made CRM platforms for leads, sales, and customer management",
+    features: ["Lead Management", "Sales Pipeline", "Business Dashboards", "Role-based Access"],
+    accent: "#34d399", gradient: "linear-gradient(135deg,#059669,#34d399)", glow: "rgba(52,211,153,0.18)",
+    tag: "CRM", price: "Custom Quote",
+  },
+  {
+    icon: Boxes, title: "ERP Development",
+    description: "End-to-end ERP systems for inventory, billing, HR, and operations",
+    features: ["Inventory Management", "Billing & GST", "HR & Payroll", "Multi-branch Support"],
+    accent: "#f97316", gradient: "linear-gradient(135deg,#c2410c,#fb923c)", glow: "rgba(249,115,22,0.18)",
+    tag: "ERP", price: "Custom Quote",
+  },
+  {
+    icon: Sparkles, title: "AI Solutions",
+    description: "AI strategy and adoption — pick the right tools and integrate them well",
+    features: ["AI Strategy", "Tool Integration", "Prompt Systems", "Team Training"],
+    accent: "#e879f9", gradient: "linear-gradient(135deg,#a21caf,#e879f9)", glow: "rgba(232,121,249,0.18)",
+    tag: "AI", price: "Custom Quote",
+  },
+  {
+    icon: Bot, title: "Chatbot Development",
+    description: "Smart chatbots for websites and WhatsApp that qualify leads 24/7",
+    features: ["Website Chatbots", "WhatsApp Bots", "Lead Qualification", "Human Handoff"],
+    accent: "#60a5fa", gradient: "linear-gradient(135deg,#1d4ed8,#60a5fa)", glow: "rgba(96,165,250,0.18)",
+    tag: "Chatbot", price: "Custom Quote",
+  },
+  {
+    icon: DatabaseZap, title: "RAG System Integration",
+    description: "Chat with your own documents using grounded retrieval pipelines",
+    features: ["Document Ingestion", "Vector Search", "Grounded Answers", "Private Data Chat"],
+    accent: "#2dd4bf", gradient: "linear-gradient(135deg,#0d9488,#2dd4bf)", glow: "rgba(45,212,191,0.18)",
+    tag: "RAG", price: "Custom Quote",
+  },
+  {
+    icon: Rocket, title: "SaaS Product Development",
+    description: "End-to-end SaaS builds — multi-tenancy, billing, and scale from day one",
+    features: ["Multi-tenant Architecture", "Subscriptions & Billing", "Admin Dashboards", "Scale & Support"],
+    accent: "#f472b6", gradient: "linear-gradient(135deg,#db2777,#f472b6)", glow: "rgba(244,114,182,0.18)",
+    tag: "SaaS", price: "Custom Quote",
   },
 ];
 
@@ -354,8 +418,8 @@ function Hero() {
         {/* Stat pills */}
         <div className="flex flex-wrap justify-center gap-3">
           {[
-            { label: "6+ Services",    accent: "#38bdf8" },
-            { label: "3+ Years",       accent: "#4ade80" },
+            { label: "15+ Services",    accent: "#38bdf8" },
+            { label: "4+ Years",       accent: "#4ade80" },
             { label: "100% On-Time",   accent: "#c084fc" },
             { label: "98% Satisfaction", accent: "#fb923c" },
           ].map(({ label, accent }) => (
@@ -432,7 +496,7 @@ export default function Services() {
     <>
       <Helmet>
         <title>Services — Akash Raikwar</title>
-        <meta name="description" content="Professional web development services including frontend development, backend development, full-stack solutions, and custom web applications." />
+        <meta name="description" content="Professional web development, AI development, chatbot, CRM, ERP, RAG systems, automation, and full-stack business solutions." />
       </Helmet>
 
       <div className="min-h-screen pt-20 pb-16 relative overflow-hidden" style={{ background: "#020209" }}>
@@ -458,7 +522,7 @@ export default function Services() {
 
           {/* ── Services ── */}
           <div ref={servicesRef} className="py-8">
-            <SectionHeader label="What I Build" title="Services" subtitle="Six core services tailored to bring your digital vision to life — from design to deployment." />
+            <SectionHeader label="What I Build" title="Services" subtitle="Fifteen specialized services tailored to bring your digital vision to life — from design to AI-powered deployment." />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {services.map((s, i) => <ServiceCard key={s.title} service={s} index={i} inView={servicesInView} />)}
             </div>
