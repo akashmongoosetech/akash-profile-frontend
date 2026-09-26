@@ -258,7 +258,7 @@ const CaseStudyDetail: React.FC = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             All Case Studies
           </Link>
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gray-950">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-gray-950">
             <img
               src={normalizeImageUrl(caseStudy.thumbnail)}
               alt={caseStudy.title}
@@ -268,17 +268,16 @@ const CaseStudyDetail: React.FC = () => {
                 e.currentTarget.src = 'https://placehold.co/1200x600/1e293b/475569?text=No+Image';
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-gray-900/20" />
-            <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3 backdrop-blur">
-                {caseStudy.category}
-              </span>
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">{caseStudy.title}</h1>
-              <div className="flex items-center gap-2 text-gray-300">
-                <span>{caseStudy.client}</span>
-                <span>•</span>
-                <span>{caseStudy.duration}</span>
-              </div>
+          </div>
+          <div className="mt-6">
+            <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium mb-3">
+              {caseStudy.category}
+            </span>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">{caseStudy.title}</h1>
+            <div className="flex items-center gap-2 text-gray-300">
+              <span>{caseStudy.client}</span>
+              <span>•</span>
+              <span>{caseStudy.duration}</span>
             </div>
           </div>
         </div>
