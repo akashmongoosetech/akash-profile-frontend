@@ -46,19 +46,24 @@ const CaseStudies: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch case studies
   useEffect(() => {
     const fetchCaseStudies = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch(`${API_BASE_URL}/api/case-studies/public`);
         const data = await response.json();
         if (data.success) {
           setCaseStudies(data.caseStudies || []);
+        } else {
+          setError(data.message || 'Failed to load case studies');
         }
       } catch (error) {
         console.error('Error fetching case studies:', error);
+        setError('Failed to connect to server');
       } finally {
         setLoading(false);
       }
@@ -92,7 +97,20 @@ const CaseStudies: React.FC = () => {
     );
   }
 
-
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4">
+        <h1 className="text-2xl font-bold text-white mb-3">Failed to load case studies</h1>
+        <p className="text-gray-400 mb-6">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 rounded-full bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   const categories = ['all', 'Web Development', 'Mobile App', 'AI Solutions'];
 
@@ -182,6 +200,12 @@ const CaseStudies: React.FC = () => {
       {/* Case Studies Grid */}
       <div className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
+          {filteredCaseStudies.length === 0 ? (
+            <div className="text-center py-16 bg-gray-900/50 rounded-2xl border border-white/10">
+              <p className="text-gray-300 font-medium text-lg">No case studies found</p>
+              <p className="text-gray-500 text-sm mt-1">Try a different category filter</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCaseStudies.map((study, index) => (
               <motion.div
@@ -233,31 +257,35 @@ const CaseStudies: React.FC = () => {
                     </p>
                     
                     {/* Tech Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {study.technologies.slice(0, 3).map((tech, i) => (
-                        <span key={i} className="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">
-                          {tech}
-                        </span>
-                      ))}
-                      {study.technologies.length > 3 && (
-                        <span className="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">
-                          +{study.technologies.length - 3}
-                        </span>
-                      )}
-                    </div>
+                    {(study.technologies ?? []).length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {(study.technologies ?? []).slice(0, 3).map((tech, i) => (
+                          <span key={i} className="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">
+                            {tech}
+                          </span>
+                        ))}
+                        {(study.technologies ?? []).length > 3 && (
+                          <span className="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">
+                            +{(study.technologies ?? []).length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Results Preview */}
-                    <div className="flex gap-4 pt-4 border-t border-white/10">
-                      {study.results.slice(0, 2).map((result, i) => {
-                        const IconComponent = getIconComponent(result.icon);
-                        return (
-                          <div key={i} className="flex items-center gap-2">
-                            <IconComponent className="w-4 h-4 text-blue-400" />
-                            <span className="text-white font-semibold">{result.value}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {(study.results ?? []).length > 0 && (
+                      <div className="flex gap-4 pt-4 border-t border-white/10">
+                        {(study.results ?? []).slice(0, 2).map((result, i) => {
+                          const IconComponent = getIconComponent(result.icon);
+                          return (
+                            <div key={i} className="flex items-center gap-2">
+                              <IconComponent className="w-4 h-4 text-blue-400" />
+                              <span className="text-white font-semibold">{result.value}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
 
                     {/* View More */}
                     <div className="mt-4 flex items-center text-blue-400 font-medium group-hover:text-blue-300 transition-colors">
@@ -270,6 +298,7 @@ const CaseStudies: React.FC = () => {
               </motion.div>
             ))}
           </div>
+          )}
         </div>
       </div>
 

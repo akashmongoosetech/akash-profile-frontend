@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { API_BASE_URL, normalizeHtmlImageSources, normalizeImageUrl, stripHtmlTags } from '../utils/api';
+import Loader from '../components/Loader';
 import {
   ArrowLeft,
   ArrowRight,
@@ -122,100 +123,10 @@ const CaseStudyDetail: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  // Dynamic SEO meta tags with cleanup on unmount/slug change (same as blog posts)
-  useEffect(() => {
-    if (!caseStudy) return;
-
-    const createdElements: HTMLElement[] = [];
-    const pushCreated = (el: HTMLElement | null) => { if (el) createdElements.push(el); };
-    const plainText = stripHtmlTags(caseStudy.overview);
-    const metaTitle = caseStudy.seoTitle || caseStudy.title;
-    const metaDescription = caseStudy.seoDescription || plainText.substring(0, 160);
-    const metaKeywords = caseStudy.seoKeywords || caseStudy.technologies.join(', ');
-    const metaImage = normalizeImageUrl(caseStudy.thumbnail);
-
-    document.title = `${metaTitle} | Case Study`;
-
-    const ensureMeta = (name: string, content: string, isProperty = false): HTMLMetaElement | null => {
-      if (!content) return null;
-      const attr = isProperty ? 'property' : 'name';
-      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement('meta');
-        el.setAttribute(attr, name);
-        document.head.appendChild(el);
-        pushCreated(el);
-      }
-      el.content = content;
-      return el;
-    };
-
-    ensureMeta('description', metaDescription);
-    if (metaKeywords) ensureMeta('keywords', metaKeywords);
-    ensureMeta('robots', 'index, follow');
-    ensureMeta('author', caseStudy.client || 'Akash Raikwar');
-
-    const ogProperties: [string, string][] = [
-      ['og:title', metaTitle],
-      ['og:description', metaDescription],
-      ['og:image', metaImage],
-      ['og:type', 'article'],
-      ['og:url', window.location.href],
-      ['og:site_name', 'Akash Raikwar - Portfolio'],
-    ];
-    for (const [prop, val] of ogProperties) ensureMeta(prop, val, true);
-
-    const twitterProperties: [string, string][] = [
-      ['twitter:card', 'summary_large_image'],
-      ['twitter:title', metaTitle],
-      ['twitter:description', metaDescription],
-      ['twitter:image', metaImage],
-    ];
-    for (const [name, val] of twitterProperties) ensureMeta(name, val);
-
-    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonicalLink) {
-      canonicalLink = document.createElement('link');
-      canonicalLink.rel = 'canonical';
-      document.head.appendChild(canonicalLink);
-      pushCreated(canonicalLink);
-    }
-    canonicalLink.href = `${window.location.origin}/case-studies/${caseStudy.slug}`;
-
-    const scriptId = 'case-study-structured-data';
-    let structuredDataScript = document.getElementById(scriptId) as HTMLScriptElement | null;
-    if (!structuredDataScript) {
-      structuredDataScript = document.createElement('script');
-      structuredDataScript.id = scriptId;
-      structuredDataScript.type = 'application/ld+json';
-      document.head.appendChild(structuredDataScript);
-      pushCreated(structuredDataScript);
-    }
-    structuredDataScript.textContent = JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: caseStudy.title,
-      description: metaDescription,
-      image: metaImage,
-      author: { '@type': 'Person', name: caseStudy.client || 'Akash Raikwar' },
-      publisher: { '@type': 'Organization', name: 'Akash Raikwar - Portfolio' },
-      mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
-      keywords: metaKeywords,
-      articleSection: caseStudy.category,
-    });
-
-    return () => {
-      document.title = 'Akash Raikwar - Portfolio';
-      for (const el of createdElements) {
-        el.remove();
-      }
-    };
-  }, [caseStudy]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 pt-14 sm:pt-16">
-        <div className="text-white text-xl">Loading case study...</div>
+        <Loader />
       </div>
     );
   }
@@ -236,16 +147,46 @@ const CaseStudyDetail: React.FC = () => {
     );
   }
 
+  // Single-source dynamic SEO (Helmet manages all tags incl. cleanup on unmount)
+  const plainOverview = stripHtmlTags(caseStudy.overview);
+  const metaTitle = `${caseStudy.seoTitle || caseStudy.title} | Case Study`;
+  const metaDescription = caseStudy.seoDescription || plainOverview.substring(0, 160);
+  const metaKeywords = caseStudy.seoKeywords || (caseStudy.technologies ?? []).join(', ');
+  const metaImage = normalizeImageUrl(caseStudy.thumbnail);
+  const canonicalUrl = `${window.location.origin}/case-studies/${caseStudy.slug}`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: caseStudy.title,
+    description: metaDescription,
+    image: metaImage,
+    author: { '@type': 'Person', name: caseStudy.client || 'Akash Raikwar' },
+    publisher: { '@type': 'Organization', name: 'Akash Raikwar - Portfolio' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': window.location.href },
+    keywords: metaKeywords,
+    articleSection: caseStudy.category,
+  };
+
   return (
     <>
       <Helmet>
-        <title>{`${caseStudy.seoTitle || caseStudy.title} | Case Study`}</title>
-        <meta
-          name="description"
-          content={caseStudy.seoDescription || stripHtmlTags(caseStudy.overview).substring(0, 160)}
-        />
-        {caseStudy.seoKeywords && <meta name="keywords" content={caseStudy.seoKeywords} />}
-        <link rel="canonical" href={`${window.location.origin}/case-studies/${caseStudy.slug}`} />
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        {metaKeywords && <meta name="keywords" content={metaKeywords} />}
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content={caseStudy.client || 'Akash Raikwar'} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content={metaImage} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:site_name" content="Akash Raikwar - Portfolio" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={metaImage} />
+        <link rel="canonical" href={canonicalUrl} />
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       </Helmet>
 
       <div className="min-h-screen bg-gray-900 pt-14 sm:pt-16">
