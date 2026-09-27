@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { API_BASE_URL, normalizeHtmlImageSources, normalizeImageUrl, stripHtmlTags } from '../utils/api';
-import Loader from '../components/Loader';
+import CaseStudyLoader from '../components/CaseStudyLoader';
 import {
   ArrowLeft,
   ArrowRight,
@@ -124,11 +124,7 @@ const CaseStudyDetail: React.FC = () => {
   }, [slug]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 pt-14 sm:pt-16">
-        <Loader />
-      </div>
-    );
+    return <CaseStudyLoader />;
   }
 
   if (error || !caseStudy) {

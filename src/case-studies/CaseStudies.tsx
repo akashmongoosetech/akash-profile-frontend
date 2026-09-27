@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { API_BASE_URL, normalizeImageUrl, stripHtmlTags } from '../utils/api';
+import CaseStudyLoader from '../components/CaseStudyLoader';
 import {
   ArrowRight,
   Code,
@@ -90,11 +91,7 @@ const CaseStudies: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-xl">Loading case studies...</div>
-      </div>
-    );
+    return <CaseStudyLoader />;
   }
 
   if (error) {
