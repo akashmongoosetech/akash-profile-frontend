@@ -14,7 +14,7 @@ import {
   FileText,
   Users,
 } from 'lucide-react';
-import { setAuthToken } from '../utils/api';
+import { setAuthToken, API_BASE_URL } from '../utils/api';
 
 /* ─── tiny floating stat card ──────────────────────────────────────────────── */
 const StatCard: React.FC<{
@@ -65,8 +65,9 @@ const AdminLogin: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });

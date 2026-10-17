@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Clock, ArrowRight, Sparkles, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from "../utils/api";
+import { normalizeImageUrl, isUsableImageUrl, stripHtmlTags, API_BASE_URL } from "../utils/api";
 import Loader from './Loader';
 
 // ── Orb ───────────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ function AuthorAvatar({ author, profilePic }) {
   const [imgErr, setImgErr] = useState(false);
   const initials = author?.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "AR";
 
-  if (isValidImageUrl(profilePic) && !imgErr) {
+  if (isUsableImageUrl(profilePic) && !imgErr) {
     return (
       <img
         src={normalizeImageUrl(profilePic)}
@@ -71,9 +71,16 @@ export default function BlogPopup({ isOpen, onClose }) {
     try {
       setLoading(true);
       setError(null);
-      const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const res = await fetch(`${API}/api/blog/latest`);
+      const res = await fetch(`${API_BASE_URL}/api/blog/latest`);
+
+      if (res.status === 404) {
+        setBlog(null);
+        setError("No blog posts available");
+        return;
+      }
+
       if (!res.ok) throw new Error("Network error");
+
       const data = await res.json();
       if (data.success && data.blog) setBlog(data.blog);
       else setError("No blog posts available");

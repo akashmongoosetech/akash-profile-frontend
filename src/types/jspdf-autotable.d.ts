@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare module 'jspdf-autotable' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   import { jsPDF } from 'jspdf';
   
   interface AutoTableOptions {

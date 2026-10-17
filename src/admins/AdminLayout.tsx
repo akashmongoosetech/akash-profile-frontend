@@ -19,7 +19,7 @@ import {
   ChevronRight,
   Briefcase,
 } from 'lucide-react';
-import { removeAuthToken, isTokenExpired } from '../utils/api';
+import { logout } from '../utils/api';
 import { AdminErrorBoundaryWrapper } from '../components/AdminErrorBoundary';
 
 /* ─── nav config ─────────────────────────────────────────────────────────── */
@@ -73,7 +73,10 @@ const AdminLayout: React.FC = () => {
   /* scroll main back to top on route change */
   useEffect(() => { mainRef.current?.scrollTo(0, 0); }, [pathname]);
 
-  const handleLogout = () => { removeAuthToken(); navigate('/admin/login'); };
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin/login', { replace: true });
+  };
 
   /* sidebar widths */
   const sidebarW     = collapsed ? 72  : 256;

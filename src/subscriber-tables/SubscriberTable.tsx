@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { RefreshCw, Trash2, CheckCircle, XCircle, Mail, Download, FileSpreadsheet, ChevronLeft, ChevronRight } from 'lucide-react';
 import DeleteModal from '../components/DeleteModal';
 import Loader from '../components/Loader';
+import { authenticatedFetch } from '../utils/api';
+import { buildCsv } from '../utils/csv';
 
 interface Subscriber {
   _id: string;
@@ -30,7 +32,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
   const fetchSubscribers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription`);
+      const response = await authenticatedFetch('/api/subscription');
       const data = await response.json();
       if (response.ok) {
         setSubscribers(data.subscriptions || []);
@@ -58,7 +60,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/${subscriberToDelete._id}`, {
+      const response = await authenticatedFetch(`/api/subscription/${subscriberToDelete._id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
@@ -171,9 +173,7 @@ const SubscriberTable: React.FC<SubscriberTableProps> = ({ className = '', onDat
       ];
 
       // Convert to CSV string
-      const csvString = csvData.map(row =>
-        row.map(cell => `"${cell}"`).join(',')
-      ).join('\n');
+      const csvString = buildCsv(csvData);
 
       // Create blob and download
       const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

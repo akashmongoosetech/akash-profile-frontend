@@ -67,6 +67,52 @@ export const isValidImageUrl = (imageUrl: string | undefined | null): boolean =>
   return !!imageUrl && imageUrl.trim() !== '';
 };
 
+// External hosts that serve signed, short-lived image URLs which eventually 404.
+const UNSTABLE_IMAGE_HOSTS = [
+  'media.licdn.com',
+  'media-exp1.licdn.com',
+  'media-exp2.licdn.com',
+  'media-exp3.licdn.com',
+];
+
+// Detect image URLs that are known to expire or break (e.g. LinkedIn's signed
+// `profile-displayphoto` CDN links). When true, callers should render a
+// fallback instead of issuing a request that is guaranteed to 404.
+export const isUnstableImageUrl = (imageUrl: string | undefined | null): boolean => {
+  if (!imageUrl) return false;
+
+  const trimmed = imageUrl.trim();
+  if (!trimmed) return false;
+
+  const lower = trimmed.toLowerCase();
+  if (UNSTABLE_IMAGE_HOSTS.some((host) => lower.includes(host))) {
+    return true;
+  }
+
+  // Generic signed-URL expiry check (?e=<epoch>).
+  try {
+    const url = new URL(trimmed);
+    const expiry = url.searchParams.get('e');
+    if (expiry && /^\d+$/.test(expiry)) {
+      let expiryMs = Number(expiry);
+      // Some providers emit seconds rather than milliseconds.
+      if (expiryMs < 1e12) expiryMs *= 1000;
+      if (Number.isFinite(expiryMs) && expiryMs < Date.now()) {
+        return true;
+      }
+    }
+  } catch {
+    // Not an absolute/parseable URL; nothing more to check.
+  }
+
+  return false;
+};
+
+// True only when a URL is present AND not a known-unstable/expired link.
+export const isUsableImageUrl = (imageUrl: string | undefined | null): boolean => {
+  return isValidImageUrl(imageUrl) && !isUnstableImageUrl(imageUrl);
+};
+
 // Get auth token from localStorage
 export const getAuthToken = (): string | null => {
   return localStorage.getItem('adminToken');
@@ -99,43 +145,92 @@ export const isAuthenticated = (): boolean => {
 };
 
 // API fetch with authentication header
+let refreshInFlight: Promise<boolean> | null = null;
+
+// Attempt to rotate the refresh cookie for a fresh access token.
+export const refreshAccessToken = async (): Promise<boolean> => {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/admin/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) return false;
+
+        const data = await response.json();
+        if (data?.token) {
+          setAuthToken(data.token);
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+
+  return refreshInFlight;
+};
+
+const redirectToLogin = () => {
+  removeAuthToken();
+  if (!window.location.pathname.startsWith('/admin/login')) {
+    window.location.href = '/admin/login';
+  }
+};
+
 export const authenticatedFetch = async (
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  allowRetry = true
 ): Promise<Response> => {
   const token = getAuthToken();
-  
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
-  
+
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   }
-  
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: 'include',
   });
 
-  // Check for token expiration (401) or invalid token (403)
-  if (response.status === 401 || response.status === 403) {
-    try {
-      const data = await response.json();
-      if (data.message && (data.message.includes('expired') || data.message.includes('Invalid'))) {
-        // Token is expired or invalid, logout automatically
-        removeAuthToken();
-        window.location.href = '/admin/login';
-      }
-    } catch {
-      // If we can't parse the response, still logout on 401/403
-      removeAuthToken();
-      window.location.href = '/admin/login';
+  // Access token expired/invalid: try a single silent refresh, then retry.
+  if (response.status === 401 && allowRetry) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      return authenticatedFetch(endpoint, options, false);
     }
+    redirectToLogin();
   }
-  
+
   return response;
+};
+
+// Clear the server-side session (revokes the refresh token) and local state.
+export const logout = async (): Promise<void> => {
+  try {
+    await fetch(`${API_BASE_URL}/api/admin/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch {
+    // Ignore network errors - clear local session regardless.
+  } finally {
+    removeAuthToken();
+  }
 };
 
 // Upload image file

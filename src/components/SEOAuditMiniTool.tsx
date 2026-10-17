@@ -77,6 +77,7 @@ const SEOAuditMiniTool: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [websiteUrl, metaTitle, metaDescription, keywords]);
 
   // Perform SEO analysis

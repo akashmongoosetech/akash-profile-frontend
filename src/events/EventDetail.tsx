@@ -24,7 +24,7 @@ import {
   IndianRupee
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
+import { isUsableImageUrl, normalizeImageUrl } from '../utils/api';
 import { formatDate, formatTime, formatDuration } from '../utils/format';
 import { eventTypeConfig } from '../constants/eventConfig';
 import Toast from '../components/Toast';
@@ -307,7 +307,7 @@ const EventDetail: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-[400px] bg-gray-900 overflow-hidden mt-4">
-        {isValidImageUrl(event.image) ? (
+        {isUsableImageUrl(event.image) ? (
           <img
             src={normalizeImageUrl(event.image)}
             alt={event.title}
@@ -607,7 +607,7 @@ const EventDetail: React.FC = () => {
                       Host Information
                     </h3>
                     <div className="flex items-center gap-4">
-                      {isValidImageUrl(event.host.image) ? (
+                      {isUsableImageUrl(event.host.image) ? (
                         <img
                           src={normalizeImageUrl(event.host.image)}
                           alt={event.host.name}
@@ -840,7 +840,7 @@ const EventDetail: React.FC = () => {
                     <Link key={re._id} to={`/events/${re.slug}`} className="group block">
                       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-shadow">
                         <div className="relative h-40 bg-gray-200 dark:bg-gray-700">
-                          {isValidImageUrl(re.image) ? (
+                          {isUsableImageUrl(re.image) ? (
                             <img src={normalizeImageUrl(re.image)} alt={re.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                           ) : (
                             <div className={`w-full h-full bg-gradient-to-br ${cfg.color} flex items-center justify-center`}>

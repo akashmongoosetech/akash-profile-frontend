@@ -22,6 +22,8 @@ import {
 import StatsCard from '../components/StatsCard';
 import DeleteModal from '../components/DeleteModal';
 import Loader from '../components/Loader';
+import { authenticatedFetch } from '../utils/api';
+import { buildCsv } from '../utils/csv';
 
 interface Contact {
   _id: string;
@@ -75,7 +77,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const fetchContacts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
+      const response = await authenticatedFetch('/api/contact');
       const data = await response.json();
 
       if (response.ok) {
@@ -94,7 +96,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   const fetchStats = async () => {
     try {
       setStatsLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`);
+      const response = await authenticatedFetch('/api/contact/stats');
       const data = await response.json();
       if (response.ok) {
         const statsArr = data.stats as ContactStats[];
@@ -110,6 +112,8 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
           completed: done
         });
       }
+    } catch {
+      setError('Network error. Please check your connection.');
     } finally {
       setStatsLoading(false);
     }
@@ -140,7 +144,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   // Update contact status
   const updateContactStatus = async (contactId: string, newStatus: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
+      const response = await authenticatedFetch(`/api/contact/${contactId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +181,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactToDelete._id}`, {
+      const response = await authenticatedFetch(`/api/contact/${contactToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -200,7 +204,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
   // Update contact
   const updateContact = async (contactId: string, updates: Partial<Contact>) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${contactId}`, {
+      const response = await authenticatedFetch(`/api/contact/${contactId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -351,9 +355,7 @@ const ContactTable: React.FC<ContactTableProps> = ({ className = '', onDataChang
       ];
 
       // Convert to CSV string
-      const csvString = csvData.map(row =>
-        row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
-      ).join('\n');
+      const csvString = buildCsv(csvData);
 
       // Create blob and download
       const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });

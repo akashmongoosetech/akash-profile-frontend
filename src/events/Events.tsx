@@ -11,7 +11,7 @@ import {
   IndianRupee
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { isValidImageUrl, normalizeImageUrl } from '../utils/api';
+import { isUsableImageUrl, normalizeImageUrl, API_BASE_URL } from '../utils/api';
 import { formatDate, formatTime, formatDuration } from '../utils/format';
 import { eventTypeConfig } from '../constants/eventConfig';
 import { useDebounce } from '../hooks/useDebounce';
@@ -101,22 +101,40 @@ const Events: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const url = `${import.meta.env.VITE_API_BASE_URL}/api/events?limit=50${selectedType ? `&eventType=${selectedType}` : ''}`;
+      const limit = 50;
+      const typeParam = selectedType ? `&eventType=${encodeURIComponent(selectedType)}` : '';
+      const firstUrl = `${API_BASE_URL}/api/events?limit=${limit}&page=1${typeParam}`;
 
-      const response = await fetch(url, { signal: controller.signal });
-      const data = await response.json();
+      const firstResponse = await fetch(firstUrl, { signal: controller.signal });
+      const firstData = await firstResponse.json();
 
-      if (data.success) {
-        setEvents(data.data);
-      } else {
-        setError(data.message || 'Failed to fetch events');
+      if (!firstData.success) {
+        setError(firstData.message || 'Failed to fetch events');
+        return;
       }
+
+      let allEvents: Event[] = firstData.data ?? [];
+      const totalPages = firstData.pagination?.totalPages ?? 1;
+
+      // Follow pagination so lists longer than one page still render fully.
+      for (let p = 2; p <= Math.min(totalPages, 20); p++) {
+        const pageUrl = `${API_BASE_URL}/api/events?limit=${limit}&page=${p}${typeParam}`;
+        const pageResponse = await fetch(pageUrl, { signal: controller.signal });
+        const pageData = await pageResponse.json();
+        if (pageData.success && Array.isArray(pageData.data)) {
+          allEvents = allEvents.concat(pageData.data);
+        }
+      }
+
+      setEvents(allEvents);
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'AbortError') return;
       setError('Failed to connect to server');
       console.error('Error fetching events:', err);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
   }, [selectedType]);
 
@@ -365,7 +383,7 @@ const Events: React.FC = () => {
                 >
                   {/* Event Image */}
                   <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
-                    {isValidImageUrl(event.image) ? (
+                    {isUsableImageUrl(event.image) ? (
                       <img
                         src={normalizeImageUrl(event.image)}
                         alt={event.title}

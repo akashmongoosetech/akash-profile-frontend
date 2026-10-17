@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authenticatedFetch, normalizeImageUrl, API_BASE_URL } from '../utils/api';
 import CKEditorComponent from '../blog-management/CKEditorComponent';
@@ -122,6 +122,7 @@ const CaseStudiesManagement: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [caseStudyToDelete, setCaseStudyToDelete] = useState<CaseStudy | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const pendingActionsRef = useRef<Set<string>>(new Set());
 
   const [formData, setFormData] = useState<CaseStudyFormData>(DEFAULT_FORM_DATA);
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
@@ -295,6 +296,9 @@ const CaseStudiesManagement: React.FC = () => {
 
   // ─── Toggle publish ────────────────────────────────────────────────────────
   const togglePublish = async (caseStudy: CaseStudy) => {
+    const key = `publish:${caseStudy._id}`;
+    if (pendingActionsRef.current.has(key)) return;
+    pendingActionsRef.current.add(key);
     try {
       const response = await authenticatedFetch(`/api/case-studies/${caseStudy._id}`, {
         method: 'PUT',
@@ -314,12 +318,18 @@ const CaseStudiesManagement: React.FC = () => {
     } catch (error) {
       console.error('Error toggling publish:', error);
       alert('Error toggling publish status');
+    } finally {
+      pendingActionsRef.current.delete(key);
     }
   };
 
   // ─── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!caseStudyToDelete) return;
+
+    const key = `delete:${caseStudyToDelete._id}`;
+    if (pendingActionsRef.current.has(key)) return;
+    pendingActionsRef.current.add(key);
 
     try {
       const response = await authenticatedFetch(`/api/case-studies/${caseStudyToDelete._id}`, {
@@ -340,6 +350,8 @@ const CaseStudiesManagement: React.FC = () => {
     } catch (error) {
       console.error('Error deleting case study:', error);
       alert('Error deleting case study');
+    } finally {
+      pendingActionsRef.current.delete(key);
     }
   };
 
@@ -764,9 +776,10 @@ const CaseStudiesManagement: React.FC = () => {
                           <select
                             value={result.icon}
                             onChange={(e) => {
-                              const newResults = [...formData.results];
-                              newResults[index].icon = e.target.value;
-                              setFormData({ ...formData, results: newResults });
+                              setFormData(prev => ({
+                                ...prev,
+                                results: prev.results.map((r, i) => i === index ? { ...r, icon: e.target.value } : r),
+                              }));
                             }}
                             className="px-3 py-2 bg-white/[0.06] border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500/50 transition-colors"
                           >
@@ -778,9 +791,10 @@ const CaseStudiesManagement: React.FC = () => {
                             type="text"
                             value={result.label}
                             onChange={(e) => {
-                              const newResults = [...formData.results];
-                              newResults[index].label = e.target.value;
-                              setFormData({ ...formData, results: newResults });
+                              setFormData(prev => ({
+                                ...prev,
+                                results: prev.results.map((r, i) => i === index ? { ...r, label: e.target.value } : r),
+                              }));
                             }}
                             className="flex-1 px-3 py-2 bg-white/[0.06] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors text-sm"
                             placeholder="Label"
@@ -789,9 +803,10 @@ const CaseStudiesManagement: React.FC = () => {
                             type="text"
                             value={result.value}
                             onChange={(e) => {
-                              const newResults = [...formData.results];
-                              newResults[index].value = e.target.value;
-                              setFormData({ ...formData, results: newResults });
+                              setFormData(prev => ({
+                                ...prev,
+                                results: prev.results.map((r, i) => i === index ? { ...r, value: e.target.value } : r),
+                              }));
                             }}
                             className="flex-1 px-3 py-2 bg-white/[0.06] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-cyan-500/50 transition-colors text-sm"
                             placeholder="Value"

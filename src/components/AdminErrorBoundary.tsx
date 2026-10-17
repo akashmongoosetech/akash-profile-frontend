@@ -1,6 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle, RefreshCw, Home, Shield } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
 
 interface Props {
   children: ReactNode;
@@ -29,9 +28,6 @@ export class AdminErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      const navigate = useNavigate();
-      const location = useLocation();
-      
       return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-[#060a14] text-white">
           <div className="max-w-md w-full p-8 rounded-3xl bg-[#0d1526] border border-red-500/20 backdrop-blur-xl shadow-2xl flex flex-col items-center text-center">
@@ -55,7 +51,7 @@ export class AdminErrorBoundary extends Component<Props, State> {
                 <RefreshCw className="w-4 h-4" /> Reload Page
               </button>
               <button
-                onClick={() => navigate('/admin')}
+                onClick={() => { window.location.href = '/admin'; }}
                 className="flex-1 py-3 px-4 rounded-xl font-bold text-sm bg-white/5 border border-white/10 text-white flex items-center justify-center gap-2 hover:bg-white/10 transition-colors cursor-pointer font-display"
               >
                 <Home className="w-4 h-4" /> Dashboard

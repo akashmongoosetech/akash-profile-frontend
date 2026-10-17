@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 // import ContactTable from '../contact-tables/ContactTable';
 import StatsCard from '../components/StatsCard';
-import { isAuthenticated } from '../utils/api';
+import { isAuthenticated, authenticatedFetch } from '../utils/api';
 
 interface ContactStats {
   _id: string;
@@ -79,10 +79,10 @@ const Admin: React.FC = () => {
 
       // Fetch all stats in parallel
       const [statsRes, contactsRes, blogStatsRes, subscriberStatsRes] = await Promise.all([
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/stats`),
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`),
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/stats`),
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscription/stats`)
+        authenticatedFetch('/api/contact/stats'),
+        authenticatedFetch('/api/contact'),
+        authenticatedFetch('/api/blog/stats'),
+        authenticatedFetch('/api/subscription/stats')
       ]);
 
       const [statsData, contactsData, blogStatsData, subscriberStatsData] = await Promise.all([

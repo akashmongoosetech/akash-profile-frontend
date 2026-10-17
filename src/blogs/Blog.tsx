@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Eye, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { normalizeImageUrl, isValidImageUrl, stripHtmlTags } from '../utils/api';
+import { normalizeImageUrl, isUsableImageUrl, stripHtmlTags, API_BASE_URL } from '../utils/api';
 import Loader from '../components/Loader';
 
 interface BlogPost {
@@ -110,13 +110,17 @@ function BlogCard({ post, index, expanded, onToggle, authorImageError, setAuthor
 
           {/* Image */}
           <div className="relative h-48 overflow-hidden">
-            <motion.img
-              src={normalizeImageUrl(post.image)}
-              alt={post.title}
-              className="w-full h-full object-cover"
-              animate={{ scale: hovered ? 1.05 : 1 }}
-              transition={{ duration: 0.3 }}
-            />
+            {isUsableImageUrl(post.image) ? (
+              <motion.img
+                src={normalizeImageUrl(post.image)}
+                alt={post.title}
+                className="w-full h-full object-cover"
+                animate={{ scale: hovered ? 1.05 : 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            ) : (
+              <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#1e293b,#334155)" }} />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             
             {/* Category Badge */}
@@ -179,7 +183,7 @@ function BlogCard({ post, index, expanded, onToggle, authorImageError, setAuthor
             {/* Meta */}
             <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <div className="flex items-center gap-3">
-                {isValidImageUrl(post.authorProfilePic) && !authorImageError ? (
+                  {isUsableImageUrl(post.authorProfilePic) && !authorImageError ? (
                   <img
                     src={normalizeImageUrl(post.authorProfilePic)}
                     alt={post.author}
@@ -263,13 +267,17 @@ function FeaturedBlogCard({ post, index, expanded, onToggle, authorImageError, s
           <div className="flex flex-col md:flex-row">
             {/* Image */}
             <div className="relative h-64 md:h-auto md:w-2/5 overflow-hidden">
-              <motion.img
-                src={normalizeImageUrl(post.image)}
-                alt={post.title}
-                className="w-full h-full object-cover"
-                animate={{ scale: hovered ? 1.05 : 1 }}
-                transition={{ duration: 0.3 }}
-              />
+              {isUsableImageUrl(post.image) ? (
+                <motion.img
+                  src={normalizeImageUrl(post.image)}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                  animate={{ scale: hovered ? 1.05 : 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              ) : (
+                <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#1e293b,#334155)" }} />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:bg-gradient-to-r" />
               
               {/* Badges */}
@@ -340,7 +348,7 @@ function FeaturedBlogCard({ post, index, expanded, onToggle, authorImageError, s
               {/* Meta */}
               <div className="flex items-center justify-between pt-4 mt-auto" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-3">
-                  {isValidImageUrl(post.authorProfilePic) && !authorImageError ? (
+                {isUsableImageUrl(post.authorProfilePic) && !authorImageError ? (
                     <img
                       src={normalizeImageUrl(post.authorProfilePic)}
                       alt={post.author}
@@ -537,6 +545,7 @@ const Blog: React.FC = () => {
   const [featuredBlogs, setFeaturedBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<BlogResponse['pagination']>();
@@ -547,17 +556,22 @@ const Blog: React.FC = () => {
   const [authorImageErrors, setAuthorImageErrors] = useState<Set<string>>(new Set());
 
   const heroRef = useRef(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchBlogs = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearch) params.append('search', debouncedSearch);
       if (selectedCategory) params.append('category', selectedCategory);
       params.append('page', currentPage.toString());
       params.append('limit', '6');
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog?${params}`);
+      const response = await fetch(`${API_BASE_URL}/api/blog?${params}`, { signal: controller.signal });
       const data: BlogResponse = await response.json();
       
       if (data.success) {
@@ -565,15 +579,18 @@ const Blog: React.FC = () => {
         setPagination(data.pagination);
       }
     } catch (error) {
+      if ((error as Error).name === 'AbortError') return;
       console.error('Error fetching blogs:', error);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-  }, [searchTerm, selectedCategory, currentPage]);
+  }, [debouncedSearch, selectedCategory, currentPage]);
 
   const fetchFeaturedBlogs = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/featured`);
+      const response = await fetch(`${API_BASE_URL}/api/blog/featured`);
       const data: BlogResponse = await response.json();
       
       if (data.success) {
@@ -586,7 +603,7 @@ const Blog: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/categories`);
+      const response = await fetch(`${API_BASE_URL}/api/blog/categories`);
       const data = await response.json();
       
       if (data.success) {
@@ -604,24 +621,22 @@ const Blog: React.FC = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [currentPage, selectedCategory, fetchBlogs]);
+    return () => abortRef.current?.abort();
+  }, [fetchBlogs]);
 
+  // Debounce the search box into a request-level term.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm) {
-        setCurrentPage(1);
-        fetchBlogs();
-      } else if (!searchTerm && blogs.length === 0) {
-        fetchBlogs();
-      }
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, fetchBlogs, blogs.length]);
+  }, [searchTerm]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setDebouncedSearch(searchTerm);
     setCurrentPage(1);
-    fetchBlogs();
   };
 
   const handleCategoryChange = (category: string) => {

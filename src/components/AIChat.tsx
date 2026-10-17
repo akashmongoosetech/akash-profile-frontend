@@ -127,6 +127,13 @@ const AIChat: React.FC = () => {
     textareaRef.current?.focus();
   }, []);
 
+  // Abort any in-flight stream when the component unmounts.
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
   const handleCopyCode = async (code: string, id: string) => {
     try {
       await navigator.clipboard.writeText(code);
@@ -279,58 +286,80 @@ const AIChat: React.FC = () => {
         content: m.content
       }));
 
-      const stream = await streamChat(conversationHistory, userMessage.content);
+      const stream = await streamChat(conversationHistory, userMessage.content, abortControllerRef.current?.signal);
       const reader = stream.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
+      let buffer = '';
+      let streamError: string | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
+        buffer += decoder.decode(value, { stream: true });
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                fullContent += parsed.content;
-                setMessages(prev => 
-                  prev.map(m => 
-                    m.id === assistantMessage.id 
-                      ? { ...m, content: fullContent }
-                      : m
-                  )
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf('\n')) !== -1) {
+          const line = buffer.slice(0, newlineIndex).trim();
+          buffer = buffer.slice(newlineIndex + 1);
+
+          if (!line.startsWith('data:')) continue;
+
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+
+          let parsed: { content?: string; error?: string; done?: boolean };
+          try {
+            parsed = JSON.parse(payload);
+          } catch {
+            // Incomplete/malformed frame - ignore it.
+            continue;
+          }
+
+          if (parsed.error) {
+            streamError = parsed.error;
+            break;
+          }
+
+          if (parsed.done) {
+            break;
+          }
+
+          if (parsed.content) {
+            fullContent += parsed.content;
+            setMessages(prev =>
+              prev.map(m =>
+                m.id === assistantMessage.id
+                  ? { ...m, content: fullContent }
+                  : m
+              )
+            );
+
+            // Update conversation in list
+            setConversations(prev =>
+              prev.map(c => {
+                if (c.id !== currentConversationId) return c;
+                const updatedMessages = c.messages.map(m =>
+                  m.id === assistantMessage.id
+                    ? { ...m, content: fullContent }
+                    : m
                 );
-                
-                // Update conversation in list
-                setConversations(prev => 
-                  prev.map(c => {
-                    if (c.id !== currentConversationId) return c;
-                    const updatedMessages = c.messages.map(m => 
-                      m.id === assistantMessage.id 
-                        ? { ...m, content: fullContent }
-                        : m
-                    );
-                    return {
-                      ...c,
-                      messages: updatedMessages,
-                      updatedAt: Date.now()
-                    };
-                  })
-                );
-              }
-              if (parsed.error) {
-                throw new Error(parsed.error);
-              }
-            } catch {
-              // Skip malformed JSON
-            }
+                return {
+                  ...c,
+                  messages: updatedMessages,
+                  updatedAt: Date.now()
+                };
+              })
+            );
           }
         }
+
+        if (streamError) break;
+      }
+
+      if (streamError) {
+        throw new Error(streamError);
       }
 
       // Mark streaming as complete
@@ -359,6 +388,18 @@ const AIChat: React.FC = () => {
         })
       );
     } catch (err) {
+      if ((err as Error)?.name === 'AbortError') {
+        // User cancelled the stream - finalize the partial message quietly.
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === assistantMessage.id
+              ? { ...m, isStreaming: false }
+              : m
+          )
+        );
+        return;
+      }
+
       console.error('Chat error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to get response';
       setError(errorMessage);

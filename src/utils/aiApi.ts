@@ -745,7 +745,8 @@ export interface ChatMessage {
  */
 export const streamChat = async (
   messages: ChatMessage[],
-  message: string
+  message: string,
+  signal?: AbortSignal
 ): Promise<ReadableStream<Uint8Array>> => {
   const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
     method: 'POST',
@@ -753,6 +754,7 @@ export const streamChat = async (
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ messages, message }),
+    signal,
   });
 
   if (!response.ok) {

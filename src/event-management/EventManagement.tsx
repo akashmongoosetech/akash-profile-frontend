@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -19,7 +19,7 @@ import {
   Users,
   IndianRupee
 } from 'lucide-react';
-import { authenticatedFetch, normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import { authenticatedFetch, normalizeImageUrl, isUsableImageUrl } from '../utils/api';
 import Loader from '../components/Loader';
 import CKEditorComponent from '../blog-management/CKEditorComponent';
 import type { EventInfo } from '@ckeditor/ckeditor5-utils';
@@ -65,6 +65,16 @@ interface Registration {
   registeredAt: string;
 }
 
+// Convert an ISO date to the value format expected by <input type="datetime-local">,
+// preserving the user's local timezone instead of shifting to UTC.
+const toLocalDateTimeInput = (value?: string): string => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 const EventManagement: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +87,7 @@ const EventManagement: React.FC = () => {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const pendingActionsRef = useRef<Set<string>>(new Set());
   
   // Registrations state
   const [showRegistrationsModal, setShowRegistrationsModal] = useState(false);
@@ -126,11 +137,7 @@ const EventManagement: React.FC = () => {
     ]
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, [currentPage, filterPublished]);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -155,7 +162,11 @@ const EventManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, filterPublished]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const openModal = (event?: Event) => {
     if (event) {
@@ -168,7 +179,7 @@ const EventManagement: React.FC = () => {
         eventType: event.eventType,
         category: event.category,
         image: event.image,
-        date: event.date ? new Date(event.date).toISOString().slice(0, 16) : '',
+        date: toLocalDateTimeInput(event.date),
         duration: event.duration,
         location: event.location,
         price: event.price,
@@ -288,6 +299,9 @@ const EventManagement: React.FC = () => {
   };
 
   const togglePublish = async (id: string) => {
+    const key = `publish:${id}`;
+    if (pendingActionsRef.current.has(key)) return;
+    pendingActionsRef.current.add(key);
     try {
       const response = await authenticatedFetch(`/api/events/admin/${id}/toggle-publish`, {
         method: 'PATCH'
@@ -298,10 +312,15 @@ const EventManagement: React.FC = () => {
       }
     } catch (err) {
       console.error('Error toggling publish status:', err);
+    } finally {
+      pendingActionsRef.current.delete(key);
     }
   };
 
   const toggleFeatured = async (id: string) => {
+    const key = `featured:${id}`;
+    if (pendingActionsRef.current.has(key)) return;
+    pendingActionsRef.current.add(key);
     try {
       const response = await authenticatedFetch(`/api/events/admin/${id}/toggle-featured`, {
         method: 'PATCH'
@@ -312,10 +331,15 @@ const EventManagement: React.FC = () => {
       }
     } catch (err) {
       console.error('Error toggling featured status:', err);
+    } finally {
+      pendingActionsRef.current.delete(key);
     }
   };
 
   const handleDelete = async (id: string) => {
+    const key = `delete:${id}`;
+    if (pendingActionsRef.current.has(key)) return;
+    pendingActionsRef.current.add(key);
     try {
       const response = await authenticatedFetch(`/api/events/admin/${id}`, {
         method: 'DELETE'
@@ -327,6 +351,8 @@ const EventManagement: React.FC = () => {
       }
     } catch (err) {
       console.error('Error deleting event:', err);
+    } finally {
+      pendingActionsRef.current.delete(key);
     }
   };
 
@@ -491,7 +517,7 @@ const EventManagement: React.FC = () => {
                     >
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          {isValidImageUrl(event.image) ? (
+                          {isUsableImageUrl(event.image) ? (
                             <img
                               src={normalizeImageUrl(event.image)}
                               alt={event.title}
@@ -697,7 +723,7 @@ const EventManagement: React.FC = () => {
                     onChange={(_event: EventInfo<string, unknown>, editor: Editor) => {
                       const data = editor.getData();
                       if (data.replace(/<[^>]*>/g, '').length <= 2000) {
-                        setFormData({ ...formData, description: data });
+                        setFormData(prev => ({ ...prev, description: data }));
                       }
                     }}
                   />
@@ -720,7 +746,7 @@ const EventManagement: React.FC = () => {
                     <input
                       type="number"
                       value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                      onChange={(e) => { const v = parseInt(e.target.value, 10); setFormData({ ...formData, duration: Number.isNaN(v) ? 0 : v }); }}
                       min={1}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -799,7 +825,7 @@ const EventManagement: React.FC = () => {
                     <input
                       type="number"
                       value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                      onChange={(e) => { const v = parseFloat(e.target.value); setFormData({ ...formData, price: Number.isNaN(v) ? 0 : v }); }}
                       min={0}
                       step="0.01"
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -810,7 +836,7 @@ const EventManagement: React.FC = () => {
                     <input
                       type="number"
                       value={formData.maxAttendees}
-                      onChange={(e) => setFormData({ ...formData, maxAttendees: parseInt(e.target.value) })}
+                      onChange={(e) => { const v = parseInt(e.target.value, 10); setFormData({ ...formData, maxAttendees: Number.isNaN(v) ? 0 : v }); }}
                       min={0}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />

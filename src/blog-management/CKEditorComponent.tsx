@@ -12,9 +12,13 @@ interface CKEditorComponentProps {
 }
 
 // Custom upload adapter that uses your API function
+interface CkUploadLoader {
+  file: Promise<File>;
+}
+
 class CustomUploadAdapter {
-  private loader: any;
-  constructor(loader: any) {
+  private loader: CkUploadLoader;
+  constructor(loader: CkUploadLoader) {
     this.loader = loader;
   }
 
@@ -36,7 +40,10 @@ class CustomUploadAdapter {
 
 // Plugin that registers the custom adapter
 function CustomUploadAdapterPlugin(editor: Editor) {
-  editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+  const fileRepository = editor.plugins.get('FileRepository') as {
+    createUploadAdapter: (loader: CkUploadLoader) => CustomUploadAdapter;
+  };
+  fileRepository.createUploadAdapter = (loader: CkUploadLoader) => {
     return new CustomUploadAdapter(loader);
   };
 }

@@ -12,11 +12,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^41.4.2",
     "@ckeditor/ckeditor5-react": "^11.0.1",
-    "@ckeditor/ckeditor5-upload": "^41.4.2",
-    "@react-three/drei": "^9.122.0",
-    "@react-three/fiber": "^8.18.0",
     "@sentry/react": "^10.73.0",
-    "@sentry/vite-plugin": "^5.4.0",
     "framer-motion": "^10.16.16",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
@@ -26,8 +22,7 @@
     "react-helmet-async": "^2.0.5",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.26.0",
-    "react-syntax-highlighter": "^15.6.1",
-    "three": "^0.177.0"
+    "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",

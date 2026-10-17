@@ -13,7 +13,7 @@ import {
   BookOpen,
   Sparkles
 } from 'lucide-react';
-import { normalizeHtmlImageSources, normalizeImageUrl, isValidImageUrl } from '../utils/api';
+import { normalizeHtmlImageSources, normalizeImageUrl, isUsableImageUrl } from '../utils/api';
 import Loader from '../components/Loader';
 import BlogContactForm from './BlogContactForm';
 
@@ -492,7 +492,7 @@ const BlogPost: React.FC = () => {
           <div className="flex flex-wrap items-center gap-6" style={{ color: "rgba(255,255,255,0.5)" }}>
             {/* Author */}
             <div className="flex items-center gap-3">
-              {isValidImageUrl(blog.authorProfilePic) && !authorImageError ? (
+              {isUsableImageUrl(blog.authorProfilePic) && !authorImageError ? (
                 <motion.img
                   src={normalizeImageUrl(blog.authorProfilePic)}
                   alt={blog.author}
@@ -548,14 +548,18 @@ const BlogPost: React.FC = () => {
           className="mb-12"
         >
           <div className="relative rounded-2xl overflow-hidden flex items-center justify-center bg-[#0a0a14]/60" style={{ border: "1px solid rgba(255,255,255,0.1)" }}>
-            <motion.img
-              src={normalizeImageUrl(blog.image)}
-              alt={blog.title}
-              className="w-full h-auto max-h-[500px] md:max-h-[650px] object-contain mx-auto"
-              initial={{ scale: 1 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-            />
+            {isUsableImageUrl(blog.image) ? (
+              <motion.img
+                src={normalizeImageUrl(blog.image)}
+                alt={blog.title}
+                className="w-full h-auto max-h-[500px] md:max-h-[650px] object-contain mx-auto"
+                initial={{ scale: 1 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+              />
+            ) : (
+              <div className="w-full h-64" style={{ background: "linear-gradient(135deg,#1e293b,#334155)" }} />
+            )}
           </div>
         </motion.div>
 
@@ -615,7 +619,7 @@ const BlogPost: React.FC = () => {
                         <div className="blog-content" dangerouslySetInnerHTML={{ __html: normalizeHtmlImageSources(section.content) }} />
                       )}
                       
-                      {section.image && (
+                      {isUsableImageUrl(section.image) && (
                         <div className="mt-6 rounded-xl overflow-hidden">
                           <img src={normalizeImageUrl(section.image)} alt={section.title} className="w-full object-cover" />
                         </div>
@@ -750,11 +754,15 @@ const BlogPost: React.FC = () => {
                       <div className="flex gap-4">
                         <div className="flex-shrink-0">
                           <div className="w-20 h-20 rounded-xl overflow-hidden">
-                            <img
-                              src={normalizeImageUrl(post.image)}
-                              alt={post.title}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
+                            {isUsableImageUrl(post.image) ? (
+                              <img
+                                src={normalizeImageUrl(post.image)}
+                                alt={post.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#1e293b,#334155)" }} />
+                            )}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -845,11 +853,15 @@ const BlogPost: React.FC = () => {
                       style={{ background: "rgb(11,12,24)", border: "1px solid rgba(255,255,255,0.06)" }}
                     >
                       <div className="relative h-40 overflow-hidden">
-                        <img
-                          src={normalizeImageUrl(post.image)}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
+                        {isUsableImageUrl(post.image) ? (
+                          <img
+                            src={normalizeImageUrl(post.image)}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#1e293b,#334155)" }} />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <span 
                           className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-bold"
