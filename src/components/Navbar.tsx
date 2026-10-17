@@ -40,10 +40,11 @@ const navItems: NavItem[] = [
   { path: "/services", label: "Services", icon: Briefcase },
   { path: "/experience", label: "Experience", icon: Clock },
   { path: "/tools", label: "AI Tools", icon: Wand2 },
+  { path: "/blog", label: "Blog", icon: BookOpen },
   {
     label: "More",
     dropdown: [
-      { path: "/blog", label: "Blog", icon: BookOpen },
+      // { path: "/blog", label: "Blog", icon: BookOpen },
       { path: "/events", label: "Events", icon: Calendar },
       { path: "/case-studies", label: "Case Studies", icon: FileText },
       { path: "/projects", label: "Projects", icon: FolderKanban },
@@ -344,7 +345,7 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* ── Desktop Actions ── */}
-            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            {/* <div className="hidden md:flex items-center gap-2 flex-shrink-0">
               <Link
                 to="/ai-chat"
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 lg:px-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 inline-flex items-center gap-2 text-sm"
@@ -371,7 +372,7 @@ const Navbar: React.FC = () => {
                   <Moon className="w-4 h-4 text-blue-400" />
                 )}
               </button>
-            </div>
+            </div> */}
 
             {/* ── Mobile Controls ── */}
             <div className="md:hidden flex items-center gap-2">
